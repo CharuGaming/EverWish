@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Gift, X, Sparkles } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 export default function BirthdayGift({ gift, primary = '#f59e0b' }) {
   const ref = useRef(null);
@@ -120,9 +121,11 @@ export default function BirthdayGift({ gift, primary = '#f59e0b' }) {
               {gift.imageUrl && (
                 <div className="relative overflow-hidden">
                   <img
-                    src={gift.imageUrl}
+                    src={optimizeCloudinaryUrl(gift.imageUrl, 800)}
                     alt="Your gift"
                     className="w-full max-h-72 object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div
                     className="absolute inset-0"

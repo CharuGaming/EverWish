@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart, CalendarHeart } from "lucide-react";
 import { siteData } from "../siteData";
+import { optimizeCloudinaryUrl } from "../utils/imageHelpers";
 
 const containerVariants = {
   hidden: {},
@@ -53,9 +54,10 @@ export default function Hero({ siteDataOverride }) {
           style={{ transform: "rotate(-1.5deg)", maxWidth: "320px" }}
         >
           <img
-            src={heroImageUrl}
+            src={optimizeCloudinaryUrl(heroImageUrl, 600)}
             alt="Us"
-            loading="eager"
+            loading="lazy"
+            decoding="async"
             fetchpriority="high"
             className="w-72 h-72 object-cover block"
           />

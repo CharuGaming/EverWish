@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { X } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
   const ref = useRef(null);
@@ -51,10 +52,11 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
                 onClick={() => setLightbox({ src, caption })}
               >
                 <img
-                  src={src}
+                  src={optimizeCloudinaryUrl(src, 600)}
                   alt={caption || `Memory ${i + 1}`}
                   className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
                 />
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-end p-3">
@@ -100,9 +102,11 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
                 style={{ border: `2px solid ${primary}40` }}
               >
                 <img
-                  src={lightbox.src}
+                  src={optimizeCloudinaryUrl(lightbox.src, 1200)}
                   alt={lightbox.caption}
                   className="max-w-full max-h-[75vh] object-contain"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               {lightbox.caption && (

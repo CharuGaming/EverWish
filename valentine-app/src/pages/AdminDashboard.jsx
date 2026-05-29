@@ -32,9 +32,23 @@ function calculateStatus(isActive, expiresAt) {
   return { text: `${days} Days Left`, color: "bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20" };
 }
 
-function formatDate(dateString) {
-  if (!dateString) return 'Legacy / No Date';
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(dateString));
+function formatDate(dateStringOrObj) {
+  if (!dateStringOrObj) return 'Legacy / No Date';
+  try {
+    const date = typeof dateStringOrObj === 'string' ? new Date(dateStringOrObj) : dateStringOrObj;
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+  } catch (e) {
+    return 'Invalid Date';
+  }
+}
+
+function getExpirationInfo(createdAt, expiresAt) {
+  if (!createdAt && !expiresAt) return { date: null, isUrgent: false };
+  const expDate = expiresAt ? new Date(expiresAt) : new Date(new Date(createdAt).getTime() + 14 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const hoursLeft = (expDate - now) / (1000 * 60 * 60);
+  return { date: expDate, isUrgent: hoursLeft > 0 && hoursLeft <= 48 };
 }
 
 export default function AdminDashboard() {
@@ -363,9 +377,16 @@ export default function AdminDashboard() {
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">/{site.siteId}</p>
                         
                         <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
-                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created:</strong> {formatDate(site.createdAt)}</span>
+                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
                           {viewMode==='list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
-                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Expires:</strong> {formatDate(site.expiresAt)}</span>
+                          {(() => {
+                            const expInfo = getExpirationInfo(site.createdAt, site.expiresAt);
+                            return (
+                              <span className={expInfo.isUrgent ? 'text-red-500 font-bold' : ''}>
+                                <strong className={`font-semibold ${expInfo.isUrgent ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>Expires On:</strong> {formatDate(expInfo.date)}
+                              </span>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
