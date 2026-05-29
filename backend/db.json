@@ -1,0 +1,1325 @@
+{
+  "sites": [
+    {
+      "siteId": "charu",
+      "createdAt": "2026-05-25T16:02:38.846Z",
+      "category": "birthday",
+      "templateType": "bday4",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": [
+          {
+            "id": "1779724992234-8qwd0axakck",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779725008/everwish-celebrations/jucit8lz1yrya0veteob.jpg",
+            "caption": ""
+          },
+          {
+            "id": "1779725005956-0ffm0oxapswo",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779725017/everwish-celebrations/yg47iyqy2xahakhcttqz.jpg",
+            "caption": ""
+          },
+          {
+            "id": "1779725020700-ua9rubwqyv",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779725034/everwish-celebrations/claljc9z9nvbh8nnoqct.jpg",
+            "caption": ""
+          },
+          {
+            "id": "1779725022867-znzteuv06g",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779725038/everwish-celebrations/sg59nck4npjdpcsrwfem.jpg",
+            "caption": ""
+          }
+        ]
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-29T12:42:42.229Z",
+      "sectionOrder": [
+        "message",
+        "hero",
+        "lifeStats",
+        "gallery",
+        "voiceNote",
+        "yearInReview",
+        "gift",
+        "scratchPrize"
+      ],
+      "socialLinks": {
+        "whatsapp": "+94771234567",
+        "instagram": "https://instagram.com/charu",
+        "facebook": "https://facebook.com/charu"
+      }
+    },
+    {
+      "siteId": "bdaytest",
+      "createdAt": "2026-05-26T05:59:57.596Z",
+      "category": "birthday",
+      "templateType": "bday1",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48",
+        "birthDate": null
+      },
+      "updatedAt": "2026-05-27T15:13:40.911Z",
+      "yearInReview": [
+        {
+          "label": "Pizzas Shared",
+          "value": "99"
+        }
+      ],
+      "unlockTime": null,
+      "voiceNoteUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "scratchPrize": "A Free Dinner Date 🍽️"
+    },
+    {
+      "siteId": "ihiihihihi",
+      "createdAt": "2026-05-26T06:05:23.340Z",
+      "category": "birthday",
+      "templateType": "bday2",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-26T06:05:23.340Z"
+    },
+    {
+      "siteId": "tt878",
+      "createdAt": "2026-05-26T07:35:57.188Z",
+      "category": "birthday",
+      "templateType": "bday2",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": 21,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48",
+        "birthDate": "2026-05-14"
+      },
+      "updatedAt": "2026-05-26T07:36:55.969Z",
+      "unlockTime": "2026-05-09T13:06",
+      "scratchPrize": "ggkoiogohoigoho",
+      "yearInReview": [
+        {
+          "label": "ioihio",
+          "value": "hoihiooh"
+        },
+        {
+          "label": "hioho",
+          "value": "iohhio"
+        }
+      ]
+    },
+    {
+      "siteId": "buuuv",
+      "createdAt": "2026-05-26T07:48:26.425Z",
+      "category": "valentine",
+      "templateType": "polaroid",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-26T07:48:37.727Z"
+    },
+    {
+      "siteId": "trfgtjt",
+      "createdAt": "2026-05-26T07:48:51.303Z",
+      "category": "valentine",
+      "templateType": "modern",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-26T07:48:53.173Z"
+    },
+    {
+      "siteId": "vhhjfjhfhj",
+      "createdAt": "2026-05-26T07:49:27.873Z",
+      "category": "birthday",
+      "templateType": "bday3",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-26T07:49:27.873Z"
+    },
+    {
+      "siteId": "binoj",
+      "createdAt": "2026-05-27T14:46:14.837Z",
+      "category": "birthday",
+      "templateType": "bday3",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "https://res.cloudinary.com/daczoccvq/video/upload/v1779893297/everwish-celebrations/qg3vhcaol1vyii0o28o5.mp3",
+        "thumbnailUrl": "https://res.cloudinary.com/daczoccvq/image/upload/v1779893316/everwish-celebrations/zw641nzqx4iy1dpn8jom.gif",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": [
+          {
+            "id": "1779893258898-usduo4a6qu",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779893268/everwish-celebrations/o0uqvjo0nh2fzpliou5r.jpg",
+            "caption": ""
+          },
+          {
+            "id": "1779893268547-lo0l3z5l6gn",
+            "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779893274/everwish-celebrations/l0egisqpuqfcathxbudu.jpg",
+            "caption": ""
+          }
+        ]
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-27T14:48:41.502Z",
+      "birthdayGallery": [
+        {
+          "url": "https://res.cloudinary.com/daczoccvq/image/upload/v1779893192/everwish-celebrations/wwqh4lrzofbiuogbtf1y.jpg",
+          "caption": ""
+        }
+      ],
+      "unlockTime": "2026-06-06T20:16",
+      "voiceNoteUrl": "https://res.cloudinary.com/daczoccvq/video/upload/v1779893224/everwish-celebrations/ugvkapmwo7ovdmfje1ah.mp3",
+      "scratchPrize": "hehfffffg",
+      "yearInReview": [
+        {
+          "label": "freedom",
+          "value": "1947"
+        },
+        {
+          "label": "freedom 1",
+          "value": "1947"
+        }
+      ]
+    },
+    {
+      "siteId": "kllkhlkhlh",
+      "createdAt": "2026-05-29T09:45:38.767Z",
+      "category": "valentine",
+      "templateType": "polaroid",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-29T09:45:38.767Z"
+    }
+  ],
+  "storefront": {
+    "isGlobal": true,
+    "templates": [
+      {
+        "id": "v1",
+        "name": "The Polaroid Love Story",
+        "price": "Rs. 750",
+        "emoji": "📸",
+        "tag": "Bestseller",
+        "category": "valentine",
+        "description": "Vintage polaroid gallery with a love-letter reveal.",
+        "gradient": "from-rose-400 to-pink-500"
+      },
+      {
+        "id": "v2",
+        "name": "The Modern Romance",
+        "price": "Rs. 750",
+        "emoji": "💫",
+        "tag": "Elegant",
+        "category": "valentine",
+        "description": "Sleek, cinematic design with smooth scroll sections.",
+        "gradient": "from-purple-400 to-rose-400"
+      },
+      {
+        "id": "v3",
+        "name": "The Valentine Experience",
+        "price": "Rs. 750",
+        "emoji": "💝",
+        "tag": "Interactive",
+        "category": "valentine",
+        "description": "Interactive floating hearts, surprise gifts & confetti.",
+        "gradient": "from-red-400 to-rose-500"
+      },
+      {
+        "id": "v4",
+        "name": "The Proposal Suite",
+        "price": "Rs. 750",
+        "emoji": "💍",
+        "tag": "Premium",
+        "category": "valentine",
+        "description": "A full proposal journey — question, countdown & ring reveal.",
+        "gradient": "from-rose-500 to-amber-400"
+      },
+      {
+        "id": "b1",
+        "name": "The Unwrapping Experience",
+        "price": "Rs. 750",
+        "emoji": "🎁",
+        "tag": "Fun",
+        "category": "birthday",
+        "description": "Tap to unwrap a digital birthday gift box with wishes inside.",
+        "gradient": "from-amber-400 to-orange-500"
+      },
+      {
+        "id": "b2",
+        "name": "The Balloon Pop",
+        "price": "Rs. 750",
+        "emoji": "🎈",
+        "tag": "Playful",
+        "category": "birthday",
+        "description": "Pop colourful balloons to reveal personalised messages.",
+        "gradient": "from-sky-400 to-violet-500"
+      },
+      {
+        "id": "b3",
+        "name": "The Card Flip",
+        "price": "Rs. 750",
+        "emoji": "🃏",
+        "tag": "Classic",
+        "category": "birthday",
+        "description": "Elegant flip-card gallery with a heartfelt birthday note.",
+        "gradient": "from-emerald-400 to-teal-500"
+      },
+      {
+        "id": "b4",
+        "name": "The Surprise Party",
+        "price": "Rs. 750",
+        "emoji": "🎉",
+        "tag": "Immersive",
+        "category": "birthday",
+        "description": "Full party experience with confetti, music & a wishes wall.",
+        "gradient": "from-fuchsia-400 to-pink-500"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Maleesha R.",
+        "avatar": "👩",
+        "rating": 5,
+        "text": "I gifted my boyfriend the Proposal Suite and he was absolutely speechless! Every detail was perfect. EverWish made it magical.",
+        "templateName": "Proposal Suite",
+        "screenshotUrl": "https://res.cloudinary.com/daczoccvq/image/upload/v1780047007/everwish-celebrations/pxesefz7nwb21ecauyga.jpg"
+      },
+      {
+        "name": "Kavindu S.",
+        "avatar": "👨",
+        "rating": 5,
+        "text": "The Balloon Pop birthday page for my best friend had everyone at the party screaming with joy. Worth every rupee!",
+        "templateName": "Balloon Pop"
+      },
+      {
+        "name": "Anuki P.",
+        "avatar": "👩‍🦱",
+        "rating": 5,
+        "text": "Setup was so fast and the support was amazing. My partner cried happy tears — mission accomplished 😭❤️",
+        "templateName": "Polaroid Love Story"
+      },
+      {
+        "name": "Tharindu M.",
+        "avatar": "🧑",
+        "rating": 5,
+        "text": "A completely unique gift idea. I've used EverWish twice now and will definitely keep coming back for every occasion!",
+        "templateName": "The Unwrapping"
+      }
+    ]
+  }
+}

@@ -1,0 +1,637 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Heart, Gift } from 'lucide-react';
+import ThingsToDoSection from './ThingsToDoSection';
+import LoveLock    from './LoveLock';
+import ReasonsJar  from './ReasonsJar';
+import Heartbeat   from './Heartbeat';
+import TimeCapsule from './TimeCapsule';
+
+// ── Confetti burst ────────────────────────────────────────────────
+function Confetti({ active }) {
+  const pieces = Array.from({ length: 60 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    color: ['#f43f5e','#ec4899','#fb7185','#fbbf24','#a78bfa','#34d399'][i % 6],
+    delay: Math.random() * 0.8,
+    duration: 1.5 + Math.random(),
+  }));
+  if (!active) return null;
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {pieces.map(p => (
+        <motion.div
+          key={p.id}
+          initial={{ y: -20, x: `${p.x}vw`, opacity: 1, rotate: 0 }}
+          animate={{ y: '110vh', opacity: [1,1,0], rotate: 720 }}
+          transition={{ duration: p.duration, delay: p.delay, ease: 'easeIn' }}
+          style={{ position:'absolute', top:0, width:8, height:8, borderRadius:2, backgroundColor: p.color }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Heart-shape Memory Match Lockscreen ───────────────────────────
+// Heart grid positions forming a perfect 10-card heart shape:
+const HEART_POSITIONS = [
+  // Row 1
+  { col: 2, row: 1 }, { col: 4, row: 1 },
+  // Row 2
+  { col: 1, row: 2 }, { col: 2, row: 2 }, { col: 4, row: 2 }, { col: 5, row: 2 },
+  // Row 3
+  { col: 2, row: 3 }, { col: 3, row: 3 }, { col: 4, row: 3 },
+  // Row 4
+  { col: 3, row: 4 }
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function MemoryCard({ card, isFlipped, isMatched, onClick, cardColor }) {
+  return (
+    <motion.div
+      onClick={onClick}
+      className="relative cursor-pointer select-none"
+      style={{ width: 56, height: 56, perspective: 600 }}
+      whileTap={{ scale: 0.92 }}
+    >
+      <motion.div
+        animate={{ rotateY: isFlipped || isMatched ? 180 : 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ width:'100%', height:'100%', transformStyle:'preserve-3d', position:'relative' }}
+      >
+        {/* Back (Plain soft pink cover matching the reference) */}
+        <div style={{ backfaceVisibility:'hidden', position:'absolute', inset:0, backgroundColor: cardColor || '#ffccd5' }}
+          className="rounded-xl shadow-[0_2px_8px_rgba(251,207,232,0.6)] border border-pink-100/30 flex items-center justify-center transition-colors hover:opacity-90" />
+        {/* Front (image) */}
+        <div style={{ backfaceVisibility:'hidden', position:'absolute', inset:0, transform:'rotateY(180deg)' }}
+          className={`rounded-xl overflow-hidden border-2 shadow-md ${isMatched ? 'border-green-400 ring-2 ring-green-300' : 'border-pink-300'}`}>
+          {card.imageUrl
+            ? <img src={card.imageUrl} alt="" className="w-full h-full object-cover" />
+            : <div className="w-full h-full bg-rose-100 flex items-center justify-center text-2xl">{['💖', '🌹', '🧸', '🍫', '💍'][card.pairIndex] || '💕'}</div>
+          }
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
+  const imgs = (matchImages && matchImages.length >= 5)
+    ? matchImages.slice(0, 5)
+    : Array.from({ length: 5 }, () => '');
+
+  const [cards, setCards] = useState(() => {
+    const deck = [...imgs, ...imgs].map((url, i) => ({
+      id: i,
+      imageUrl: url,
+      pairIndex: i % 5,
+    }));
+    return shuffle(deck);
+  });
+
+  const [flipped, setFlipped] = useState([]);
+  const [matched, setMatched] = useState([]);
+  const [locked, setLocked] = useState(false);
+  const [confetti, setConfetti] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleFlip = useCallback((idx) => {
+    if (locked || flipped.includes(idx) || matched.includes(cards[idx].id)) return;
+    const next = [...flipped, idx];
+    setFlipped(next);
+    if (next.length === 2) {
+      setLocked(true);
+      const [a, b] = next;
+      if (cards[a].pairIndex === cards[b].pairIndex) {
+        const newMatched = [...matched, cards[a].id, cards[b].id];
+        setMatched(newMatched);
+        setFlipped([]);
+        setLocked(false);
+        if (newMatched.length === cards.length) {
+          setConfetti(true);
+          setTimeout(() => { setDone(true); setTimeout(onComplete, 1200); }, 800);
+        }
+      } else {
+        setTimeout(() => { setFlipped([]); setLocked(false); }, 1000);
+      }
+    }
+  }, [locked, flipped, matched, cards, onComplete]);
+
+  const valColors = themeColors?.valentine || {};
+  const primaryColor = valColors.primary || '#e11d48';
+  const backgroundColor = valColors.background || '#fff0f5';
+  const cardColor = valColors.cardColor || '#ffccd5';
+
+  return (
+    <motion.div
+      className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden select-none"
+      style={{ background: backgroundColor }}
+      animate={{ opacity: done ? 0 : 1 }}
+      transition={{ duration: 1 }}
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;600&display=swap');
+        .cursive-title {
+          font-family: 'Dancing Script', cursive;
+        }
+        .quicksand-subtitle {
+          font-family: 'Quicksand', sans-serif;
+        }
+        .lock-primary-text {
+          color: ${primaryColor} !important;
+        }
+      `}</style>
+      <Confetti active={confetti} />
+      <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} className="text-center mb-10 px-4">
+        <h1 className="cursive-title text-5xl md:text-6xl lock-primary-text flex items-center justify-center gap-3">
+          For My Valentine <span className="inline-block animate-pulse text-4xl md:text-5xl">❤️</span>
+        </h1>
+        <p className="quicksand-subtitle text-xs sm:text-sm text-slate-800 font-semibold tracking-wide mt-6 mb-2">
+          Match the pairs to unlock a surprise...
+        </p>
+      </motion.div>
+
+      {/* Heart-shaped grid using absolute positioning */}
+      <div className="relative scale-[0.85] sm:scale-100 transition-transform duration-300" style={{ width: 4 * 64 + 56, height: 3 * 64 + 56 }}>
+        {HEART_POSITIONS.map((pos, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            left: (pos.col - 1) * 64,
+            top: (pos.row - 1) * 64,
+          }}>
+            <MemoryCard
+              card={cards[i]}
+              isFlipped={flipped.includes(i)}
+              isMatched={matched.includes(cards[i].id)}
+              onClick={() => handleFlip(i)}
+              cardColor={cardColor}
+            />
+          </div>
+        ))}
+      </div>
+
+      {matched.length === 0 && (
+        <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.5 }}
+          className="mt-10 text-xs text-rose-400 font-medium">
+          Tap any card to start ✨
+        </motion.p>
+      )}
+    </motion.div>
+  );
+}
+
+
+// ── Why I Love You section ─────────────────────────────────────────
+function WhyILoveYou({ reasons = [] }) {
+  if (!reasons.length) return null;
+  return (
+    <section className="py-20 px-6 relative overflow-hidden" style={{ background:'linear-gradient(180deg,#fff0f5 0%,#fce4ec 100%)' }}>
+      <div className="absolute inset-0 pointer-events-none">
+        {['💕','🌹','💝','✨','💖'].map((e,i) => (
+          <motion.span key={i}
+            className="absolute text-3xl opacity-10 select-none"
+            style={{ left:`${10+i*18}%`, top:`${20+i*12}%` }}
+            animate={{ y:[0,-15,0], rotate:[0,10,-10,0] }}
+            transition={{ duration:3+i, repeat:Infinity, delay:i*0.5 }}
+          >{e}</motion.span>
+        ))}
+      </div>
+      <div className="max-w-2xl mx-auto text-center relative z-10">
+        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
+          <span className="text-xs font-bold uppercase tracking-widest text-rose-500 font-mono">From the heart</span>
+          <h2 className="text-4xl font-serif text-rose-800 mt-2 mb-3">Why I Love You</h2>
+          <div className="w-16 h-0.5 bg-rose-300 mx-auto mb-12" />
+        </motion.div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {reasons.map((r, i) => (
+            <motion.div key={i}
+              initial={{ opacity:0, y:30, rotate: i%2===0 ? -2 : 2 }}
+              whileInView={{ opacity:1, y:0, rotate:0 }}
+              viewport={{ once:true }}
+              transition={{ delay:i*0.08, type:'spring', stiffness:120 }}
+              whileHover={{ scale:1.03, rotate: i%2===0 ? -1 : 1 }}
+              className="relative bg-white rounded-2xl px-5 py-4 shadow-md border border-rose-100 text-left"
+            >
+              <span className="absolute -top-3 -left-2 text-xl">💗</span>
+              <p className="text-rose-800 font-serif italic text-base leading-relaxed pl-2">{r}</p>
+              <span className="text-[10px] font-bold text-rose-300 uppercase tracking-widest mt-2 block">#{i+1}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Scratch Card component ─────────────────────────────────────────
+function ScratchCard({ imageUrl, caption }) {
+  const canvasRef = useRef(null);
+  const isDrawing = useRef(false);
+  const [scratched, setScratched] = useState(false);
+  const [pct, setPct] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#f9a8d4';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Label
+    ctx.fillStyle = '#be185d';
+    ctx.font = 'bold 13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✨ Scratch Me! ✨', canvas.width / 2, canvas.height / 2 - 8);
+    ctx.fillStyle = '#db2777';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.fillText('Reveal the memory inside', canvas.width / 2, canvas.height / 2 + 12);
+  }, []);
+
+  const getPos = (e, canvas) => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * (canvas.width / r.width), y: (src.clientY - r.top) * (canvas.height / r.height) };
+  };
+
+  const scratch = (e) => {
+    if (!isDrawing.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const { x, y } = getPos(e, canvas);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    // Sample coverage
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let transparent = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] < 128) transparent++;
+    const p = Math.round((transparent / (canvas.width * canvas.height)) * 100);
+    setPct(p);
+    if (p > 60 && !scratched) setScratched(true);
+  };
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-rose-100 bg-white group">
+      {/* Background image */}
+      {imageUrl
+        ? <img src={imageUrl} alt={caption||'memory'} className="w-full aspect-square object-cover" />
+        : <div className="w-full aspect-square bg-rose-50 flex items-center justify-center text-5xl">💕</div>
+      }
+      {/* Canvas overlay */}
+      <canvas
+        ref={canvasRef}
+        width={300} height={300}
+        className="absolute inset-0 w-full h-full touch-none cursor-crosshair"
+        style={{ opacity: scratched ? 0 : 1, transition: 'opacity 0.8s ease' }}
+        onMouseDown={() => { isDrawing.current = true; }}
+        onMouseMove={scratch}
+        onMouseUp={() => { isDrawing.current = false; }}
+        onMouseLeave={() => { isDrawing.current = false; }}
+        onTouchStart={(e) => { e.preventDefault(); isDrawing.current = true; }}
+        onTouchMove={(e) => { e.preventDefault(); scratch(e); }}
+        onTouchEnd={() => { isDrawing.current = false; }}
+      />
+      {caption && (
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-3">
+          <p className="text-white text-xs font-medium truncate">{caption}</p>
+        </div>
+      )}
+      {!scratched && (
+        <div className="absolute top-2 right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+          {pct}%
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ScratchMemories({ scratchMemories = [] }) {
+  if (!scratchMemories.length) return null;
+  return (
+    <section className="py-20 px-6" style={{ background:'#fff7f9' }}>
+      <div className="max-w-3xl mx-auto">
+        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-rose-500 font-mono">Reveal our moments</span>
+          <h2 className="text-4xl font-serif text-rose-800 mt-2 mb-3">Scratch Memories</h2>
+          <p className="text-sm text-rose-400">Scratch each card to reveal a hidden memory 💝</p>
+          <div className="w-16 h-0.5 bg-rose-300 mx-auto mt-4" />
+        </motion.div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+          {scratchMemories.map((m, i) => (
+            <motion.div key={i}
+              initial={{ opacity:0, scale:0.9 }}
+              whileInView={{ opacity:1, scale:1 }}
+              viewport={{ once:true }}
+              transition={{ delay:i*0.1 }}
+            >
+              <ScratchCard imageUrl={m.imageUrl} caption={m.caption} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Love Letter section ───────────────────────────────────────────
+function LoveLetter({ text, coupleName }) {
+  if (!text) return null;
+  return (
+    <section className="py-20 px-6" style={{ background:'linear-gradient(180deg,#fdf2f8 0%,#fff0f5 100%)' }}>
+      <div className="max-w-xl mx-auto">
+        <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+          className="relative bg-white rounded-3xl shadow-xl border border-rose-100 overflow-hidden"
+        >
+          {/* Decorative corners */}
+          <div className="absolute top-0 left-0 w-20 h-20 bg-rose-50 rounded-br-full opacity-70" />
+          <div className="absolute bottom-0 right-0 w-20 h-20 bg-pink-50 rounded-tl-full opacity-70" />
+          <div className="relative z-10 p-8 sm:p-12">
+            <div className="text-center mb-8">
+              <span className="text-3xl">💌</span>
+              <h2 className="text-3xl font-serif text-rose-800 mt-3">A Love Letter</h2>
+              {coupleName && <p className="text-xs text-rose-400 uppercase tracking-widest mt-1 font-mono">for {coupleName}</p>}
+            </div>
+            {/* Lined paper effect */}
+            <div className="relative">
+              <div className="absolute left-8 top-0 bottom-0 w-px bg-rose-100" />
+              <p className="pl-10 text-base font-serif italic text-slate-700 leading-8 whitespace-pre-line">
+                {text}
+              </p>
+            </div>
+            <p className="text-right text-rose-400 font-serif italic text-sm mt-8">With all my love 💕</p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ── Virtual Gift Modal ────────────────────────────────────────────
+function VirtualGift({ gift }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="py-20 px-6 text-center" style={{ background:'#fff0f5' }}>
+      <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
+        <h2 className="text-3xl font-serif text-rose-800 mb-2">Your Special Gift 🎁</h2>
+        <p className="text-sm text-rose-400 mb-12">Something wrapped just for you…</p>
+        
+        {/* Interactive Gift Box */}
+        <div className="flex justify-center mb-6">
+          <motion.div
+            initial={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            onClick={() => setOpen(true)}
+            className="relative w-56 h-56 flex flex-col items-center justify-center cursor-pointer select-none"
+          >
+            {/* Shaking motion on hover */}
+            <motion.div
+              whileHover={{ 
+                rotate: [0, -3, 3, -3, 3, 0],
+                transition: { duration: 0.5, repeat: Infinity }
+              }}
+              className="relative w-40 h-40"
+            >
+              {/* Lid */}
+              <motion.div 
+                className="absolute -top-7 -left-2.5 w-[170px] h-10 bg-rose-600 rounded-t-xl z-20 shadow-md flex items-center justify-center border border-rose-500"
+                style={{ transformOrigin: 'bottom center' }}
+                whileHover={{ y: -6 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+              >
+                {/* Lid Ribbon Horizontal */}
+                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
+              </motion.div>
+
+              {/* Bow on Top of Lid */}
+              <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                <svg width="70" height="36" viewBox="0 0 70 36" fill="none" className="filter drop-shadow-sm">
+                  {/* Left Loop */}
+                  <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+                  {/* Right Loop */}
+                  <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+                  {/* Center Knot */}
+                  <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5" />
+                </svg>
+              </div>
+
+              {/* Box Body */}
+              <div className="w-40 h-32 bg-rose-500 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border border-rose-400">
+                {/* Vertical Ribbon */}
+                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
+                {/* Horizontal Ribbon */}
+                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
+              </div>
+            </motion.div>
+
+            <span className="mt-8 text-xs font-semibold text-rose-500 tracking-widest animate-pulse uppercase">
+              Tap to open your gift 🎁
+            </span>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+          >
+            <motion.div
+              initial={{ scale:0.5, y:60, opacity:0 }}
+              animate={{ scale:1, y:0, opacity:1 }}
+              exit={{ scale:0.7, opacity:0 }}
+              transition={{ type:'spring', damping:18, stiffness:90 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-rose-100 relative"
+            >
+              <button onClick={() => setOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-400 transition z-10">
+                <X size={16} />
+              </button>
+              {/* Gift top decoration */}
+              <div className="h-3 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400" />
+              <div className="p-6 text-center">
+                <div className="text-4xl mb-4">🎁</div>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-rose-400 mb-4">A Special Gift</h3>
+                {gift?.bouquetUrl ? (
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-rose-50">
+                    <img src={gift.bouquetUrl} alt="gift" className="w-full h-full object-contain" />
+                  </div>
+                ) : (
+                  <div className="w-full aspect-[4/3] rounded-2xl bg-rose-50 border-2 border-dashed border-rose-200 flex items-center justify-center text-4xl mb-5">💐</div>
+                )}
+                <h4 className="text-xl font-serif italic text-rose-800 mb-3">
+                  For {gift?.recipient || 'My Love'} 💕
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap px-2">
+                  {gift?.message || 'You deserve all the flowers in the world.'}
+                </p>
+              </div>
+              <div className="h-2 bg-gradient-to-r from-pink-200 via-rose-200 to-pink-200" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
+// ── Hero banner ───────────────────────────────────────────────────
+function ValentineHero({ siteData }) {
+  return (
+    <section className="pt-16 pb-12 px-6 text-center relative overflow-hidden"
+      style={{ background:'linear-gradient(160deg,#fff0f5 0%,#fce4ec 60%,#fdf2f8 100%)' }}>
+      {/* Floating emojis */}
+      {['💕','🌹','💖','✨','💗','🌸'].map((e,i) => (
+        <motion.span key={i} className="absolute text-2xl opacity-20 select-none pointer-events-none"
+          style={{ left:`${8+i*15}%`, top:`${10+i*8}%` }}
+          animate={{ y:[0,-20,0], rotate:[0,15,-15,0] }}
+          transition={{ duration:3+i*0.5, repeat:Infinity, delay:i*0.4 }}
+        >{e}</motion.span>
+      ))}
+      <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8 }} className="relative z-10">
+        <motion.span className="text-6xl sm:text-8xl block mb-6"
+          animate={{ scale:[1,1.08,1] }} transition={{ duration:2, repeat:Infinity }}>
+          {siteData.coupleEmoji || '💕'}
+        </motion.span>
+        <h1 className="text-4xl sm:text-5xl font-serif text-rose-800 mb-3">
+          {siteData.coupleName || 'Our Love Story'}
+        </h1>
+        {siteData.heroDate && (
+          <p className="text-sm text-rose-500 font-mono uppercase tracking-widest mb-4">{siteData.heroDate}</p>
+        )}
+        {siteData.heroSubtitle && (
+          <p className="text-base font-serif italic text-rose-600 max-w-md mx-auto leading-relaxed">
+            "{siteData.heroSubtitle}"
+          </p>
+        )}
+        <div className="flex justify-center gap-2 mt-8 opacity-40">
+          {Array.from({length:5}).map((_,i)=>(
+            <motion.div key={i} animate={{ y:[0,-6,0] }} transition={{ duration:1.2, repeat:Infinity, delay:i*0.15 }}>
+              <Heart size={16} fill="#f43f5e" color="#f43f5e" />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
+// ── Main export ───────────────────────────────────────────────────
+export default function TemplateValentine({ siteData, onUnlock }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const val = siteData?.valentine || {};
+  const matchImages = val.matchImages || [];
+  const reasons = val.reasons || [];
+  const scratchMemories = val.scratchMemories || [];
+
+  // Opening lock screen always plays; we use fallback emojis if no custom match images are configured
+  const skipLock = false;
+
+  if (!unlocked && !skipLock) {
+    return (
+      <HeartMemoryMatch
+        matchImages={matchImages}
+        onComplete={() => {
+          setUnlocked(true);
+          if (onUnlock) onUnlock();
+        }}
+        themeColors={siteData?.themeColors}
+      />
+    );
+  }
+
+  const colors = siteData?.themeColors?.valentine || {};
+  const primaryColor = colors.primary || '#e11d48';
+  const backgroundColor = colors.background || '#fff0f5';
+  const cardColor = colors.cardColor || '#ffccd5';
+
+  return (
+    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }}
+      className="min-h-screen template-valentine-root" style={{ background: backgroundColor }}>
+      <style>{`
+        .template-valentine-root {
+          --primary-val: ${primaryColor};
+          --bg-val: ${backgroundColor};
+          --card-val: ${cardColor};
+        }
+        
+        .template-valentine-root .text-rose-500,
+        .template-valentine-root .text-rose-800,
+        .template-valentine-root .text-rose-400,
+        .template-valentine-root .text-rose-600,
+        .template-valentine-root .text-pink-500,
+        .template-valentine-root .text-rose-300,
+        .template-valentine-root h2.text-rose-800,
+        .template-valentine-root h1.cursive-title,
+        .template-valentine-root .text-rose-700 {
+          color: var(--primary-val) !important;
+        }
+
+        .template-valentine-root .bg-rose-500,
+        .template-valentine-root .bg-rose-600,
+        .template-valentine-root .bg-rose-400,
+        .template-valentine-root .bg-pink-500 {
+          background-color: var(--primary-val) !important;
+        }
+
+        .template-valentine-root .bg-rose-500 *,
+        .template-valentine-root .bg-rose-600 *,
+        .template-valentine-root .bg-pink-500 * {
+          color: #ffffff !important;
+        }
+
+        /* Ribbon colors on Gift Box */
+        .template-valentine-root .bg-amber-400 {
+          background-color: #fbbf24 !important; /* Keep ribbon gold */
+        }
+
+        .template-valentine-root .border-rose-300,
+        .template-valentine-root .border-rose-100,
+        .template-valentine-root .border-pink-300 {
+          border-color: var(--primary-val) !important;
+        }
+        
+        .template-valentine-root section,
+        .template-valentine-root .min-h-screen {
+          background: linear-gradient(180deg, var(--bg-val) 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+        }
+
+        .template-valentine-root .bg-\\[\\#ffccd5\\] {
+          background-color: var(--card-val) !important;
+        }
+      `}</style>
+      <ValentineHero siteData={siteData} />
+      <WhyILoveYou reasons={reasons} />
+      <ScratchMemories scratchMemories={scratchMemories} />
+      <LoveLetter text={siteData.loveLetterText} coupleName={siteData.coupleName} />
+      <VirtualGift gift={siteData.gift} />
+      <ThingsToDoSection items={siteData.thingsToDo} themeColors={siteData.themeColors?.valentine} />
+
+      {/* ── Valentine Exclusive Features ─────────────────── */}
+      <LoveLock
+        initials={siteData.loveLock?.initials}
+        isEnabled={siteData.loveLock?.isEnabled}
+      />
+      <ReasonsJar reasons={siteData.reasonsJar} />
+      <Heartbeat />
+      <TimeCapsule
+        unlockDate={siteData.timeCapsule?.unlockDate}
+        message={siteData.timeCapsule?.message}
+        mediaUrl={siteData.timeCapsule?.mediaUrl}
+      />
+      <footer className="text-center py-8 text-[10px] uppercase tracking-widest text-rose-300 font-mono border-t border-rose-100">
+        © {new Date().getFullYear()} · Made with 💕 by EverWish
+      </footer>
+    </motion.div>
+  );
+}

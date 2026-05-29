@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+/* stylelint-disable-next-line */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --rose: #e11d48;
+  --rose-light: #fda4af;
+  --blush: #fff0f5;
+  --blush-dark: #fce7f3;
+  --gold: #d4a017;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--blush);
+  color: #1f1f1f;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .serif {
+  font-family: var(--font-serif);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--blush-dark); }
+::-webkit-scrollbar-thumb { background: var(--rose-light); border-radius: 99px; }
+
+/* Polaroid */
+.polaroid {
+  background: white;
+  padding: 12px 12px 36px 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.08);
+  display: inline-block;
+}
+
+/* Ripped-paper clip-path on central gallery image */
+.ripped-paper {
+  clip-path: polygon(
+    3% 0%, 8% 2%, 14% 0%, 20% 3%, 26% 0%,
+    33% 2%, 39% 0%, 46% 3%, 52% 0%, 58% 2%,
+    64% 0%, 71% 3%, 77% 0%, 83% 2%, 89% 0%,
+    95% 3%, 100% 0%,
+    100% 5%, 98% 12%, 100% 19%, 97% 25%, 100% 32%,
+    98% 39%, 100% 46%, 97% 53%, 100% 60%, 98% 67%,
+    100% 74%, 97% 81%, 100% 88%, 98% 94%, 100% 100%,
+    95% 98%, 88% 100%, 82% 97%, 76% 100%, 69% 97%,
+    63% 100%, 56% 97%, 50% 100%, 43% 97%, 37% 100%,
+    30% 97%, 24% 100%, 17% 97%, 11% 100%, 5% 97%, 0% 100%,
+    2% 94%, 0% 87%, 3% 80%, 0% 73%, 2% 66%,
+    0% 59%, 3% 52%, 0% 45%, 2% 38%, 0% 31%,
+    3% 24%, 0% 17%, 2% 10%, 0% 3%
+  );
+}
+
+/* Timeline dashed line */
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    #fda4af 0px, #fda4af 8px,
+    transparent 8px, transparent 16px
+  );
+}
+
+@media (max-width: 768px) {
+  .timeline-line { left: 20px; }
+}

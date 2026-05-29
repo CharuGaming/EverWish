@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💝 A Special Gift For You</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #e8365d;
+    --deep: #1a0a14;
+    --gold: #f0c060;
+    --pink: #ff7eb3;
+    --purple: #3d1a4e;
+  }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--deep);
+    color: #fff;
+    overflow: hidden;
+    height: 100dvh;
+  }
+
+  /* ========== PARTICLES ========== */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* ========== LOCKSCREEN ========== */
+  #lockscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #2d0b2e 0%, #0d0010 100%);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #lockscreen.unlock {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .lock-time {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 40px rgba(232,54,93,0.6);
+    letter-spacing: 4px;
+  }
+  .lock-date {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    margin-bottom: 60px;
+  }
+
+  .heart-lock {
+    font-size: 3rem;
+    animation: pulse 1.5s ease-in-out infinite;
+    margin-bottom: 30px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 20px #e8365d);
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .lock-hint {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 16px;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  /* Slide to unlock */
+  .slider-wrap {
+    position: relative;
+    width: min(320px, 80vw);
+    height: 56px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.15);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    margin-top: 10px;
+  }
+  .slider-track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    user-select: none;
+    pointer-events: none;
+  }
+  .slider-thumb {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose), #ff6b9d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    cursor: grab;
+    box-shadow: 0 4px 20px rgba(232,54,93,0.6);
+    transition: box-shadow 0.2s;
+    touch-action: none;
+    z-index: 2;
+  }
+  .slider-thumb:active { cursor: grabbing; box-shadow: 0 4px 30px rgba(232,54,93,0.9); }
+
+  /* ========== LANDING PAGE ========== */
+  #landing {
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease 0.3s;
+  }
+  #landing.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at 50% 0%, #3d0b2e 0%, #0d0010 60%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-img-wrap {
+    position: relative;
+    width: min(300px, 70vw);
+    margin-bottom: 30px;
+    animation: floatHero 4s ease-in-out infinite;
+  }
+  @keyframes floatHero {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)}
+  }
+  .hero-img-wrap img {
+    width: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 60px rgba(232,54,93,0.5), 0 0 120px rgba(232,54,93,0.2);
+  }
+  .hero-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(135deg, var(--gold), #e09020);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 20px rgba(240,192,96,0.6);
+    animation: spin 6s linear infinite;
+  }
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 7vw, 4rem);
+    background: linear-gradient(135deg, #fff 30%, var(--pink) 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    color: rgba(255,255,255,0.65);
+    font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+    max-width: 380px;
+    line-height: 1.7;
+    margin-bottom: 36px;
+  }
+
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: blink 2s ease-in-out infinite;
+  }
+  .scroll-arrow { font-size: 1.2rem; animation: bounce 1.5s ease-in-out infinite; }
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+  /* ========== GIFT SECTIONS ========== */
+  .section {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+    position: relative;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.95rem;
+    max-width: 340px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  /* Gift Box */
+  .gift-box-wrap {
+    position: relative;
+    cursor: pointer;
+    margin: 20px auto;
+  }
+  .gift-box {
+    font-size: clamp(5rem, 18vw, 9rem);
+    display: block;
+    transition: transform 0.3s;
+    filter: drop-shadow(0 0 30px rgba(240,192,96,0.5));
+  }
+  .gift-box-wrap:hover .gift-box { transform: scale(1.1) rotate(-5deg); }
+  .gift-box-wrap.opened .gift-box { animation: shake 0.5s ease; }
+  @keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+
+  .gift-content {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 20px 28px;
+    width: 240px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s, transform 0.4s;
+    transform: translateX(-50%) translateY(20px);
+  }
+  .gift-box-wrap.opened .gift-content {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: all;
+  }
+  .tap-hint {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  /* Reasons Cards */
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 500px;
+  }
+  .reason-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(232,54,93,0.25);
+    border-radius: 18px;
+    padding: 20px 14px;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+  .reason-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--rose);
+    box-shadow: 0 8px 30px rgba(232,54,93,0.25);
+  }
+  .reason-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
+  .reason-text { font-size: 0.82rem; color: rgba(255,255,255,0.7); line-height: 1.5; }
+
+  /* Message Section */
+  .letter-paper {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(240,192,96,0.25);
+    border-radius: 24px;
+    padding: 36px 28px;
+    max-width: 420px;
+    position: relative;
+    backdrop-filter: blur(10px);
+  }
+  .letter-paper::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 5rem;
+    font-family: 'Playfair Display', serif;
+    color: var(--rose);
+    opacity: 0.4;
+    line-height: 1;
+  }
+  .letter-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    color: rgba(255,255,255,0.85);
+    line-height: 1.8;
+  }
+  .letter-sign {
+    margin-top: 24px;
+    text-align: right;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+  }
+
+  /* Final Section */
+  .final-section {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 100%, #2d0b1e 0%, #0d0010 60%);
+  }
+  .big-heart {
+    font-size: clamp(5rem, 20vw, 10rem);
+    display: block;
+    animation: heartBeat 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(232,54,93,0.7));
+  }
+  @keyframes heartBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1.05)}42%{transform:scale(1.2)}70%{transform:scale(1)}}
+  .final-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 7vw, 3.5rem);
+    background: linear-gradient(135deg, var(--gold), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 20px 0 16px;
+  }
+  .final-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.95rem;
+    max-width: 300px;
+    line-height: 1.7;
+  }
+
+  /* Divider */
+  .rose-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.15);
+    font-size: 1.2rem;
+    margin: 10px 0;
+  }
+  .rose-divider::before, .rose-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,54,93,0.3), transparent);
+    max-width: 80px;
+  }
+
+  /* Confetti burst */
+  .confetti-burst {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confettiFall 2s ease-in forwards;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Sections bg alternation */
+  .s1 { background: radial-gradient(ellipse at 30% 50%, #2a0520 0%, #0d0010 70%); }
+  .s2 { background: radial-gradient(ellipse at 70% 50%, #0a1a2a 0%, #0d0010 70%); }
+  .s3 { background: radial-gradient(ellipse at 50% 50%, #1a0a14 0%, #0d0010 70%); }
+</style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<!-- Confetti -->
+<div class="confetti-burst" id="confetti"></div>
+
+<!-- =================== LOCKSCREEN =================== -->
+<div id="lockscreen">
+  <div class="lock-time" id="clockTime">00:00</div>
+  <div class="lock-date" id="clockDate">Loading...</div>
+
+  <div class="heart-lock" onclick="unlockByClick()" title="Tap to open">❤️</div>
+
+  <div class="slider-wrap" id="sliderWrap">
+    <div class="slider-track">slide to open your gift →</div>
+    <div class="slider-thumb" id="thumb">🎁</div>
+  </div>
+  <div class="lock-hint">tap the heart or slide to unlock</div>
+</div>
+
+<!-- =================== LANDING PAGE =================== -->
+<div id="landing">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-img-wrap">
+      <img src="hero.png" alt="Valentine Gift">
+      <div class="hero-badge">✨</div>
+    </div>
+    <h1>Happy Valentine's Day,<br><em>My Love</em> 💕</h1>
+    <p>I made something just for you — a little piece of my heart, wrapped up in pixels and love.</p>
+    <div class="rose-divider">🌹</div>
+    <div class="scroll-hint">
+      <div class="scroll-arrow">↓</div>
+      <span>scroll to explore your gift</span>
+    </div>
+  </div>
+
+  <!-- GIFT BOX SECTION -->
+  <div class="section s1">
+    <div class="section-title">🎀 Your Virtual Gift</div>
+    <div class="section-sub">I couldn't wrap this in a bow, but I wrapped it with all my love. Tap the box! 🎁</div>
+
+    <div class="gift-box-wrap" id="giftBox" onclick="openGift()">
+      <div class="gift-content" id="giftContent">
+        <strong style="color:var(--gold)">💝 You've unlocked:</strong><br><br>
+        365 days of my undivided love, countless hugs, and a promise to always make you smile. 🌹
+      </div>
+      <span class="gift-box">🎁</span>
+    </div>
+    <div class="tap-hint">tap the gift to open</div>
+  </div>
+
+  <!-- REASONS I LOVE YOU -->
+  <div class="section s2">
+    <div class="section-title">💖 Why I Love You</div>
+    <div class="section-sub">Just a few of the million reasons...</div>
+    <div class="reasons-grid">
+      <div class="reason-card">
+        <span class="reason-icon">😊</span>
+        <div class="reason-text">Your smile makes my whole world brighter</div>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">🌙</span>
+        <div class="reason-text">You're my first thought every morning</div>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">💪</span>
+        <div class="reason-text">You make me a better person every day</div>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">🌊</span>
+        <div class="reason-text">With you, even silence feels perfect</div>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">✨</span>
+        <div class="reason-text">You light up every room you walk into</div>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">🏠</span>
+        <div class="reason-text">You feel like home, wherever we are</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOVE LETTER -->
+  <div class="section s3">
+    <div class="section-title">💌 A Letter For You</div>
+    <div class="section-sub">From my heart to yours</div>
+    <div class="letter-paper">
+      <div class="letter-text">
+        Every day with you feels like a gift I never knew I deserved. You are my favourite chapter, my safe place, and my greatest adventure. No gift could ever capture how much you mean to me — but I hope this little corner of the internet makes you smile, even for a moment.
+      </div>
+      <div class="letter-sign">— Yours, always 🌹</div>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="final-section">
+    <span class="big-heart">❤️</span>
+    <div class="final-title">Happy Valentine's Day!</div>
+    <div class="final-sub">Thank you for being my person. I love you more than words could ever say. 💕</div>
+    <br><br>
+    <div class="rose-divider" style="max-width:300px;width:100%;">🌹</div>
+    <br>
+    <div style="color:rgba(255,255,255,0.25);font-size:0.75rem;letter-spacing:2px;">made with 💝 just for you</div>
+  </div>
+
+</div>
+
+<script>
+  // ---- Clock ----
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours().toString().padStart(2,'0');
+    let m = now.getMinutes().toString().padStart(2,'0');
+    document.getElementById('clockTime').textContent = h + ':' + m;
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('clockDate').textContent =
+      days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // ---- Particles ----
+  const container = document.getElementById('particles');
+  const colors = ['#e8365d','#ff7eb3','#f0c060','#fff0f5','#c060f0'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 6 + 3;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*10+8}s;
+      animation-delay:${Math.random()*8}s;
+      opacity:0;
+    `;
+    container.appendChild(p);
+  }
+
+  // ---- Slide to Unlock ----
+  const thumb = document.getElementById('thumb');
+  const sliderWrap = document.getElementById('sliderWrap');
+  let dragging = false, startX = 0, currentX = 0;
+  const maxSlide = () => sliderWrap.offsetWidth - 56;
+
+  function startDrag(x) { dragging = true; startX = x - currentX; }
+  function moveDrag(x) {
+    if (!dragging) return;
+    let dx = Math.min(Math.max(x - startX, 0), maxSlide());
+    currentX = dx;
+    thumb.style.left = (4 + dx) + 'px';
+    if (maxSlide() > 0 && dx >= maxSlide() * 0.9) unlock();
+  }
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    if (currentX < maxSlide() * 0.9) {
+      currentX = 0;
+      thumb.style.transition = 'left 0.3s';
+      thumb.style.left = '4px';
+      setTimeout(() => thumb.style.transition = '', 300);
+    }
+  }
+
+  thumb.addEventListener('mousedown', e => startDrag(e.clientX));
+  document.addEventListener('mousemove', e => moveDrag(e.clientX));
+  document.addEventListener('mouseup', endDrag);
+
+  thumb.addEventListener('touchstart', e => startDrag(e.touches[0].clientX), {passive:true});
+  document.addEventListener('touchmove', e => moveDrag(e.touches[0].clientX), {passive:true});
+  document.addEventListener('touchend', endDrag);
+
+  function unlockByClick() { unlock(); }
+
+  function unlock() {
+    document.getElementById('lockscreen').classList.add('unlock');
+    document.getElementById('landing').classList.add('show');
+    document.body.style.overflow = 'hidden'; // landing handles scroll
+    setTimeout(() => {
+      document.getElementById('lockscreen').style.display = 'none';
+      document.body.style.overflow = '';
+    }, 1000);
+    spawnConfetti();
+  }
+
+  // ---- Gift Box ----
+  function openGift() {
+    const box = document.getElementById('giftBox');
+    box.classList.toggle('opened');
+    if (box.classList.contains('opened')) spawnConfetti();
+  }
+
+  // ---- Confetti ----
+  function spawnConfetti() {
+    const burst = document.getElementById('confetti');
+    burst.style.display = 'block';
+    burst.innerHTML = '';
+    const confColors = ['#e8365d','#ff7eb3','#f0c060','#9b59b6','#3498db','#2ecc71'];
+    for (let i = 0; i < 60; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.cssText = `
+        left:${Math.random()*100}%;
+        top:0;
+        background:${confColors[Math.floor(Math.random()*confColors.length)]};
+        animation-delay:${Math.random()*0.8}s;
+        animation-duration:${1.5 + Math.random()}s;
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+      `;
+      burst.appendChild(c);
+    }
+    setTimeout(() => { burst.style.display = 'none'; }, 3000);
+  }
+</script>
+</body>
+</html>

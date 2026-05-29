@@ -1,0 +1,682 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, getStorefront, updateStorefront, uploadImage } from '../api';
+import {
+  Heart, Plus, ExternalLink, Trash2, Edit3,
+  Search, AlertCircle, Loader2, CheckCircle2,
+  Sun, Moon, LayoutGrid, List, Copy, ToggleLeft, ToggleRight, AlertTriangle,
+  Store, Users, Save, Star, Upload, Image as ImageIcon
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// REMINDER: Add the following route to backend siteRoutes.js:
+// PATCH /api/sites/:siteId/status -> updates isActive boolean.
+
+function calculateStatus(isActive, expiresAt) {
+  if (!isActive) {
+    return { text: "Inactive", color: "bg-neutral-200/50 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400 border border-neutral-300/50 dark:border-neutral-700/50" };
+  }
+  
+  if (!expiresAt) {
+    return { text: "Active", color: "bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20" };
+  }
+
+  const days = Math.ceil((new Date(expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
+  
+  if (days <= 0) {
+    return { text: "Expired", color: "bg-neutral-200/50 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400 border border-neutral-300/50 dark:border-neutral-700/50" };
+  }
+  if (days <= 3) {
+    return { text: `Expires in ${days} Days`, color: "bg-orange-100/50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-200/50 dark:border-orange-500/20" };
+  }
+  return { text: `${days} Days Left`, color: "bg-emerald-100/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20" };
+}
+
+function formatDate(dateString) {
+  if (!dateString) return 'Legacy / No Date';
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(dateString));
+}
+
+export default function AdminDashboard() {
+  const [sites, setSites]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [newId, setNewId]       = useState('');
+  const [templateType, setTemplateType] = useState('polaroid');
+  const [category, setCategory] = useState('valentine');
+  const [showModal, setShowModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [search, setSearch]     = useState('');
+  const [toast, setToast]       = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Task 1: View Mode State & Delete Modal State
+  const [viewMode, setViewMode] = useState('list');
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, siteId: null });
+
+  // Storefront Tab State
+  const [activeTab, setActiveTab] = useState('sites'); // 'sites' | 'storefront'
+  const [storefront, setStorefront] = useState({ templates: [], testimonials: [] });
+  const [savingStorefront, setSavingStorefront] = useState(false);
+
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => {
+      const nextTheme = !prev;
+      if (nextTheme) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      return nextTheme;
+    });
+  };
+
+  const showToast = (msg, ok = true) => {
+    setToast({ msg, ok });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const [sitesRes, storeRes] = await Promise.all([listSites(), getStorefront()]);
+      setSites(sitesRes.data || []);
+      if (storeRes.data) setStorefront(storeRes.data);
+    } catch (e) {
+      console.error(e);
+      showToast("Failed to load data", false);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleCreate = async () => {
+    const id = newId.trim().toLowerCase().replace(/\s+/g, '-');
+    if (!id) return;
+    setCreating(true);
+    await saveSite(id, emptyTemplate(id, templateType, category));
+    setCreating(false);
+    setNewId('');
+    setShowModal(false);
+    showToast(`Site "${id}" created!`);
+    nav(`/admin/edit/${id}`);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.siteId) return;
+    setDeleting(deleteModal.siteId);
+    await deleteSite(deleteModal.siteId);
+    setDeleting(null);
+    setDeleteModal({ isOpen: false, siteId: null });
+    showToast(`Deleted "${deleteModal.siteId}".`);
+    load();
+  };
+
+  const handleCopyLink = (siteId) => {
+    const url = `${window.location.origin}/${siteId}`;
+    navigator.clipboard.writeText(url);
+    showToast("Link copied to clipboard!");
+  };
+
+  const handleToggleStatus = async (siteId, currentStatus) => {
+    try {
+      const updatedStatus = !currentStatus;
+      await toggleSiteStatus(siteId, updatedStatus);
+      setSites(prev => prev.map(s => s.siteId === siteId ? { ...s, isActive: updatedStatus } : s));
+      showToast(updatedStatus ? "Site activated!" : "Site deactivated!", true);
+    } catch (err) {
+      showToast("Failed to update status", false);
+    }
+  };
+
+  const filtered = sites.filter(s =>
+    s.siteId?.toLowerCase().includes(search.toLowerCase()) ||
+    s.general?.coupleName?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSaveStorefront = async () => {
+    setSavingStorefront(true);
+    try {
+      await updateStorefront(storefront);
+      showToast("Storefront updated successfully!");
+    } catch (e) {
+      showToast("Failed to update storefront", false);
+    }
+    setSavingStorefront(false);
+  };
+
+  const handleTemplateChange = (idx, field, val) => {
+    const newTpls = [...storefront.templates];
+    newTpls[idx][field] = val;
+    setStorefront({ ...storefront, templates: newTpls });
+  };
+
+  const handleTestimonialChange = (idx, field, val) => {
+    const newTests = [...storefront.testimonials];
+    newTests[idx][field] = val;
+    setStorefront({ ...storefront, testimonials: newTests });
+  };
+
+  const handleTestimonialImageUpload = async (idx, file) => {
+    if (!file) return;
+    try {
+      showToast("Uploading screenshot...", true);
+      const res = await uploadImage(file);
+      if (res.success) {
+        handleTestimonialChange(idx, 'screenshotUrl', res.url);
+        showToast("Screenshot uploaded successfully!", true);
+      } else {
+        showToast(res.message || "Upload failed", false);
+      }
+    } catch (err) {
+      showToast("Upload failed", false);
+    }
+  };
+
+  const addTemplate = () => {
+    setStorefront({
+      ...storefront,
+      templates: [
+        ...storefront.templates,
+        { id: `c-${Date.now()}`, name: 'New Template', price: 'Rs. 2,500', category: 'valentine', tag: 'New', description: 'Description', emoji: '✨', gradient: 'from-gray-400 to-gray-500' }
+      ]
+    });
+  };
+
+  const addTestimonial = () => {
+    setStorefront({
+      ...storefront,
+      testimonials: [
+        ...storefront.testimonials,
+        { name: 'New User', templateName: 'Custom', rating: 5, text: 'Great template!', avatar: '👤', screenshotUrl: '' }
+      ]
+    });
+  };
+
+  const removeTemplate = (idx) => {
+    const newTpls = [...storefront.templates];
+    newTpls.splice(idx, 1);
+    setStorefront({ ...storefront, templates: newTpls });
+  };
+
+  const removeTestimonial = (idx) => {
+    const newTests = [...storefront.testimonials];
+    newTests.splice(idx, 1);
+    setStorefront({ ...storefront, testimonials: newTests });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden relative">
+      
+      {/* Floating Theme Toggle */}
+      <button 
+        onClick={toggleTheme}
+        className="fixed top-5 right-6 z-40 p-3 bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-full hover:scale-105 transition-transform"
+      >
+        {isDarkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-slate-700" />}
+      </button>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 px-5 py-3 rounded-2xl shadow-2xl text-sm font-semibold backdrop-blur-xl border ${toast.ok ? 'bg-emerald-500/80 text-white border-emerald-400/50' : 'bg-red-500/80 text-white border-red-400/50'}`}
+          >
+            <CheckCircle2 size={16} />
+            {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Header */}
+      <header className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm relative z-10">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="EverWish Logo" className="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-rose-500/20" />
+            <div>
+              <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">EverWish</h1>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Admin Portal</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Navigation Tabs */}
+      <div className="max-w-6xl mx-auto px-6 pt-6 relative z-10">
+        <div className="flex gap-2 p-1 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl w-fit shadow-sm">
+          <button 
+            onClick={() => setActiveTab('sites')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'sites' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+          >
+            <Users size={16} /> Client Sites
+          </button>
+          <button 
+            onClick={() => setActiveTab('storefront')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'storefront' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+          >
+            <Store size={16} /> Manage Storefront
+          </button>
+        </div>
+      </div>
+
+      <main className="max-w-6xl mx-auto px-6 py-8 relative z-10">
+        {activeTab === 'sites' ? (
+          <>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Client Sites</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">Manage all active celebration websites</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 p-1 rounded-2xl shadow-sm">
+              <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
+                <List size={18} />
+              </button>
+              <button onClick={() => setViewMode('grid')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
+                <LayoutGrid size={18} />
+              </button>
+            </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-xl shadow-rose-500/20 transition-all hover:scale-105 active:scale-95"
+            >
+              <Plus size={16} strokeWidth={3} /> Create Site
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Main Glassy Container */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6 md:p-8"
+        >
+          {/* Search */}
+          <div className="relative mb-8">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search clients…"
+              className="w-full bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:bg-white/60 dark:focus:bg-white/10 focus:ring-2 focus:ring-rose-500/50 transition-all shadow-inner"
+            />
+          </div>
+
+          {/* Sites list/grid */}
+          {loading ? (
+            <div className="text-center py-24 text-slate-500 dark:text-slate-400">
+              <Loader2 size={36} className="animate-spin mx-auto mb-4 text-rose-500" />
+              <p className="text-sm font-medium">Loading your clients…</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-24 text-slate-500 dark:text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 bg-white/20 dark:bg-black/20 rounded-3xl">
+              <AlertCircle size={36} className="mx-auto mb-4 opacity-50" />
+              <p className="text-sm font-medium">{search ? 'No clients match your search.' : 'No clients yet. Create one above!'}</p>
+            </div>
+          ) : (
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+              {filtered.map((site, idx) => {
+                const status = calculateStatus(site.isActive, site.expiresAt);
+                return (
+                  <motion.div
+                    key={site.siteId}
+                    initial={{ opacity: 0, scale: viewMode === 'grid' ? 0.95 : 1, y: viewMode === 'list' ? 10 : 0 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className={`group bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-3xl p-5 flex transition-all duration-300 hover:shadow-lg shadow-black/5 hover:-translate-y-1 hover:border-rose-300 dark:hover:border-rose-500/30 ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row md:items-center justify-between gap-6'}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-500/20 dark:to-rose-500/5 border border-rose-200 dark:border-rose-500/20 flex-shrink-0 flex items-center justify-center text-xl shadow-sm">
+                        💌
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-900 dark:text-white text-base truncate flex items-center gap-3">
+                          {site.general?.coupleName || site.siteId}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">/{site.siteId}</p>
+                        
+                        <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
+                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created:</strong> {formatDate(site.createdAt)}</span>
+                          {viewMode==='list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
+                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Expires:</strong> {formatDate(site.expiresAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`flex items-center gap-3 mt-4 md:mt-0 ${viewMode === 'grid' ? 'pt-4 border-t border-slate-200 dark:border-slate-800 justify-between' : ''}`}>
+                      <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
+                        {status.text}
+                      </span>
+
+                      <div className="flex items-center gap-1.5 ml-auto md:ml-0">
+                        <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                          <Copy size={16} />
+                        </button>
+                        <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? "Deactivate Site" : "Activate Site"} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                          {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
+                        </button>
+                        <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                          <Edit3 size={16} />
+                        </button>
+                        <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
+      </>
+    ) : (
+      /* STOREFRONT MANAGEMENT UI */
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Storefront Content</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">Dynamically manage templates and testimonials</p>
+          </div>
+          <button
+            onClick={handleSaveStorefront}
+            disabled={savingStorefront}
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+          >
+            {savingStorefront ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            Save Changes
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Templates Editor */}
+          <div className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold flex items-center gap-2"><LayoutGrid className="text-rose-500" /> Templates</h3>
+              <button onClick={addTemplate} className="text-sm font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 px-3 py-1.5 rounded-xl transition">
+                + Add New
+              </button>
+            </div>
+            
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              {storefront.templates?.map((tpl, i) => (
+                <div key={i} className="bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-2xl p-4 flex flex-col gap-3 relative group">
+                  <button onClick={() => removeTemplate(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100">
+                    <Trash2 size={16} />
+                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Name</label>
+                      <input value={tpl.name} onChange={e => handleTemplateChange(i, 'name', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">ID / Route</label>
+                      <input value={tpl.id} onChange={e => handleTemplateChange(i, 'id', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Price (e.g. Rs. 2,500)</label>
+                      <input value={tpl.price} onChange={e => handleTemplateChange(i, 'price', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Tag / Badge</label>
+                      <input value={tpl.tag} onChange={e => handleTemplateChange(i, 'tag', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500">Description</label>
+                    <textarea value={tpl.description} onChange={e => handleTemplateChange(i, 'description', e.target.value)} rows={2} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Testimonials Editor */}
+          <div className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Star className="text-amber-500" /> Testimonials</h3>
+              <button onClick={addTestimonial} className="text-sm font-bold text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 px-3 py-1.5 rounded-xl transition">
+                + Add Feedback
+              </button>
+            </div>
+
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              {storefront.testimonials?.map((test, i) => (
+                <div key={i} className="bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-2xl p-4 flex flex-col gap-3 relative group">
+                  <button onClick={() => removeTestimonial(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100">
+                    <Trash2 size={16} />
+                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Customer Name</label>
+                      <input value={test.name} onChange={e => handleTestimonialChange(i, 'name', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Template Used</label>
+                      <input value={test.templateName} onChange={e => handleTestimonialChange(i, 'templateName', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500">Review Text</label>
+                    <textarea value={test.text} onChange={e => handleTestimonialChange(i, 'text', e.target.value)} rows={3} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Proof Screenshot (Chat / Review)</label>
+                    <div className="flex items-center gap-3">
+                      {test.screenshotUrl ? (
+                        <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-black/5 flex-shrink-0 group/img">
+                          <img src={test.screenshotUrl} alt="Proof" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => handleTestimonialChange(i, 'screenshotUrl', '')}
+                            className="absolute inset-0 bg-black/70 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-rose-500 transition-colors cursor-pointer bg-white/30 dark:bg-black/10 flex-shrink-0">
+                          <Upload size={16} className="text-slate-400" />
+                          <span className="text-[9px] font-bold text-slate-500 mt-0.5">Upload</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={e => handleTestimonialImageUpload(i, e.target.files[0])} 
+                            className="hidden" 
+                          />
+                        </label>
+                      )}
+                      <div className="flex-1 text-xs text-slate-500 leading-normal">
+                        {test.screenshotUrl ? (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">✓ Screenshot Linked</span>
+                        ) : (
+                          <span>Upload a chat screenshot as proof.</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+        </div>
+      </motion.div>
+    )}
+      </main>
+
+      {/* Creation Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-md p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white/70 dark:bg-neutral-900/70 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-[2rem] p-8 w-full max-w-md shadow-2xl shadow-black/20"
+            >
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">New Client Site</h3>
+              
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Site ID (URL Slug)</label>
+                  <input
+                    value={newId}
+                    onChange={e => setNewId(e.target.value)}
+                    placeholder="e.g. maleesha-charu"
+                    className="w-full bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl px-5 py-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white/60 dark:focus:bg-white/20 focus:ring-2 focus:ring-rose-500/50 shadow-inner transition"
+                  />
+                  <p className="text-[11px] text-slate-500 mt-2 ml-1">Spaces are auto-converted to dashes.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Category</label>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => { setCategory('valentine'); setTemplateType('polaroid'); }} 
+                      className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors ${category === 'valentine' ? 'bg-rose-500 text-white' : 'bg-white/40 dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400'}`}
+                    >
+                      Valentine / Proposal
+                    </button>
+                    <button 
+                      onClick={() => { setCategory('birthday'); setTemplateType('bday1'); }} 
+                      className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors ${category === 'birthday' ? 'bg-amber-500 text-white' : 'bg-white/40 dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400'}`}
+                    >
+                      Birthday
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Template Type</label>
+                  <select
+                    value={templateType}
+                    onChange={e => setTemplateType(e.target.value)}
+                    className="w-full bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl px-5 py-3.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:bg-white/60 dark:focus:bg-white/20 focus:ring-2 focus:ring-rose-500/50 shadow-inner transition appearance-none"
+                  >
+                    {category === 'valentine' ? (
+                      <>
+                        <option value="polaroid">Template 1 - Polaroid (Original)</option>
+                        <option value="modern">Template 2 - Modern</option>
+                        <option value="valentine">Template 3 - Valentine (Interactive)</option>
+                        <option value="proposal">Template 4 - Proposal (Interactive)</option>
+                        <option value="custom">Template 5 - Custom (Mix &amp; Match)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="bday1">Birthday Template 1 - The Unwrapping</option>
+                        <option value="bday2">Birthday Template 2 - The Balloon Pop</option>
+                        <option value="bday3">Birthday Template 3 - The Card Flip</option>
+                        <option value="bday4">Birthday Template 4 - The Surprise Party</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-8">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-5 py-3 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreate}
+                  disabled={!newId.trim() || creating}
+                  className="flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-xl shadow-rose-500/20 transition-all hover:scale-105 active:scale-95"
+                >
+                  {creating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} strokeWidth={3} />}
+                  Create Site
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Task 4: Custom Delete Modal */}
+      <AnimatePresence>
+        {deleteModal.isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-[2rem] p-8 w-full max-w-sm shadow-2xl shadow-black/20 text-center"
+            >
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+                <AlertTriangle size={28} className="text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Delete Permanently?</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                Are you sure you want to delete <strong className="text-slate-900 dark:text-white">/{deleteModal.siteId}</strong>? This action will completely erase the site and cannot be undone.
+              </p>
+              
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting === deleteModal.siteId}
+                  className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-3.5 rounded-2xl text-sm shadow-lg shadow-red-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                >
+                  {deleting === deleteModal.siteId ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                  Delete Permanently
+                </button>
+                <button
+                  onClick={() => setDeleteModal({ isOpen: false, siteId: null })}
+                  disabled={deleting === deleteModal.siteId}
+                  className="w-full px-6 py-3.5 rounded-2xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}
