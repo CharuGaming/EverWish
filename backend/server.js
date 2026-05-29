@@ -61,7 +61,9 @@ app.use((err, _req, res, _next) => {
 // ── Connect to MongoDB, then start server ─────────────────────────
 const fs = require('fs');
 const path = require('path');
-const dbPath = path.join(__dirname, 'db.json');
+const dbPath = process.env.NODE_ENV === 'production' 
+  ? path.join('/tmp', 'db.json') 
+  : path.join(__dirname, 'db.json');
 
 function readDb() {
   if (!fs.existsSync(dbPath)) {

@@ -1,6 +1,6 @@
 // ── Centralised API client ────────────────────────────────────────
 // Set VITE_API_URL in .env.local to override for production
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
 
 // ── Sites ─────────────────────────────────────────────────────────
 export async function listSites() {
