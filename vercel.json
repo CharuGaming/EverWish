@@ -19,8 +19,11 @@
       "dest": "backend/server.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "valentine-app/$1"
+      "dest": "/index.html"
     }
   ],
   "crons": [
