@@ -19,11 +19,16 @@
       "dest": "backend/server.js"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/valentine-app/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2))$",
+      "dest": "/valentine-app/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/valentine-app/index.html"
     }
   ],
   "crons": [
