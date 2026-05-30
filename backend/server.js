@@ -42,61 +42,48 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// ── Serverless MongoDB Connection ─────────────────────────────────
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null, fallback: false };
+}
+
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+  if (cached.fallback) return null; // Already entered fallback mode
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      minPoolSize: 1
+    };
+    cached.promise = mongoose.connect(process.env.MONGO_URI, opts)
+      .then((mongoose) => {
+        return mongoose;
+      })
+      .catch((err) => {
+        console.warn('⚠️ MongoDB connection failed, enabling JSON fallback:', err.message);
+        cached.fallback = true;
+        enableJsonFallback();
+        return null;
+      });
+  }
+  
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
 // ── Database Connection Middleware for Serverless ──────────────────
 app.use(async (req, res, next) => {
-  // If fallback is already enabled, just proceed
-  if (mongoose.connection.isFallbackEnabled) {
+  if (mongoose.connection.isFallbackEnabled || cached.fallback) {
     return next();
   }
-
-  // If connected (readyState === 1), proceed
-  if (mongoose.connection.readyState === 1) {
-    return next();
-  }
-
-  // If connecting (readyState === 2), wait for it with a timeout of 4 seconds
-  if (mongoose.connection.readyState === 2) {
-    let interval;
-    try {
-      await Promise.race([
-        new Promise((resolve) => {
-          interval = setInterval(() => {
-            if (mongoose.connection.readyState === 1) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-        }),
-        new Promise((_, reject) => setTimeout(() => {
-          clearInterval(interval);
-          reject(new Error('MongoDB connection timeout'));
-        }, 4000))
-      ]);
-      return next();
-    } catch (e) {
-      clearInterval(interval);
-      console.warn('⚠️ MongoDB connection timeout during request, using JSON fallback');
-      enableJsonFallback();
-      return next();
-    }
-  }
-
-  // If disconnected or anything else, try to connect with a fast timeout
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      bufferCommands:           false,
-      serverSelectionTimeoutMS: 4000,
-      socketTimeoutMS:          45000,
-      maxPoolSize:              10,
-      minPoolSize:              1,
-      keepAlive:                true,
-    });
-    return next();
-  } catch (err) {
-    console.warn('⚠️ MongoDB connection failed, using JSON fallback:', err.message);
-    enableJsonFallback();
-    return next();
-  }
+  
+  await connectDB();
+  return next();
 });
 
 // ── Mount Routes ──────────────────────────────────────────────────
@@ -256,36 +243,8 @@ function enableJsonFallback() {
   };
 }
 
-// ── MongoDB Atlas is the permanent, authoritative database. ───────
-// The options below stabilize the Mongoose connection pool for Vercel's
-// serverless environment, where each invocation may reuse a warm
-// connection or open a new one. Atlas itself is always persistent.
-mongoose
-  .connect(process.env.MONGO_URI, {
-    // Serverless: don't buffer queries — fail fast if not connected
-    bufferCommands:           false,
-    // Wait up to 8s for Atlas to respond (covers cold-start latency)
-    serverSelectionTimeoutMS: 8000,
-    // Close sockets idle for more than 45s
-    socketTimeoutMS:          45000,
-    // Reuse up to 10 connections within one serverless container
-    maxPoolSize:              10,
-    // Always keep at least 1 connection warm for faster reuse
-    minPoolSize:              1,
-    // TCP keepalive prevents Atlas from dropping idle connections
-    keepAlive:                true,
-    keepAliveInitialDelay:    300000, // begin keepalive after 5min idle
-  })
-  .then(() => {
-    console.log('✅  MongoDB Atlas connected');
-    startServer();
-  })
-  .catch((err) => {
-    console.error('❌  MongoDB connection failed:', err.message);
-    enableJsonFallback();
-    startServer();
-  });
-
+// ── Start server (Local Dev) ────────────────────────────────────────
+startServer();
 function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

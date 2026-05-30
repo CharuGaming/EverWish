@@ -5,7 +5,22 @@ const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http:
 // ── Sites ─────────────────────────────────────────────────────────
 export async function listSites() {
   const r = await fetch(`${BASE}/api/sites`);
-  return r.json();
+  if (!r.ok) {
+    let msg = 'API error';
+    try {
+      const text = await r.text();
+      try {
+        const data = JSON.parse(text);
+        msg = data.message || msg;
+      } catch (e) {
+        msg = text.slice(0, 100); // Capture Vercel HTML timeout or 500 error
+      }
+    } catch(e) {}
+    throw new Error(msg);
+  }
+  const data = await r.json();
+  if (!data.success) throw new Error(data.message || 'API returned failure');
+  return data;
 }
 
 export async function getSite(siteId) {

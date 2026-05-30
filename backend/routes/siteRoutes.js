@@ -77,7 +77,7 @@ router.get('/', async (req, res) => {
     res.status(200).json({ success: true, data: sites });
   } catch (err) {
     console.error('[GET /api/sites]', err.message);
-    res.status(500).json({ success: false, message: 'Server error listing sites.' });
+    res.status(500).json({ success: false, message: err.message || 'Server error listing sites.' });
   }
 });
 

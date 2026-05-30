@@ -120,7 +120,7 @@ export default function AdminDashboard() {
       if (storeRes.data) setStorefront(storeRes.data);
     } catch (e) {
       console.error(e);
-      showToast("Failed to load data", false);
+      showToast(`Failed to load data: ${e.message}`, false);
     }
     setLoading(false);
   };
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
       const res = await listOrders();
       setOrders(res.data || []);
     } catch (e) {
-      showToast('Failed to load orders', false);
+      showToast(`Failed to load orders: ${e.message}`, false);
     }
     setOrdersLoading(false);
   };
