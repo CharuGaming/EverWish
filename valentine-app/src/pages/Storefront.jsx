@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   Heart, Star, MessageCircle, Mail, Share2, Eye,
@@ -8,7 +9,7 @@ import PreviewModal from '../components/PreviewModal';
 import { getStorefront } from '../api';
 
 // ── Data ─────────────────────────────────────────────────────────────
-const WHATSAPP_NUMBER = '94XXXXXXXXX'; // TODO: replace with real number
+const WHATSAPP_NUMBER = '94712000590'; // EverWish Business WhatsApp
 
 const TEMPLATES = {
   valentine: [
@@ -171,16 +172,14 @@ function TemplateCard({ tpl, index, onPreview }) {
               <Eye size={13} />
               Preview
             </button>
-            {/* Buy Now button */}
-            <a
-              href={waLink(tpl.name)}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* Buy Now button → Order Form */}
+            <Link
+              to={`/order/${tpl.id}`}
               className="flex items-center justify-center gap-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-xs font-bold py-2.5 rounded-2xl shadow-md shadow-rose-400/20 transition-all hover:scale-105 active:scale-95"
             >
-              <MessageCircle size={13} strokeWidth={2.5} />
+              <ChevronRight size={13} strokeWidth={2.5} />
               Buy Now
-            </a>
+            </Link>
           </div>
         </div>
       </div>

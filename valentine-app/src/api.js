@@ -57,6 +57,30 @@ export async function uploadImage(file) {
   return r.json();
 }
 
+// ── Orders ────────────────────────────────────────────────────────
+export async function createOrder(payload) {
+  const r = await fetch(`${BASE}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return r.json();
+}
+
+export async function listOrders() {
+  const r = await fetch(`${BASE}/api/orders`);
+  return r.json();
+}
+
+export async function updateOrderStatus(orderId, status) {
+  const r = await fetch(`${BASE}/api/orders/${orderId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  return r.json();
+}
+
 // ── Transform MongoDB doc → format existing components expect ─────
 export function toComponentData(doc) {
   if (!doc) return null;

@@ -9,6 +9,7 @@ const siteRoutes       = require('./routes/siteRoutes');
 const uploadRoutes     = require('./routes/uploadRoutes');
 const storefrontRoutes = require('./routes/storefrontRoutes');
 const cronRoutes       = require('./routes/cronRoutes');
+const orderRoutes      = require('./routes/orderRoutes');
 
 // ── Initialise Express ─────────────────────────────────────────────
 const app    = express();
@@ -46,6 +47,7 @@ app.use('/api/sites',      siteRoutes);
 app.use('/api/upload',     uploadRoutes);
 app.use('/api/storefront', storefrontRoutes);
 app.use('/api/cron',       cronRoutes);
+app.use('/api/orders',     orderRoutes);
 
 // ── Global 404 Handler ────────────────────────────────────────────
 app.use((_req, res) => {

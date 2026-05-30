@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, getStorefront, updateStorefront, uploadImage } from '../api';
+import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, getStorefront, updateStorefront, uploadImage, listOrders, updateOrderStatus } from '../api';
 import {
   Heart, Plus, ExternalLink, Trash2, Edit3,
   Search, AlertCircle, Loader2, CheckCircle2,
   Sun, Moon, LayoutGrid, List, Copy, ToggleLeft, ToggleRight, AlertTriangle,
-  Store, Users, Save, Star, Upload, Image as ImageIcon
+  Store, Users, Save, Star, Upload, Image as ImageIcon, ShoppingBag, X, Music, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -69,9 +69,14 @@ export default function AdminDashboard() {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, siteId: null });
 
   // Storefront Tab State
-  const [activeTab, setActiveTab] = useState('sites'); // 'sites' | 'storefront'
+  const [activeTab, setActiveTab] = useState('sites'); // 'sites' | 'storefront' | 'orders'
   const [storefront, setStorefront] = useState({ templates: [], testimonials: [] });
   const [savingStorefront, setSavingStorefront] = useState(false);
+
+  // ── Orders state ──────────────────────────────────────────────
+  const [orders, setOrders]           = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null); // asset viewer modal
 
   const nav = useNavigate();
 
@@ -120,7 +125,19 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const loadOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const res = await listOrders();
+      setOrders(res.data || []);
+    } catch (e) {
+      showToast('Failed to load orders', false);
+    }
+    setOrdersLoading(false);
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { if (activeTab === 'orders') loadOrders(); }, [activeTab]);
 
   const handleCreate = async () => {
     const id = newId.trim().toLowerCase().replace(/\s+/g, '-');
@@ -291,6 +308,17 @@ export default function AdminDashboard() {
           >
             <Store size={16} /> Manage Storefront
           </button>
+          <button 
+            onClick={() => setActiveTab('orders')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'orders' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+          >
+            <ShoppingBag size={16} /> Orders Received
+            {orders.filter(o => o.status === 'pending').length > 0 && (
+              <span className="bg-rose-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
+                {orders.filter(o => o.status === 'pending').length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -446,6 +474,94 @@ export default function AdminDashboard() {
           )}
         </motion.div>
       </>
+    ) : activeTab === 'orders' ? (
+      /* ──── ORDERS RECEIVED ─────────────────────────────────── */
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Orders Received</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">Customer submissions from the Order Form</p>
+          </div>
+          <button onClick={loadOrders} className="flex items-center gap-2 bg-white/50 dark:bg-black/30 border border-white/60 dark:border-white/10 text-slate-600 dark:text-slate-300 font-bold px-5 py-2.5 rounded-2xl text-sm hover:bg-white/80 dark:hover:bg-white/10 transition">
+            <Loader2 size={14} className={ordersLoading ? 'animate-spin' : ''} /> Refresh
+          </button>
+        </div>
+
+        <div className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl overflow-hidden">
+          {ordersLoading ? (
+            <div className="space-y-3 p-6">
+              {[1,2,3].map(i => (
+                <div key={i} className="h-16 rounded-2xl bg-slate-200 dark:bg-slate-800 animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+              ))}
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-24 text-slate-500 dark:text-slate-400">
+              <ShoppingBag size={36} className="mx-auto mb-4 opacity-30" />
+              <p className="text-sm font-medium">No orders yet. Share your store link to get started!</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-white/10 bg-white/30 dark:bg-white/5">
+                    {['Order ID', 'Customer', 'Template', 'Date', 'Status', 'Actions'].map(h => (
+                      <th key={h} className="text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 px-5 py-3.5">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {orders.map((order) => {
+                    const statusColors = {
+                      pending:     'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20',
+                      in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20',
+                      completed:   'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20',
+                      cancelled:   'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700',
+                    };
+                    return (
+                      <tr key={order._id} className="hover:bg-white/40 dark:hover:bg-white/5 transition-colors">
+                        <td className="px-5 py-4 font-mono text-xs font-bold text-rose-600 dark:text-rose-400">{order.orderId}</td>
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-slate-800 dark:text-white text-sm">{order.customerName}</p>
+                          <p className="text-slate-400 text-xs font-mono">{order.customerPhone}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-slate-700 dark:text-slate-200 text-xs">{order.templateName || order.templateId}</p>
+                          <p className="text-slate-400 text-[10px] uppercase tracking-widest">{order.category}</p>
+                        </td>
+                        <td className="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{formatDate(order.createdAt)}</td>
+                        <td className="px-5 py-4">
+                          <select
+                            value={order.status}
+                            onChange={async (e) => {
+                              await updateOrderStatus(order.orderId, e.target.value);
+                              setOrders(prev => prev.map(o => o.orderId === order.orderId ? { ...o, status: e.target.value } : o));
+                              showToast('Status updated!');
+                            }}
+                            className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest cursor-pointer border-0 outline-none ${statusColors[order.status]}`}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td className="px-5 py-4">
+                          <button
+                            onClick={() => setSelectedOrder(order)}
+                            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-2 rounded-xl transition hover:border-rose-300 dark:hover:border-rose-500/30"
+                          >
+                            <Eye size={13} /> View Assets
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </motion.div>
     ) : (
       /* STOREFRONT MANAGEMENT UI */
       <motion.div
@@ -725,7 +841,76 @@ export default function AdminDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* ── Asset Viewer Modal ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
+            onClick={() => setSelectedOrder(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-[2rem] p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl"
+            >
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Order Assets</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{selectedOrder.orderId} · {selectedOrder.customerName}</p>
+                </div>
+                <button onClick={() => setSelectedOrder(null)} className="p-2 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-500 transition">
+                  <X size={18} />
+                </button>
+              </div>
 
+              {/* Form Data */}
+              <div className="mb-6">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-3">Form Data</h4>
+                <div className="space-y-2">
+                  {Object.entries(selectedOrder.formData || {}).map(([key, val]) => (
+                    <div key={key} className="flex gap-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3">
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 capitalize flex-shrink-0">{key.replace(/([A-Z])/g, ' $1')}:</span>
+                      <span className="text-sm text-slate-800 dark:text-white break-all">
+                        {Array.isArray(val) ? val.join(' · ') : String(val || '—')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Gallery Images */}
+              {selectedOrder.images?.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-3">Gallery Photos ({selectedOrder.images.length})</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    {selectedOrder.images.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block">
+                        <img src={url} alt={`Photo ${i+1}`} className="w-full h-28 object-cover rounded-2xl border border-slate-200 dark:border-white/10 hover:scale-105 transition-transform" loading="lazy" decoding="async" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Audio */}
+              {selectedOrder.audioUrl && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-3">Background Music</h4>
+                  <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3">
+                    <Music size={16} className="text-rose-400 flex-shrink-0" />
+                    <a href={selectedOrder.audioUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-rose-500 hover:text-rose-700 underline truncate">
+                      {selectedOrder.audioUrl}
+                    </a>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

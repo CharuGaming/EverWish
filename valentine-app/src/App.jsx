@@ -8,6 +8,7 @@ import AdminEditor    from "./pages/AdminEditor";
 import ClientPage     from "./pages/ClientPage";
 import Storefront     from "./pages/Storefront";
 import DemoPage       from "./pages/DemoPage";
+import OrderForm      from "./pages/OrderForm";
 
 // Static demo components (hardcoded siteData — the original demo at /)
 import LockScreen    from "./components/LockScreen";
@@ -78,6 +79,9 @@ export default function App() {
         {/* Admin portal */}
         <Route path="/admin"             element={<AdminDashboard />} />
         <Route path="/admin/edit/:siteId" element={<AdminEditor />} />
+
+        {/* Order form — /order/:templateId */}
+        <Route path="/order/:templateId"    element={<OrderForm />} />
 
         {/* Dynamic client celebration page — must stay last */}
         <Route path="/:siteId"           element={<ClientPage />} />
