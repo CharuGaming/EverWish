@@ -189,7 +189,7 @@ export default function AdminDashboard() {
       await updateStorefront(storefront);
       showToast("Storefront updated successfully!");
     } catch (e) {
-      showToast("Failed to update storefront", false);
+      showToast(`Failed: ${e.message}`, false);
     }
     setSavingStorefront(false);
   };

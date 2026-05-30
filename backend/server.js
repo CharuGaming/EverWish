@@ -56,20 +56,25 @@ app.use(async (req, res, next) => {
 
   // If connecting (readyState === 2), wait for it with a timeout of 4 seconds
   if (mongoose.connection.readyState === 2) {
+    let interval;
     try {
       await Promise.race([
         new Promise((resolve) => {
-          const interval = setInterval(() => {
+          interval = setInterval(() => {
             if (mongoose.connection.readyState === 1) {
               clearInterval(interval);
               resolve();
             }
           }, 100);
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB connection timeout')), 4000))
+        new Promise((_, reject) => setTimeout(() => {
+          clearInterval(interval);
+          reject(new Error('MongoDB connection timeout'));
+        }, 4000))
       ]);
       return next();
     } catch (e) {
+      clearInterval(interval);
       console.warn('⚠️ MongoDB connection timeout during request, using JSON fallback');
       enableJsonFallback();
       return next();

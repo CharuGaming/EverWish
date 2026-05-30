@@ -1206,88 +1206,16 @@
       "updatedAt": "2026-05-29T09:45:38.767Z"
     }
   ],
+  "orders": [],
   "storefront": {
     "isGlobal": true,
     "templates": [
       {
-        "id": "v1",
-        "name": "The Polaroid Love Story",
-        "price": "Rs. 750",
-        "emoji": "📸",
-        "tag": "Bestseller",
-        "category": "valentine",
-        "description": "Vintage polaroid gallery with a love-letter reveal.",
-        "gradient": "from-rose-400 to-pink-500"
-      },
-      {
-        "id": "v2",
-        "name": "The Modern Romance",
-        "price": "Rs. 750",
-        "emoji": "💫",
-        "tag": "Elegant",
-        "category": "valentine",
-        "description": "Sleek, cinematic design with smooth scroll sections.",
-        "gradient": "from-purple-400 to-rose-400"
-      },
-      {
-        "id": "v3",
-        "name": "The Valentine Experience",
-        "price": "Rs. 750",
-        "emoji": "💝",
-        "tag": "Interactive",
-        "category": "valentine",
-        "description": "Interactive floating hearts, surprise gifts & confetti.",
-        "gradient": "from-red-400 to-rose-500"
-      },
-      {
-        "id": "v4",
-        "name": "The Proposal Suite",
-        "price": "Rs. 750",
-        "emoji": "💍",
-        "tag": "Premium",
-        "category": "valentine",
-        "description": "A full proposal journey — question, countdown & ring reveal.",
-        "gradient": "from-rose-500 to-amber-400"
-      },
-      {
-        "id": "b1",
-        "name": "The Unwrapping Experience",
-        "price": "Rs. 750",
-        "emoji": "🎁",
-        "tag": "Fun",
-        "category": "birthday",
-        "description": "Tap to unwrap a digital birthday gift box with wishes inside.",
-        "gradient": "from-amber-400 to-orange-500"
-      },
-      {
-        "id": "b2",
-        "name": "The Balloon Pop",
-        "price": "Rs. 750",
-        "emoji": "🎈",
-        "tag": "Playful",
-        "category": "birthday",
-        "description": "Pop colourful balloons to reveal personalised messages.",
-        "gradient": "from-sky-400 to-violet-500"
-      },
-      {
-        "id": "b3",
-        "name": "The Card Flip",
-        "price": "Rs. 750",
-        "emoji": "🃏",
-        "tag": "Classic",
-        "category": "birthday",
-        "description": "Elegant flip-card gallery with a heartfelt birthday note.",
-        "gradient": "from-emerald-400 to-teal-500"
-      },
-      {
-        "id": "b4",
-        "name": "The Surprise Party",
-        "price": "Rs. 750",
-        "emoji": "🎉",
-        "tag": "Immersive",
-        "category": "birthday",
-        "description": "Full party experience with confetti, music & a wishes wall.",
-        "gradient": "from-fuchsia-400 to-pink-500"
+        "id": "c-1780137561505",
+        "name": "New Template",
+        "price": "Rs. 2,500",
+        "tag": "New",
+        "description": "Description"
       }
     ],
     "testimonials": [
@@ -1297,28 +1225,31 @@
         "rating": 5,
         "text": "I gifted my boyfriend the Proposal Suite and he was absolutely speechless! Every detail was perfect. EverWish made it magical.",
         "templateName": "Proposal Suite",
-        "screenshotUrl": "https://res.cloudinary.com/daczoccvq/image/upload/v1780047007/everwish-celebrations/pxesefz7nwb21ecauyga.jpg"
+        "screenshotUrl": ""
       },
       {
         "name": "Kavindu S.",
         "avatar": "👨",
         "rating": 5,
         "text": "The Balloon Pop birthday page for my best friend had everyone at the party screaming with joy. Worth every rupee!",
-        "templateName": "Balloon Pop"
+        "templateName": "Balloon Pop",
+        "screenshotUrl": ""
       },
       {
         "name": "Anuki P.",
         "avatar": "👩‍🦱",
         "rating": 5,
         "text": "Setup was so fast and the support was amazing. My partner cried happy tears — mission accomplished 😭❤️",
-        "templateName": "Polaroid Love Story"
+        "templateName": "Polaroid Love Story",
+        "screenshotUrl": ""
       },
       {
         "name": "Tharindu M.",
         "avatar": "🧑",
         "rating": 5,
         "text": "A completely unique gift idea. I've used EverWish twice now and will definitely keep coming back for every occasion!",
-        "templateName": "The Unwrapping"
+        "templateName": "The Unwrapping",
+        "screenshotUrl": ""
       }
     ]
   }

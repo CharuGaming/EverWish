@@ -48,7 +48,14 @@ export async function updateStorefront(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  return r.json();
+  if (!r.ok) {
+    let msg = 'API error';
+    try { const data = await r.json(); msg = data.message; } catch(e) {}
+    throw new Error(msg);
+  }
+  const data = await r.json();
+  if (!data.success) throw new Error(data.message || 'API returned failure');
+  return data;
 }
 export async function uploadImage(file) {
   const fd = new FormData();
