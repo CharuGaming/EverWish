@@ -6,18 +6,27 @@ const fs = require('fs');
 const path = require('path');
 
 // Fallback logic for db.json if mongo fails
-const dbPath = path.join(__dirname, '..', 'db.json');
+const dbPath = process.env.NODE_ENV === 'production'
+  ? path.join('/tmp', 'db.json')
+  : path.join(__dirname, '..', 'db.json');
 
 function readDb() {
   if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, JSON.stringify([]));
+    fs.writeFileSync(dbPath, JSON.stringify({ sites: [], orders: [], storefront: null }));
   }
   try {
     const content = fs.readFileSync(dbPath, 'utf8');
     const data = JSON.parse(content);
-    return Array.isArray(data) ? { sites: data, storefront: null } : data;
+    if (Array.isArray(data)) {
+      return { sites: data, orders: [], storefront: null };
+    }
+    return {
+      sites: data.sites || [],
+      orders: data.orders || [],
+      storefront: data.storefront || null
+    };
   } catch (e) {
-    return { sites: [], storefront: null };
+    return { sites: [], orders: [], storefront: null };
   }
 }
 

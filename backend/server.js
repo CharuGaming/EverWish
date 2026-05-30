@@ -42,6 +42,58 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// ── Database Connection Middleware for Serverless ──────────────────
+app.use(async (req, res, next) => {
+  // If fallback is already enabled, just proceed
+  if (mongoose.connection.isFallbackEnabled) {
+    return next();
+  }
+
+  // If connected (readyState === 1), proceed
+  if (mongoose.connection.readyState === 1) {
+    return next();
+  }
+
+  // If connecting (readyState === 2), wait for it with a timeout of 4 seconds
+  if (mongoose.connection.readyState === 2) {
+    try {
+      await Promise.race([
+        new Promise((resolve) => {
+          const interval = setInterval(() => {
+            if (mongoose.connection.readyState === 1) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 100);
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB connection timeout')), 4000))
+      ]);
+      return next();
+    } catch (e) {
+      console.warn('⚠️ MongoDB connection timeout during request, using JSON fallback');
+      enableJsonFallback();
+      return next();
+    }
+  }
+
+  // If disconnected or anything else, try to connect with a fast timeout
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      bufferCommands:           false,
+      serverSelectionTimeoutMS: 4000,
+      socketTimeoutMS:          45000,
+      maxPoolSize:              10,
+      minPoolSize:              1,
+      keepAlive:                true,
+    });
+    return next();
+  } catch (err) {
+    console.warn('⚠️ MongoDB connection failed, using JSON fallback:', err.message);
+    enableJsonFallback();
+    return next();
+  }
+});
+
 // ── Mount Routes ──────────────────────────────────────────────────
 app.use('/api/sites',      siteRoutes);
 app.use('/api/upload',     uploadRoutes);
@@ -69,13 +121,20 @@ const dbPath = process.env.NODE_ENV === 'production'
 
 function readDb() {
   if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, JSON.stringify({ sites: [], storefront: null }));
+    fs.writeFileSync(dbPath, JSON.stringify({ sites: [], orders: [], storefront: null }));
   }
   try {
     const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    return Array.isArray(data) ? { sites: data, storefront: null } : data;
+    if (Array.isArray(data)) {
+      return { sites: data, orders: [], storefront: null };
+    }
+    return {
+      sites: data.sites || [],
+      orders: data.orders || [],
+      storefront: data.storefront || null
+    };
   } catch (e) {
-    return { sites: [], storefront: null };
+    return { sites: [], orders: [], storefront: null };
   }
 }
 
@@ -84,9 +143,15 @@ function writeDb(data) {
 }
 
 function enableJsonFallback() {
+  if (mongoose.connection.isFallbackEnabled) return;
+  mongoose.connection.isFallbackEnabled = true;
+
   console.log('⚠️  Using local JSON database fallback (backend/db.json) instead of MongoDB Atlas.');
-  const Site = require('./models/Site');
   
+  const Site = require('./models/Site');
+  const Order = require('./models/Order');
+
+  // --- Site Mocking ---
   Site.findOne = async function(query) {
     const db = readDb();
     const siteId = query.siteId.toLowerCase();
@@ -124,6 +189,7 @@ function enableJsonFallback() {
         let results = db.sites.map(s => ({
           siteId: s.siteId,
           general: s.general || {},
+          createdAt: s.createdAt || s.updatedAt,
           updatedAt: s.updatedAt || s.createdAt,
           isActive: s.isActive !== false,
           expiresAt: s.expiresAt
@@ -142,6 +208,46 @@ function enableJsonFallback() {
     const deleted = db.sites.splice(index, 1)[0];
     writeDb(db);
     return deleted;
+  };
+
+  // --- Order Mocking ---
+  Order.create = async function(payload) {
+    const db = readDb();
+    const uuid = require('uuid').v4;
+    const orderId = 'EW-' + uuid().replace(/-/g, '').substring(0, 6).toUpperCase();
+    const order = {
+      orderId,
+      ...payload,
+      status: payload.status || 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    db.orders.push(order);
+    writeDb(db);
+    return order;
+  };
+
+  Order.find = function() {
+    return {
+      sort: function(sortQuery) {
+        const db = readDb();
+        const results = [...db.orders];
+        results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return results;
+      }
+    };
+  };
+
+  Order.findOneAndUpdate = async function(query, payload, options) {
+    const db = readDb();
+    const orderId = query.orderId;
+    const index = db.orders.findIndex(o => o.orderId === orderId);
+    if (index === -1) return null;
+    const order = db.orders[index];
+    Object.assign(order, payload);
+    order.updatedAt = new Date().toISOString();
+    writeDb(db);
+    return order;
   };
 }
 
