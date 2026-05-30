@@ -54,7 +54,22 @@ export async function toggleSiteStatus(siteId, isActive) {
 // ── Storefront Configuration ──────────────────────────────────────
 export async function getStorefront() {
   const r = await fetch(`${BASE}/api/storefront`);
-  return r.json();
+  if (!r.ok) {
+    let msg = 'API error';
+    try {
+      const text = await r.text();
+      try {
+        const data = JSON.parse(text);
+        msg = data.message || msg;
+      } catch (e) {
+        msg = text.slice(0, 100);
+      }
+    } catch(e) {}
+    throw new Error(msg);
+  }
+  const data = await r.json();
+  if (!data.success) throw new Error(data.message || 'API returned failure');
+  return data;
 }
 
 export async function updateStorefront(payload) {

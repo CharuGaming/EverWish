@@ -55,7 +55,7 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 2000,
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
       minPoolSize: 1
@@ -119,7 +119,7 @@ app.use((err, _req, res, _next) => {
 // ── Connect to MongoDB, then start server ─────────────────────────
 const fs = require('fs');
 const path = require('path');
-const dbPath = process.env.NODE_ENV === 'production' 
+const dbPath = (process.env.NODE_ENV === 'production' || process.env.VERCEL)
   ? path.join('/tmp', 'db.json') 
   : path.join(__dirname, 'db.json');
 
@@ -258,7 +258,7 @@ function enableJsonFallback() {
 // ── Start server (Local Dev) ────────────────────────────────────────
 startServer();
 function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
       console.log(`🚀  Server running on http://localhost:${PORT}`);
       console.log(`📦  Health:  http://localhost:${PORT}/health`);

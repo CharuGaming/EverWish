@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Fallback logic for db.json if mongo fails
-const dbPath = process.env.NODE_ENV === 'production'
+const dbPath = (process.env.NODE_ENV === 'production' || process.env.VERCEL)
   ? path.join('/tmp', 'db.json')
   : path.join(__dirname, '..', 'db.json');
 
