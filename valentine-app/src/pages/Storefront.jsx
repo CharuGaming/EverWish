@@ -9,7 +9,16 @@ import PreviewModal from '../components/PreviewModal';
 import { getStorefront } from '../api';
 
 // ── Data ─────────────────────────────────────────────────────────────
-const WHATSAPP_NUMBER = '94712000590'; // EverWish Business WhatsApp
+// ── Contact Details ──────────────────────────────────────────────────
+const WHATSAPP_NUMBER  = '94712000590';                          // EverWish Business phone
+const WHATSAPP_LINK    = 'https://wa.me/message/OMLL3GNWH3JJA1'; // Direct WhatsApp Business link
+const CONTACT_EMAIL    = 'everwishlk@gmail.com';
+
+// Helper: build a WA link with a pre-filled message.
+// Uses the direct business link so any pre-filled text is appended correctly.
+function waLink(text) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
 
 const TEMPLATES = {
   valentine: [
@@ -98,11 +107,7 @@ const TESTIMONIALS = [
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────
-function waLink(templateName) {
-  const msg = encodeURIComponent(`Hello! I'd like to purchase the *${templateName}* template on EverWish. 😊`);
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
-}
-
+// waLink() is now defined at the top with the contact constants above.
 // ── Animation variants ────────────────────────────────────────────────
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -249,7 +254,7 @@ export default function Storefront() {
               Templates
             </button>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hello! I have a question about EverWish.')}`}
+              href={waLink('Hello! I have a question about EverWish.')}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg shadow-rose-400/30 hover:scale-105 transition-transform"
@@ -313,7 +318,7 @@ export default function Storefront() {
             <ChevronDown size={16} className="group-hover:translate-y-1 transition-transform" />
           </button>
           <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi! I want to know more about EverWish.')}`}
+            href={waLink('Hi! I want to know more about EverWish.')}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-white/60 backdrop-blur-md border border-white/80 text-slate-700 font-bold px-8 py-4 rounded-2xl shadow-md hover:scale-105 hover:bg-white/80 transition-all text-base"
@@ -521,7 +526,7 @@ export default function Storefront() {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'd like to order a personalised EverWish page 🎉")}`}
+                  href={waLink("Hi! I'd like to order a personalised EverWish page 🎉")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-2 bg-white text-rose-600 font-extrabold px-8 py-4 rounded-2xl shadow-lg hover:scale-105 transition-transform text-base"
@@ -558,11 +563,11 @@ export default function Storefront() {
 
           {/* Links */}
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-slate-500">
-            <a href={`mailto:everwish@gmail.com`} className="flex items-center gap-1.5 hover:text-rose-600 transition-colors font-medium">
-              <Mail size={15} /> everwish@gmail.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-1.5 hover:text-rose-600 transition-colors font-medium">
+              <Mail size={15} /> {CONTACT_EMAIL}
             </a>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              href={WHATSAPP_LINK}
               target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-green-600 transition-colors font-medium"
             >
