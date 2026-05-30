@@ -60,16 +60,21 @@ async function connectDB() {
       maxPoolSize: 10,
       minPoolSize: 1
     };
-    cached.promise = mongoose.connect(process.env.MONGO_URI, opts)
-      .then((mongoose) => {
-        return mongoose;
-      })
-      .catch((err) => {
-        console.warn('⚠️ MongoDB connection failed, enabling JSON fallback:', err.message);
-        cached.fallback = true;
-        enableJsonFallback();
-        return null;
-      });
+    try {
+      cached.promise = mongoose.connect(process.env.MONGO_URI, opts)
+        .then((mongoose) => mongoose)
+        .catch((err) => {
+          console.warn('⚠️ MongoDB connection failed (async), enabling JSON fallback:', err.message);
+          cached.fallback = true;
+          enableJsonFallback();
+          return null;
+        });
+    } catch (err) {
+      console.warn('⚠️ MongoDB connection failed (sync), enabling JSON fallback:', err.message);
+      cached.promise = Promise.resolve(null);
+      cached.fallback = true;
+      enableJsonFallback();
+    }
   }
   
   cached.conn = await cached.promise;
@@ -82,8 +87,15 @@ app.use(async (req, res, next) => {
     return next();
   }
   
-  await connectDB();
-  return next();
+  try {
+    await connectDB();
+    return next();
+  } catch (err) {
+    console.error('⚠️ Critical DB middleware error:', err.message);
+    cached.fallback = true;
+    try { enableJsonFallback(); } catch(e) {}
+    return next();
+  }
 });
 
 // ── Mount Routes ──────────────────────────────────────────────────
