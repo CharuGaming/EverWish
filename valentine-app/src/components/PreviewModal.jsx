@@ -1,5 +1,5 @@
 // PreviewModal.jsx – Mobile-frame preview modal for template demos
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageCircle, Smartphone } from 'lucide-react';
 
@@ -23,10 +23,14 @@ const TEMPLATE_PRICES = {
 export default function PreviewModal({ isOpen, templateId, whatsappNumber, onClose }) {
   const name   = TEMPLATE_NAMES[templateId]  || 'this template';
   const price  = TEMPLATE_PRICES[templateId] || '';
-  const demoUrl = `/demo/${templateId}`;
+  const demoUrl = `/demo/${templateId}?demo=1`;
   const waUrl   = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     `Hello! I'd like to purchase the *${name}* template on EverWish. 😊`
   )}`;
+
+  // Reset iframe load state whenever a new template is opened
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  useEffect(() => { if (isOpen) setIframeLoaded(false); }, [isOpen, templateId]);
 
   // Close on Escape key
   useEffect(() => {
@@ -99,15 +103,41 @@ export default function PreviewModal({ isOpen, templateId, whatsappNumber, onClo
                 <div className="w-14 h-3.5 rounded-full bg-neutral-800" />
               </div>
 
+              {/* Skeleton loader — visible while iframe is loading */}
+              {!iframeLoaded && (
+                <div className="absolute inset-0 z-10 flex flex-col gap-4 p-6 pt-10 bg-neutral-900">
+                  {/* Fake hero block */}
+                  <div className="h-40 w-full rounded-2xl bg-neutral-800 animate-pulse" />
+                  {/* Fake content lines */}
+                  <div className="space-y-3 mt-2">
+                    <div className="h-4 w-3/4 rounded-full bg-neutral-800 animate-pulse" />
+                    <div className="h-4 w-1/2 rounded-full bg-neutral-700 animate-pulse" />
+                    <div className="h-4 w-2/3 rounded-full bg-neutral-800 animate-pulse" />
+                  </div>
+                  {/* Fake gallery grid */}
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    <div className="h-24 rounded-xl bg-neutral-800 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-neutral-700 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-neutral-700 animate-pulse" />
+                    <div className="h-24 rounded-xl bg-neutral-800 animate-pulse" />
+                  </div>
+                  <div className="mt-auto flex items-center justify-center gap-2 opacity-40">
+                    <Smartphone size={14} className="text-neutral-400" />
+                    <span className="text-neutral-400 text-xs font-medium">Loading preview…</span>
+                  </div>
+                </div>
+              )}
+
               {/* iframe – full template demo */}
               <iframe
                 key={templateId}
                 src={demoUrl}
                 title={`${name} Demo`}
                 className="absolute inset-0 w-full h-full border-0"
-                style={{ marginTop: 0 }}
+                style={{ marginTop: 0, opacity: iframeLoaded ? 1 : 0, transition: 'opacity 0.4s ease' }}
                 loading="lazy"
                 allow="autoplay"
+                onLoad={() => setIframeLoaded(true)}
               />
             </div>
 

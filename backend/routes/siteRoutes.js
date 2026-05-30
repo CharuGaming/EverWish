@@ -70,7 +70,10 @@ router.post('/:siteId', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
-    const sites = await Site.find({}, 'siteId general.coupleName updatedAt isActive expiresAt').sort({ updatedAt: -1 });
+    // Projection: only fetch lightweight summary fields — never pull full image arrays/messages
+    const sites = await Site
+      .find({}, 'siteId general.coupleName createdAt updatedAt isActive expiresAt')
+      .sort({ updatedAt: -1 });
     res.status(200).json({ success: true, data: sites });
   } catch (err) {
     console.error('[GET /api/sites]', err.message);

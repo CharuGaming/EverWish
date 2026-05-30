@@ -143,10 +143,28 @@ function enableJsonFallback() {
   };
 }
 
+// ── MongoDB Atlas is the permanent, authoritative database. ───────
+// The options below stabilize the Mongoose connection pool for Vercel's
+// serverless environment, where each invocation may reuse a warm
+// connection or open a new one. Atlas itself is always persistent.
 mongoose
-  .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })
+  .connect(process.env.MONGO_URI, {
+    // Serverless: don't buffer queries — fail fast if not connected
+    bufferCommands:           false,
+    // Wait up to 8s for Atlas to respond (covers cold-start latency)
+    serverSelectionTimeoutMS: 8000,
+    // Close sockets idle for more than 45s
+    socketTimeoutMS:          45000,
+    // Reuse up to 10 connections within one serverless container
+    maxPoolSize:              10,
+    // Always keep at least 1 connection warm for faster reuse
+    minPoolSize:              1,
+    // TCP keepalive prevents Atlas from dropping idle connections
+    keepAlive:                true,
+    keepAliveInitialDelay:    300000, // begin keepalive after 5min idle
+  })
   .then(() => {
-    console.log('✅  MongoDB connected');
+    console.log('✅  MongoDB Atlas connected');
     startServer();
   })
   .catch((err) => {

@@ -345,9 +345,37 @@ export default function AdminDashboard() {
 
           {/* Sites list/grid */}
           {loading ? (
-            <div className="text-center py-24 text-slate-500 dark:text-slate-400">
-              <Loader2 size={36} className="animate-spin mx-auto mb-4 text-rose-500" />
-              <p className="text-sm font-medium">Loading your clients…</p>
+            /* ── Glassmorphic skeleton loaders ── */
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="group bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-3xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 animate-pulse"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  {/* Left: icon + text lines */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-rose-100/70 dark:bg-rose-500/10 flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-44 rounded-full bg-slate-200 dark:bg-slate-700" />
+                      <div className="h-3 w-28 rounded-full bg-slate-100 dark:bg-slate-800" />
+                      <div className="flex gap-3 mt-1">
+                        <div className="h-3 w-24 rounded-full bg-slate-100 dark:bg-slate-800" />
+                        <div className="h-3 w-24 rounded-full bg-slate-100 dark:bg-slate-800" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Right: status pill + action icons */}
+                  <div className="flex items-center gap-3 ml-auto">
+                    <div className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-700" />
+                    <div className="flex gap-1.5">
+                      {[1,2,3,4].map(j => (
+                        <div key={j} className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-24 text-slate-500 dark:text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 bg-white/20 dark:bg-black/20 rounded-3xl">

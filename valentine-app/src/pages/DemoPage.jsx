@@ -3,7 +3,7 @@
 // Mirrors ClientPage's render logic but skips the API fetch entirely.
 
 import { useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MOCK_DATA } from '../mockData';
 
@@ -55,6 +55,10 @@ function UnknownTemplate({ id }) {
 // ── Main DemoPage ─────────────────────────────────────────────
 export default function DemoPage() {
   const { templateId } = useParams();
+  const [searchParams] = useSearchParams();
+  // When loaded inside PreviewModal's iframe, ?demo=1 is appended
+  // — skip CPU-heavy particle effects to keep mobile smooth
+  const isDemo = searchParams.get('demo') === '1';
   const siteData = MOCK_DATA[templateId];
 
   const [isUnlocked, setIsUnlocked]   = useState(false);
@@ -90,7 +94,8 @@ export default function DemoPage() {
     return (
       <div className="relative min-h-screen pt-8" style={{ backgroundColor: bg }}>
         <DemoBanner />
-        <FloatingBalloons />
+        {/* FloatingBalloons suppressed in iframe demo to reduce mobile GPU/CPU load */}
+        {!isDemo && <FloatingBalloons />}
         <GlobalMusicPlayer musicData={siteData.music} />
         <TemplateComponent siteData={siteData} onUnlock={triggerBurst} />
       </div>
