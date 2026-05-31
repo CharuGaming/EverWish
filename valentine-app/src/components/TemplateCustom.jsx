@@ -341,24 +341,166 @@ function DatePlannerModule({ activities, foods, primary }) {
   );
 }
 
-// ── Module: Virtual Gift ────────────────────────────────────────────
+// ── Module: Virtual Gift — Explosion Reveal ─────────────────────────
 function VirtualGiftModule({ giftImageUrl, giftMessage, primary }) {
-  const [open, setOpen] = useState(false);
+  const [phase, setPhase] = useState('closed'); // closed | exploding | revealed
+
+  const [explosionData] = useState(() => {
+    const particles = Array.from({ length: 36 }, (_, i) => {
+      const angle = (Math.PI * 2 * i) / 36 + (Math.random() - 0.5) * 0.5;
+      const dist = 90 + Math.random() * 160;
+      return {
+        id: i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist - 50,
+        rotation: Math.random() * 720 - 360,
+        delay: Math.random() * 0.15,
+        duration: 0.8 + Math.random() * 0.5,
+        emoji: ["❤️","🌸","✨","💖","🎀","💕","🌹","⭐"][Math.floor(Math.random() * 8)],
+        size: Math.random() * 14 + 6,
+      };
+    });
+    const fragments = Array.from({ length: 12 }, (_, i) => {
+      const angle = (Math.PI * 2 * i) / 12;
+      const dist = 50 + Math.random() * 110;
+      return {
+        id: i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist - 30,
+        rotation: Math.random() * 540 - 270,
+        delay: Math.random() * 0.08,
+        width: 12 + Math.random() * 20,
+        height: 10 + Math.random() * 16,
+        color: [primary || "#e11d48","#f43f5e","#fb7185","#fda4af","#fbbf24","#f59e0b"][Math.floor(Math.random() * 6)],
+      };
+    });
+    return { particles, fragments };
+  });
+
   if (!giftImageUrl && !giftMessage) return null;
+
+  const handleOpen = () => {
+    if (phase !== 'closed') return;
+    setPhase('exploding');
+    setTimeout(() => setPhase('revealed'), 900);
+  };
+
   return (
-    <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="py-20 px-6 text-center">
+    <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="py-20 px-6 text-center relative overflow-hidden">
       <h2 className="text-4xl font-serif mb-10" style={{ color: primary }}>A Gift Just for You 🎁</h2>
-      <AnimatePresence mode="wait">
-        {!open ? (
-          <motion.button key="box" onClick={() => setOpen(true)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-            className="text-8xl cursor-pointer block mx-auto" animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2 }}>🎁</motion.button>
-        ) : (
-          <motion.div key="reveal" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="max-w-sm mx-auto">
-            {giftImageUrl && <img src={giftImageUrl} alt="gift" className="w-full h-64 object-cover rounded-3xl shadow-2xl mb-6" />}
-            {giftMessage && <p className="text-lg font-serif italic text-slate-700 leading-relaxed">{giftMessage}</p>}
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+      <div className="relative min-h-[380px] flex flex-col items-center justify-center max-w-md mx-auto">
+        {/* Explosion Particles */}
+        <AnimatePresence>
+          {(phase === 'exploding') && explosionData.particles.map(p => (
+            <motion.div
+              key={`ep-${p.id}`}
+              className="absolute pointer-events-none z-40"
+              style={{ fontSize: p.size }}
+              initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: p.x, y: p.y,
+                scale: [0.3, 1.3, 1, 0],
+                rotate: p.rotation,
+              }}
+              transition={{ duration: p.duration, delay: p.delay, ease: "easeOut" }}
+            >{p.emoji}</motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Box Fragments */}
+        <AnimatePresence>
+          {(phase === 'exploding') && explosionData.fragments.map(f => (
+            <motion.div
+              key={`bf-${f.id}`}
+              className="absolute z-30 rounded-sm pointer-events-none"
+              style={{ width: f.width, height: f.height, backgroundColor: f.color }}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
+              animate={{
+                opacity: [1, 1, 0],
+                x: f.x, y: f.y,
+                scale: [1, 0.8, 0.3],
+                rotate: f.rotation,
+              }}
+              transition={{ duration: 0.7, delay: f.delay, ease: "easeOut" }}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Gift Box (closed) */}
+        <AnimatePresence>
+          {phase === 'closed' && (
+            <motion.div
+              key="gift-closed"
+              exit={{
+                scale: [1, 1.15, 0],
+                opacity: [1, 1, 0],
+                transition: { duration: 0.4, ease: "easeIn" },
+              }}
+              onClick={handleOpen}
+              className="cursor-pointer select-none flex flex-col items-center"
+            >
+              <motion.div
+                whileHover={{ rotate: [0, -3, 3, -3, 3, 0], transition: { duration: 0.5, repeat: Infinity } }}
+                whileTap={{ scale: 0.92 }}
+                className="relative w-40 h-40"
+              >
+                {/* Lid */}
+                <div className="absolute -top-7 -left-2.5 w-[170px] h-10 rounded-t-xl z-20 shadow-md flex items-center justify-center"
+                  style={{ backgroundColor: primary || '#e11d48' }}>
+                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
+                </div>
+                {/* Bow */}
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                  <svg width="70" height="36" viewBox="0 0 70 36" fill="none">
+                    <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
+                    <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
+                    <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5"/>
+                  </svg>
+                </div>
+                {/* Box Body */}
+                <div className="w-40 h-32 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border"
+                  style={{ backgroundColor: primary || '#e11d48', borderColor: primary || '#e11d48' }}>
+                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
+                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
+                </div>
+              </motion.div>
+              <motion.span
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="mt-8 text-xs font-semibold tracking-widest uppercase"
+                style={{ color: primary }}
+              >Tap to open your gift ✨</motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Revealed Gift */}
+        <AnimatePresence>
+          {phase === 'revealed' && (
+            <motion.div
+              key="gift-revealed"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+              className="max-w-sm mx-auto"
+            >
+              {giftImageUrl && (
+                <motion.img
+                  src={giftImageUrl}
+                  alt="gift"
+                  initial={{ scale: 0.7, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.3 }}
+                  className="w-full h-64 object-cover rounded-3xl shadow-2xl mb-6"
+                />
+              )}
+              {giftMessage && <p className="text-lg font-serif italic text-slate-700 leading-relaxed">{giftMessage}</p>}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.section>
   );
 }

@@ -275,71 +275,166 @@ function LoveLetter({ text, themeColors }) {
   );
 }
 
-// ── Section 4: Virtual Gift Box ───────────────────────────────────
+// ── Section 4: Virtual Gift Box — Explosion Reveal ────────────────
 function VirtualGiftBox({ giftImageUrl, giftMessage, themeColors }) {
-  const [open, setOpen] = useState(false);
+  const [phase, setPhase] = useState('closed'); // closed | exploding | revealed
+
+  const [explosionData] = useState(() => {
+    const particles = Array.from({ length: 36 }, (_, i) => {
+      const angle = (Math.PI * 2 * i) / 36 + (Math.random() - 0.5) * 0.5;
+      const dist = 90 + Math.random() * 160;
+      return {
+        id: i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist - 50,
+        rotation: Math.random() * 720 - 360,
+        delay: Math.random() * 0.15,
+        duration: 0.8 + Math.random() * 0.5,
+        emoji: ["❤️","🌸","✨","💖","🎀","💕","🌹","⭐"][Math.floor(Math.random() * 8)],
+        size: Math.random() * 14 + 6,
+      };
+    });
+    const fragments = Array.from({ length: 12 }, (_, i) => {
+      const angle = (Math.PI * 2 * i) / 12;
+      const dist = 50 + Math.random() * 110;
+      return {
+        id: i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist - 30,
+        rotation: Math.random() * 540 - 270,
+        delay: Math.random() * 0.08,
+        width: 12 + Math.random() * 20,
+        height: 10 + Math.random() * 16,
+        color: [themeColors.primary, "#f43f5e","#fb7185","#fda4af","#fbbf24","#f59e0b"][Math.floor(Math.random() * 6)],
+      };
+    });
+    return { particles, fragments };
+  });
+
+  const handleOpen = () => {
+    if (phase !== 'closed') return;
+    setPhase('exploding');
+    setTimeout(() => setPhase('revealed'), 900);
+  };
+
   return (
-    <section className="py-20 px-6 text-center" style={{ background: `linear-gradient(180deg, ${themeColors.background} 0%, #fff0f5 100%)` }}>
+    <section className="py-20 px-6 text-center relative overflow-hidden" style={{ background: `linear-gradient(180deg, ${themeColors.background} 0%, #fff0f5 100%)` }}>
       <motion.div initial={{ opacity:0,y:20 }} whileInView={{ opacity:1,y:0 }} viewport={{ once:true }} className="mb-10">
         <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: themeColors.primary }}>A Surprise For You</span>
         <h2 className="text-4xl font-serif mt-2" style={{ color: themeColors.primary }}>Your Special Gift 🎁</h2>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity:0, scale:0.8 }} whileInView={{ opacity:1, scale:1 }}
-        viewport={{ once:true }} transition={{ type:'spring', stiffness:100 }}
-        className="inline-block cursor-pointer" onClick={() => setOpen(true)}
-      >
-        <motion.div
-          whileHover={{ rotate:[0,-3,3,-3,3,0], transition:{ duration:0.5, repeat:Infinity } }}
-          className="relative w-40 h-40 mx-auto"
-        >
-          {/* Lid */}
-          <motion.div whileHover={{ y:-10 }} transition={{ type:'spring', stiffness:300, damping:10 }}
-            className="absolute -top-7 -left-2.5 w-[170px] h-10 rounded-t-xl z-20 shadow-md flex items-center justify-center"
-            style={{ transformOrigin:'bottom center', backgroundColor: themeColors.primary }}>
-            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
-          </motion.div>
-          {/* Bow */}
-          <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-            <svg width="70" height="36" viewBox="0 0 70 36" fill="none">
-              <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
-              <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
-              <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5"/>
-            </svg>
-          </div>
-          {/* Box body */}
-          <div className="w-40 h-32 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border"
-            style={{ backgroundColor: themeColors.primary, borderColor: themeColors.primary }}>
-            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
-          </div>
-        </motion.div>
-        <p className="mt-10 text-xs font-semibold tracking-widest animate-pulse uppercase" style={{ color: themeColors.primary }}>Tap to open your gift 🎁</p>
-      </motion.div>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6">
+      <div className="relative min-h-[380px] flex flex-col items-center justify-center max-w-md mx-auto">
+        {/* Explosion Particles */}
+        <AnimatePresence>
+          {(phase === 'exploding') && explosionData.particles.map(p => (
             <motion.div
-              initial={{ scale:0.4, y:80, opacity:0 }} animate={{ scale:1, y:0, opacity:1 }}
-              exit={{ scale:0.6, opacity:0 }} transition={{ type:'spring', damping:18, stiffness:90 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-rose-100 relative">
-              <button onClick={() => setOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-400 transition z-10">
-                <X size={16} />
-              </button>
+              key={`ep-${p.id}`}
+              className="absolute pointer-events-none z-40"
+              style={{ fontSize: p.size }}
+              initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: p.x, y: p.y,
+                scale: [0.3, 1.3, 1, 0],
+                rotate: p.rotation,
+              }}
+              transition={{ duration: p.duration, delay: p.delay, ease: "easeOut" }}
+            >{p.emoji}</motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Box Fragments */}
+        <AnimatePresence>
+          {(phase === 'exploding') && explosionData.fragments.map(f => (
+            <motion.div
+              key={`bf-${f.id}`}
+              className="absolute z-30 rounded-sm pointer-events-none"
+              style={{ width: f.width, height: f.height, backgroundColor: f.color }}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
+              animate={{
+                opacity: [1, 1, 0],
+                x: f.x, y: f.y,
+                scale: [1, 0.8, 0.3],
+                rotate: f.rotation,
+              }}
+              transition={{ duration: 0.7, delay: f.delay, ease: "easeOut" }}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Gift Box (closed state) */}
+        <AnimatePresence>
+          {phase === 'closed' && (
+            <motion.div
+              key="gift-closed"
+              exit={{
+                scale: [1, 1.15, 0],
+                opacity: [1, 1, 0],
+                transition: { duration: 0.4, ease: "easeIn" },
+              }}
+              initial={{ opacity:0, scale:0.8 }}
+              whileInView={{ opacity:1, scale:1 }}
+              viewport={{ once:true }}
+              onClick={handleOpen}
+              className="inline-block cursor-pointer"
+            >
+              <motion.div
+                whileHover={{ rotate:[0,-3,3,-3,3,0], transition:{ duration:0.5, repeat:Infinity } }}
+                whileTap={{ scale: 0.92 }}
+                className="relative w-40 h-40 mx-auto"
+              >
+                <motion.div whileHover={{ y:-10 }} transition={{ type:'spring', stiffness:300, damping:10 }}
+                  className="absolute -top-7 -left-2.5 w-[170px] h-10 rounded-t-xl z-20 shadow-md flex items-center justify-center"
+                  style={{ transformOrigin:'bottom center', backgroundColor: themeColors.primary }}>
+                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
+                </motion.div>
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                  <svg width="70" height="36" viewBox="0 0 70 36" fill="none">
+                    <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
+                    <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5"/>
+                    <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5"/>
+                  </svg>
+                </div>
+                <div className="w-40 h-32 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border"
+                  style={{ backgroundColor: themeColors.primary, borderColor: themeColors.primary }}>
+                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
+                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
+                </div>
+              </motion.div>
+              <motion.p
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="mt-10 text-xs font-semibold tracking-widest uppercase"
+                style={{ color: themeColors.primary }}
+              >Tap to open your gift ✨</motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Revealed Gift */}
+        <AnimatePresence>
+          {phase === 'revealed' && (
+            <motion.div
+              key="gift-revealed"
+              initial={{ scale:0, opacity:0, y:30 }}
+              animate={{ scale:1, opacity:1, y:0 }}
+              transition={{ type:'spring', damping:16, stiffness:120 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-rose-100 relative"
+            >
               <div className="h-3 bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${themeColors.primary}, ${themeColors.primary}bb, ${themeColors.primary})` }} />
               <div className="p-6 text-center">
                 <div className="text-4xl mb-4">🎁</div>
                 <h3 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: themeColors.primary }}>A Special Gift</h3>
                 {giftImageUrl && (
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden mb-5 bg-rose-50">
+                  <motion.div
+                    initial={{ scale: 0.7, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.3 }}
+                    className="w-full aspect-square rounded-2xl overflow-hidden mb-5 bg-rose-50"
+                  >
                     <img src={giftImageUrl} alt="gift" className="w-full h-full object-cover" />
-                  </div>
+                  </motion.div>
                 )}
                 <p className="text-slate-700 font-serif italic text-lg leading-relaxed">
                   {giftMessage || 'You deserve all the love in the world 💖'}
@@ -351,9 +446,9 @@ function VirtualGiftBox({ giftImageUrl, giftMessage, themeColors }) {
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </div>
     </section>
   );
 }

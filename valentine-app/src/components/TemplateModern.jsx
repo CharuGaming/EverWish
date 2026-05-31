@@ -296,101 +296,180 @@ export default function TemplateModern({ siteData }) {
         </section>
       )}
 
-      {/* SECTION 3: Virtual Gift Box */}
-      <section className="max-w-2xl mx-auto px-6 text-center mb-20 relative min-h-[340px] flex flex-col items-center justify-center">
-        <AnimatePresence mode="wait">
-          {!giftOpen ? (
-            <motion.div
-              key="closed-box"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              onClick={() => setGiftOpen(true)}
-              className="relative w-56 h-56 flex flex-col items-center justify-center cursor-pointer select-none"
-            >
-              {/* Shaking motion on hover */}
-              <motion.div
-                whileHover={{ 
-                  rotate: [0, -3, 3, -3, 3, 0],
-                  transition: { duration: 0.5, repeat: Infinity }
-                }}
-                className="relative w-40 h-40"
-              >
-                {/* Lid */}
-                <motion.div 
-                  className="absolute -top-7 -left-2.5 w-[170px] h-10 bg-rose-600 rounded-t-xl z-20 shadow-md flex items-center justify-center"
-                  style={{ transformOrigin: 'bottom center' }}
-                  whileHover={{ y: -8 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+      {/* SECTION 3: Virtual Gift Box — Explosion Reveal */}
+      {(() => {
+        // Generate explosion data once via closure
+        const explosionParticles = Array.from({ length: 36 }, (_, i) => {
+          const angle = (Math.PI * 2 * i) / 36 + (Math.random() - 0.5) * 0.5;
+          const dist = 90 + Math.random() * 160;
+          return {
+            id: i,
+            x: Math.cos(angle) * dist,
+            y: Math.sin(angle) * dist - 50,
+            rotation: Math.random() * 720 - 360,
+            delay: Math.random() * 0.15,
+            duration: 0.8 + Math.random() * 0.5,
+            emoji: ["❤️","🌸","✨","💖","🎀","💕","🌹","⭐"][Math.floor(Math.random() * 8)],
+            size: Math.random() * 14 + 6,
+          };
+        });
+        const boxFragments = Array.from({ length: 12 }, (_, i) => {
+          const angle = (Math.PI * 2 * i) / 12;
+          const dist = 50 + Math.random() * 110;
+          return {
+            id: i,
+            x: Math.cos(angle) * dist,
+            y: Math.sin(angle) * dist - 30,
+            rotation: Math.random() * 540 - 270,
+            delay: Math.random() * 0.08,
+            width: 12 + Math.random() * 20,
+            height: 10 + Math.random() * 16,
+            color: ["#e11d48","#f43f5e","#fb7185","#fda4af","#fbbf24","#f59e0b"][Math.floor(Math.random() * 6)],
+          };
+        });
+
+        return (
+          <section className="max-w-2xl mx-auto px-6 text-center mb-20 relative min-h-[420px] flex flex-col items-center justify-center">
+            {/* Explosion Particles */}
+            <AnimatePresence>
+              {giftOpen && explosionParticles.map(p => (
+                <motion.div
+                  key={`ep-${p.id}`}
+                  className="absolute pointer-events-none z-40"
+                  style={{ fontSize: p.size }}
+                  initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                  animate={{
+                    opacity: [0, 1, 1, 0],
+                    x: p.x, y: p.y,
+                    scale: [0.3, 1.3, 1, 0],
+                    rotate: p.rotation,
+                  }}
+                  transition={{ duration: p.duration, delay: p.delay, ease: "easeOut" }}
+                >{p.emoji}</motion.div>
+              ))}
+            </AnimatePresence>
+
+            {/* Box Fragments */}
+            <AnimatePresence>
+              {giftOpen && boxFragments.map(f => (
+                <motion.div
+                  key={`bf-${f.id}`}
+                  className="absolute z-30 rounded-sm pointer-events-none"
+                  style={{ width: f.width, height: f.height, backgroundColor: f.color }}
+                  initial={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
+                  animate={{
+                    opacity: [1, 1, 0],
+                    x: f.x, y: f.y,
+                    scale: [1, 0.8, 0.3],
+                    rotate: f.rotation,
+                  }}
+                  transition={{ duration: 0.7, delay: f.delay, ease: "easeOut" }}
+                />
+              ))}
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              {!giftOpen ? (
+                <motion.div
+                  key="closed-box"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{
+                    scale: [1, 1.15, 0],
+                    opacity: [1, 1, 0],
+                    transition: { duration: 0.4, ease: "easeIn" },
+                  }}
+                  onClick={() => setGiftOpen(true)}
+                  className="relative w-56 h-56 flex flex-col items-center justify-center cursor-pointer select-none"
                 >
-                  {/* Lid Ribbon Horizontal */}
-                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
+                  {/* Shaking motion on hover */}
+                  <motion.div
+                    whileHover={{ 
+                      rotate: [0, -3, 3, -3, 3, 0],
+                      transition: { duration: 0.5, repeat: Infinity }
+                    }}
+                    whileTap={{ scale: 0.92 }}
+                    className="relative w-40 h-40"
+                  >
+                    {/* Lid */}
+                    <motion.div 
+                      className="absolute -top-7 -left-2.5 w-[170px] h-10 bg-rose-600 rounded-t-xl z-20 shadow-md flex items-center justify-center"
+                      style={{ transformOrigin: 'bottom center' }}
+                      whileHover={{ y: -8 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+                    >
+                      {/* Lid Ribbon Horizontal */}
+                      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400" />
+                    </motion.div>
+
+                    {/* Bow on Top of Lid */}
+                    <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                      <svg width="70" height="36" viewBox="0 0 70 36" fill="none" className="filter drop-shadow-sm">
+                        <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+                        <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
+                        <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5" />
+                      </svg>
+                    </div>
+
+                    {/* Box Body */}
+                    <div className="w-40 h-32 bg-rose-500 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border border-rose-400">
+                      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
+                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
+                    </div>
+                  </motion.div>
+
+                  <motion.span
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="mt-8 text-xs font-semibold text-rose-500 tracking-widest uppercase"
+                  >
+                    Tap to open your gift ✨
+                  </motion.span>
                 </motion.div>
-
-                {/* Bow on Top of Lid */}
-                <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-                  {/* Bow loops */}
-                  <svg width="70" height="36" viewBox="0 0 70 36" fill="none" className="filter drop-shadow-sm">
-                    {/* Left Loop */}
-                    <path d="M35 24 C12 0, 5 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
-                    {/* Right Loop */}
-                    <path d="M35 24 C58 0, 65 36, 35 24 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" />
-                    {/* Center Knot */}
-                    <circle cx="35" cy="24" r="6" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5" />
-                  </svg>
-                </div>
-
-                {/* Box Body */}
-                <div className="w-40 h-32 bg-rose-500 rounded-b-2xl relative z-10 shadow-lg overflow-hidden border border-rose-400">
-                  {/* Vertical Ribbon */}
-                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-7 bg-amber-400 shadow-inner" />
-                  {/* Horizontal Ribbon */}
-                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-7 bg-amber-400 shadow-inner" />
-                </div>
-              </motion.div>
-
-              <span className="mt-8 text-xs font-semibold text-rose-500 tracking-widest animate-pulse uppercase">
-                Tap to open your gift 🎁
-              </span>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="opened-gift"
-              initial={{ scale: 0.5, opacity: 0, y: 40 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', damping: 15, stiffness: 85 }}
-              className="bg-white border border-slate-200 w-full max-w-md rounded-3xl overflow-hidden shadow-md relative p-6 text-center"
-            >
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-6 mt-2">
-                Special Gift Box 💐
-              </h3>
-
-              {siteData.gift?.bouquetUrl ? (
-                <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
-                  <img 
-                    src={siteData.gift.bouquetUrl} 
-                    alt="Gift bouquet" 
-                    className="max-w-full max-h-full object-contain rounded-xl"
-                  />
-                </div>
               ) : (
-                <div className="w-full aspect-[4/3] rounded-2xl bg-rose-50 border-2 border-dashed border-rose-200 flex items-center justify-center text-rose-300 text-3xl mb-6">
-                  💐
-                </div>
-              )}
+                <motion.div
+                  key="opened-gift"
+                  initial={{ scale: 0, opacity: 0, y: 30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 16, stiffness: 120, delay: 0.6 }}
+                  className="bg-white border border-slate-200 w-full max-w-md rounded-3xl overflow-hidden shadow-md relative p-6 text-center"
+                >
+                  <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-6 mt-2">
+                    Special Gift Box 💐
+                  </h3>
 
-              <h4 className="text-lg font-serif italic text-slate-800 mb-3 px-2">
-                For {siteData.gift?.recipient || 'My Love'}
-              </h4>
-              
-              <p className="text-sm text-slate-600 leading-relaxed px-4 whitespace-pre-wrap">
-                {siteData.gift?.message || 'You deserve all the flowers in the world.'}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
+                  {siteData.gift?.bouquetUrl ? (
+                    <motion.div
+                      initial={{ scale: 0.7, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.8 }}
+                      className="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-slate-50 border border-slate-100 flex items-center justify-center p-2"
+                    >
+                      <img 
+                        src={siteData.gift.bouquetUrl} 
+                        alt="Gift bouquet" 
+                        className="max-w-full max-h-full object-contain rounded-xl"
+                      />
+                    </motion.div>
+                  ) : (
+                    <div className="w-full aspect-[4/3] rounded-2xl bg-rose-50 border-2 border-dashed border-rose-200 flex items-center justify-center text-rose-300 text-3xl mb-6">
+                      💐
+                    </div>
+                  )}
+
+                  <h4 className="text-lg font-serif italic text-slate-800 mb-3 px-2">
+                    For {siteData.gift?.recipient || 'My Love'}
+                  </h4>
+                  
+                  <p className="text-sm text-slate-600 leading-relaxed px-4 whitespace-pre-wrap">
+                    {siteData.gift?.message || 'You deserve all the flowers in the world.'}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+        );
+      })()}
 
       {/* SECTION 4: Lightbox Gallery */}
       <section className="max-w-4xl mx-auto px-6">
