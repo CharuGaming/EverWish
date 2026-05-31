@@ -4,6 +4,11 @@ const express   = require('express');
 const cors      = require('cors');
 const mongoose  = require('mongoose');
 
+// Prevent unhandled connection errors from crashing the Vercel lambda
+mongoose.connection.on('error', err => {
+  console.warn('⚠️ Mongoose connection error event:', err.message);
+});
+
 // ── Import route modules ──────────────────────────────────────────
 const siteRoutes       = require('./routes/siteRoutes');
 const uploadRoutes     = require('./routes/uploadRoutes');
