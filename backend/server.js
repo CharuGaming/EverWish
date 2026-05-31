@@ -47,6 +47,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
+app.get('/api/test-crash', (req, res) => {
+  res.status(200).json({ success: true, message: 'Server is alive' });
+});
+
 // ── Serverless MongoDB Connection ─────────────────────────────────
 let cached = global.mongoose;
 if (!cached) {
