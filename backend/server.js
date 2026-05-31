@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+console.log("Starting EverWish backend on Vercel...");
 const express   = require('express');
 const cors      = require('cors');
 const mongoose  = require('mongoose');
