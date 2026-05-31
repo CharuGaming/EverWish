@@ -44,6 +44,8 @@ app.get('/health', (_req, res) => {
     service:  'Celebration SaaS API',
     time:     new Date().toISOString(),
     mongo:    mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+  });
+});
 // ── Serverless MongoDB Connection ─────────────────────────────────
 let cached = global.mongoose;
 if (!cached) {
