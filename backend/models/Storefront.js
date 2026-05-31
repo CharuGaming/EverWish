@@ -28,4 +28,4 @@ const storefrontSchema = new mongoose.Schema({
   testimonials: [testimonialSchema]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Storefront', storefrontSchema);
+module.exports = mongoose.models.Storefront || mongoose.model('Storefront', storefrontSchema);

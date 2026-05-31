@@ -271,4 +271,4 @@ const SiteSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Site', SiteSchema);
+module.exports = mongoose.models.Site || mongoose.model('Site', SiteSchema);
