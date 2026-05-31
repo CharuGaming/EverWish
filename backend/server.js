@@ -221,8 +221,8 @@ function enableJsonFallback() {
   // --- Order Mocking ---
   Order.create = async function(payload) {
     const db = readDb();
-    const uuid = require('uuid').v4;
-    const orderId = 'EW-' + uuid().replace(/-/g, '').substring(0, 6).toUpperCase();
+    const crypto = require('crypto');
+    const orderId = 'EW-' + crypto.randomUUID().replace(/-/g, '').substring(0, 6).toUpperCase();
     const order = {
       orderId,
       ...payload,

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 // ─── Helper: Generate short EverWish order ID (EW-XXXX) ───────────
 function generateOrderId() {
-  return 'EW-' + uuidv4().replace(/-/g, '').substring(0, 6).toUpperCase();
+  return 'EW-' + crypto.randomUUID().replace(/-/g, '').substring(0, 6).toUpperCase();
 }
 
 // ─── Order Schema ─────────────────────────────────────────────────
