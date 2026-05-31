@@ -458,7 +458,7 @@ export default function Storefront() {
             <p className="relative text-sm text-slate-700 font-semibold">
               <span className="font-black text-rose-600">Flat Rate:</span> Any standard template for just{' '}
               <span className="font-black text-rose-600 text-base">Rs. 750</span>
-              <span className="text-slate-500 font-medium"> — includes custom content setup, photos, music &amp; 1 month free hosting.</span>
+              <span className="text-slate-500 font-medium"> — includes custom content setup, photos, music &amp; 2 weeks free hosting.</span>
             </p>
           </div>
         </motion.div>
@@ -489,7 +489,7 @@ export default function Storefront() {
             className="inline-flex flex-col sm:flex-row items-center gap-3 bg-white/60 backdrop-blur-xl border border-white/70 rounded-2xl px-8 py-4 shadow-sm text-sm text-slate-600"
           >
             <Check size={16} className="text-emerald-500" />
-            <span>All prices include <strong className="text-slate-900">custom content setup, photos, music & 1 month of hosting</strong>.</span>
+            <span>All prices include <strong className="text-slate-900">custom content setup, photos, music & 2 weeks of hosting</strong>.</span>
           </motion.div>
         </Section>
       </section>
@@ -599,7 +599,7 @@ export default function Storefront() {
                 Create Their Perfect<br />Digital Celebration
               </h2>
               <p className="text-pink-100 max-w-lg mx-auto mb-10 text-base">
-                Starting from Rs. 2,500 · Delivered in 24 hours · Private link just for them.
+                Starting from Rs. 750 · Delivered in 24 hours · Private link just for them.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a

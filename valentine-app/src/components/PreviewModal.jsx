@@ -9,15 +9,17 @@ const TEMPLATE_NAMES = {
   v2: 'The Modern Romance',
   v3: 'The Valentine Experience',
   v4: 'The Proposal Suite',
+  v5: 'The Cinematic Anniversary',
   b1: 'The Unwrapping Experience',
   b2: 'The Balloon Pop',
   b3: 'The Card Flip',
   b4: 'The Surprise Party',
+  b5: 'The Cinematic Birthday',
 };
 
 const TEMPLATE_PRICES = {
-  v1: 'Rs. 2,500', v2: 'Rs. 2,500', v3: 'Rs. 3,000', v4: 'Rs. 3,500',
-  b1: 'Rs. 2,500', b2: 'Rs. 2,500', b3: 'Rs. 2,500', b4: 'Rs. 3,000',
+  v1: 'Rs. 750', v2: 'Rs. 750', v3: 'Rs. 750', v4: 'Rs. 750', v5: 'Rs. 750',
+  b1: 'Rs. 750', b2: 'Rs. 750', b3: 'Rs. 750', b4: 'Rs. 750', b5: 'Rs. 750',
 };
 
 export default function PreviewModal({ isOpen, templateId, whatsappNumber, onClose }) {

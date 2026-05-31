@@ -227,7 +227,7 @@ export default function AdminDashboard() {
       ...storefront,
       templates: [
         ...storefront.templates,
-        { id: `c-${Date.now()}`, name: 'New Template', price: 'Rs. 2,500', category: 'valentine', tag: 'New', description: 'Description', emoji: '✨', gradient: 'from-gray-400 to-gray-500' }
+        { id: `c-${Date.now()}`, name: 'New Template', price: 'Rs. 750', category: 'valentine', tag: 'New', description: 'Description', emoji: '✨', gradient: 'from-gray-400 to-gray-500' }
       ]
     });
   };
