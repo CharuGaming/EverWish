@@ -16,14 +16,17 @@ const WA_NUMBER = '94712000590';
 
 // ── Template metadata map ────────────────────────────────────────
 const TEMPLATE_META = {
-  v1: { name: 'The Polaroid Love Story',     category: 'valentine', emoji: '📸', price: 'Rs. 2,500' },
-  v2: { name: 'The Modern Romance',          category: 'valentine', emoji: '💫', price: 'Rs. 2,500' },
-  v3: { name: 'The Valentine Experience',    category: 'valentine', emoji: '💝', price: 'Rs. 3,000' },
-  v4: { name: 'The Proposal Suite',          category: 'valentine', emoji: '💍', price: 'Rs. 3,500' },
-  b1: { name: 'The Unwrapping Experience',   category: 'birthday',  emoji: '🎁', price: 'Rs. 2,500' },
-  b2: { name: 'The Balloon Pop',             category: 'birthday',  emoji: '🎈', price: 'Rs. 2,500' },
-  b3: { name: 'The Card Flip',               category: 'birthday',  emoji: '🃏', price: 'Rs. 2,500' },
-  b4: { name: 'The Surprise Party',          category: 'birthday',  emoji: '🎉', price: 'Rs. 3,000' },
+  v1: { name: 'The Polaroid Love Story',     category: 'valentine', emoji: '📸', price: 'Rs. 750' },
+  v2: { name: 'The Modern Romance',          category: 'valentine', emoji: '💫', price: 'Rs. 750' },
+  v3: { name: 'The Valentine Experience',    category: 'valentine', emoji: '💝', price: 'Rs. 750' },
+  v4: { name: 'The Proposal Suite',          category: 'valentine', emoji: '💍', price: 'Rs. 750' },
+  v5: { name: 'The Cinematic Anniversary',   category: 'valentine', emoji: '🎬', price: 'Rs. 750' },
+  b1: { name: 'The Unwrapping Experience',   category: 'birthday',  emoji: '🎁', price: 'Rs. 750' },
+  b2: { name: 'The Balloon Pop',             category: 'birthday',  emoji: '🎈', price: 'Rs. 750' },
+  b3: { name: 'The Card Flip',               category: 'birthday',  emoji: '🃏', price: 'Rs. 750' },
+  b4: { name: 'The Surprise Party',          category: 'birthday',  emoji: '🎉', price: 'Rs. 750' },
+  b5: { name: 'The Cinematic Birthday',       category: 'birthday',  emoji: '🎬', price: 'Rs. 750' },
+  'custom-design': { name: 'Fully Custom Design', category: 'valentine', emoji: '✦', price: 'Rs. 750 + Custom Quote' },
 };
 
 // ── Shared styled input / textarea ───────────────────────────────
@@ -179,7 +182,11 @@ export default function OrderForm() {
   const [submitting, setSubmitting]     = useState(false);
   const [error, setError]               = useState('');
   const [success, setSuccess]           = useState(false);
+  // Custom design-specific
+  const [customVision, setCustomVision] = useState('');
+  const [customRefs, setCustomRefs]     = useState([]);
 
+  const isCustomOrder = templateId === 'custom-design';
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
   // ── Upload helpers ─────────────────────────────────────────────
@@ -195,6 +202,19 @@ export default function OrderForm() {
     setUploading(false);
   }, []);
 
+  const handleRefImageAdd = useCallback(async (file) => {
+    setUploading(true);
+    try {
+      const res = await uploadImage(file);
+      if (res.success) setCustomRefs(prev => [...prev, res.url]);
+      else setError(res.message || 'Reference upload failed.');
+    } catch {
+      setError('Reference image upload failed. Please try again.');
+    }
+    setUploading(false);
+  }, []);
+
+  const handleRefImageRemove = (i) => setCustomRefs(prev => prev.filter((_, idx) => idx !== i));
   const handleImageRemove = (i) => setGalleryUrls(prev => prev.filter((_, idx) => idx !== i));
 
   const handleAudioUpload = async (e) => {
@@ -226,9 +246,11 @@ export default function OrderForm() {
 
     setSubmitting(true);
 
-    const formData = meta?.category === 'birthday'
-      ? { recipientAge: form.recipientAge, birthDate: form.birthDate, birthdayWish: form.birthdayWish }
-      : { initials: form.initials, reasons: form.reasons.filter(r => r.trim()) };
+    const formData = isCustomOrder
+      ? { customVision, customReferences: customRefs }
+      : meta?.category === 'birthday'
+        ? { recipientAge: form.recipientAge, birthDate: form.birthDate, birthdayWish: form.birthdayWish }
+        : { initials: form.initials, reasons: form.reasons.filter(r => r.trim()) };
 
     try {
       const res = await createOrder({
@@ -238,7 +260,7 @@ export default function OrderForm() {
         templateName:  meta?.name || templateId,
         category:      meta?.category || 'valentine',
         formData,
-        images:  galleryUrls,
+        images:  isCustomOrder ? customRefs : galleryUrls,
         audioUrl,
       });
 
@@ -252,14 +274,22 @@ export default function OrderForm() {
 
       // ── WhatsApp redirect notification ──────────────────────────
       const { orderId } = res.data;
-      const waText = encodeURIComponent(
-        `Hello EverWish! 🎉 I just placed a new order.\n\n` +
-        `🔖 Order ID: ${orderId}\n` +
-        `🎨 Template: ${meta?.name || templateId} ${meta?.emoji || ''}\n` +
-        `👤 Name: ${form.customerName.trim()}\n` +
-        `📱 Phone: ${form.customerPhone.trim()}\n\n` +
-        `Please review my submission in the dashboard! 🙏`
-      );
+      const waText = isCustomOrder
+        ? encodeURIComponent(
+            `Hello EverWish! ⚡ I want to order a Fully Custom Design.\n\n` +
+            `🔖 Order ID: ${orderId}\n` +
+            `👤 Name: ${form.customerName.trim()}\n` +
+            `📱 Phone: ${form.customerPhone.trim()}\n\n` +
+            `I have filled out my custom requirements on the form. Please give me a price quote! 🙏`
+          )
+        : encodeURIComponent(
+            `Hello EverWish! 🎉 I just placed a new order.\n\n` +
+            `🔖 Order ID: ${orderId}\n` +
+            `🎨 Template: ${meta?.name || templateId} ${meta?.emoji || ''}\n` +
+            `👤 Name: ${form.customerName.trim()}\n` +
+            `📱 Phone: ${form.customerPhone.trim()}\n\n` +
+            `Please review my submission in the dashboard! 🙏`
+          );
 
       setTimeout(() => {
         window.location.href = `https://wa.me/${WA_NUMBER}?text=${waText}`;
@@ -306,7 +336,8 @@ export default function OrderForm() {
     );
   }
 
-  const isBirthday = meta.category === 'birthday';
+  // ── Custom design form flow ───────────────────────────────────
+  const isBirthday = !isCustomOrder && meta.category === 'birthday';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-rose-950/30 to-slate-900 py-10 px-4">
@@ -403,6 +434,47 @@ export default function OrderForm() {
               <p className="text-xs text-slate-500 mt-1.5">Optional. Plays automatically when the page opens.</p>
             </div>
           </div>
+
+          {/* ── Section: Custom Design fields ──────────────── */}
+          {isCustomOrder && (
+            <div className="bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-400/30 backdrop-blur-xl rounded-3xl p-6 space-y-5">
+              <h2 className="text-white font-black text-base flex items-center gap-2">
+                <span className="text-violet-400">✦</span> Your Custom Vision
+              </h2>
+              <div>
+                <label className={labelCls}>Describe Your Custom Vision</label>
+                <p className="text-xs text-violet-300/70 mb-2">Detail out the animations, themes, colour palette, flows, or any specific ideas you want included.</p>
+                <textarea
+                  required
+                  value={customVision}
+                  onChange={e => setCustomVision(e.target.value)}
+                  placeholder="e.g. I want a dark galaxy-themed template with floating stars, a cinematic intro with our names, 3D flip cards for our memories, and a countdown to our anniversary..."
+                  rows={6}
+                  className={`${inputCls} resize-none border-violet-400/30 focus:ring-violet-500/50`}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Upload Reference Screenshots / Inspiration Images</label>
+                <p className="text-xs text-violet-300/70 mb-2">Optional. Any screenshots, mockups, or inspiration images that communicate your vision.</p>
+                <div className="space-y-2">
+                  {customRefs.map((url, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-white/10 border border-violet-400/20 rounded-2xl px-4 py-2">
+                      <img src={url} alt="" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" loading="lazy" decoding="async" />
+                      <span className="flex-1 text-xs text-violet-300 truncate">Reference {i + 1} uploaded ✓</span>
+                      <button type="button" onClick={() => handleRefImageRemove(i)} className="text-slate-400 hover:text-red-400 transition-colors p-1">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  <label className={`flex items-center justify-center gap-2 border-2 border-dashed border-violet-400/30 hover:border-violet-400/70 rounded-2xl py-4 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <ImageIcon size={16} className="text-violet-400" />
+                    <span className="text-sm text-violet-300 font-medium">Click to add reference images</span>
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => { const files = Array.from(e.target.files || []); for (const f of files) await handleRefImageAdd(f); e.target.value=''; }} disabled={uploading} />
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Section: Birthday fields ─────────────────────── */}
           {isBirthday && (

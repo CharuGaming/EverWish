@@ -196,6 +196,71 @@ function AudioField({ label, hint, value, onChange }) {
   );
 }
 
+// ── Video Upload Field ────────────────────────────────────────────
+function VideoField({ label, hint, value, onChange }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const inputRef = useRef();
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const res = await uploadImage(file);
+      if (res.success) {
+        onChange(res.url);
+      } else {
+        setError(res.message || 'Upload failed');
+      }
+    } catch {
+      setError('Network error. Is the backend running?');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  return (
+    <div className="mb-5">
+      <Label>{label}</Label>
+      {hint && <p className="text-[11px] text-slate-500 mb-2">{hint}</p>}
+
+      <div className="flex gap-2">
+        <input
+          value={value || ''}
+          onChange={e => onChange(e.target.value)}
+          placeholder="https://... (or upload video below)"
+          className="flex-1 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white/60 dark:focus:bg-white/20 focus:ring-2 focus:ring-rose-500/50 shadow-inner transition-all"
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-2 bg-gradient-to-r from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-white hover:to-slate-100 dark:hover:from-slate-700 dark:hover:to-slate-600 disabled:opacity-50 text-slate-700 dark:text-slate-200 text-xs font-bold px-4 py-3 rounded-2xl transition-all shadow-sm border border-white/60 dark:border-white/10 whitespace-nowrap"
+        >
+          {uploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+          {uploading ? 'Uploading…' : 'Upload Video'}
+        </button>
+        <input ref={inputRef} type="file" accept="video/*" onChange={handleFile} className="hidden" />
+      </div>
+
+      {error && (
+        <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+          <AlertTriangle size={11} /> {error}
+        </p>
+      )}
+
+      {value && !error && (
+        <div className="mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg max-w-xs">
+          <video src={value} controls className="w-full rounded-md max-h-40 object-cover" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Tabs ──────────────────────────────────────────────────────────
 const TABS = [
   { id: 'general',    label: 'General',      Icon: Settings },
@@ -205,6 +270,16 @@ const TABS = [
   { id: 'milestones', label: 'Milestones',   Icon: MapPin   },
   { id: 'gallery',    label: 'Gallery',      Icon: Image    },
   { id: 'socialLinks',label: 'Social Links', Icon: Share2   },
+];
+
+const CINEMATIC_TABS = [
+  { id: 'general',    label: 'General & Videos',  Icon: Settings },
+  { id: 'music',      label: 'Music & Lyrics',    Icon: Music    },
+  { id: 'loveLetter', label: 'Love Letter',       Icon: Gift     },
+  { id: 'milestones', label: 'Milestones',        Icon: MapPin   },
+  { id: 'gallery',    label: 'Photo Gallery',     Icon: Image    },
+  { id: 'reasons',    label: 'Why I Love You',    Icon: Heart    },
+  { id: 'socialLinks',label: 'Social Links',      Icon: Share2   },
 ];
 
 const VALENTINE_TABS = [
@@ -242,6 +317,15 @@ const BIRTHDAY_TABS = [
   { id: 'music',        label: 'Music',             Icon: Music    },
   { id: 'sectionOrder', label: 'Section Order',     Icon: Layers   },
   { id: 'socialLinks',  label: 'Social Links',      Icon: Share2   },
+];
+
+const CINEMATIC_BDAY_TABS = [
+  { id: 'cinbday_general', label: 'General & Videos', Icon: Settings },
+  { id: 'cinbday_gift',    label: 'Gift Reveal',      Icon: Gift     },
+  { id: 'cinbday_recap',   label: 'Year Recap',       Icon: CheckCircle2 },
+  { id: 'cinbday_music',   label: 'Music & Lyrics',   Icon: Music    },
+  { id: 'cinbday_gallery', label: 'Photo Gallery',    Icon: Image    },
+  { id: 'socialLinks',     label: 'Social Links',     Icon: Share2   },
 ];
 
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -1481,6 +1565,397 @@ function BirthdayGeneralTab({ doc, setDoc }) {
   );
 }
 
+// ── Cinematic: General & Videos tab ─────────────────────────────────
+function CinGeneralTab({ doc, setDoc }) {
+  const g = doc.general || {};
+  const cin = doc.cinematic || {};
+  
+  const up = (field, val) => setDoc(d => ({ ...d, general: { ...d.general, [field]: val } }));
+  const upCin = (field, val) => setDoc(d => ({ ...d, cinematic: { ...(d.cinematic || {}), [field]: val } }));
+
+  return (
+    <>
+      <Card title="Couple Identity">
+        <div className="mb-5">
+          <Label>Couple's Names</Label>
+          <TextInput value={g.coupleName} onChange={e => up('coupleName', e.target.value)} placeholder="Name & Name" />
+        </div>
+        <div className="mb-0">
+          <Label>Couple Emoji</Label>
+          <TextInput value={g.coupleEmoji} onChange={e => up('coupleEmoji', e.target.value)} placeholder="💌" />
+        </div>
+      </Card>
+
+      <Card title="Hero Setup & Anniversary">
+        <div className="mb-5">
+          <Label>Hero Subtitle</Label>
+          <TextInput value={g.heroSubtitle} onChange={e => up('heroSubtitle', e.target.value)} placeholder="A love written in the stars" />
+        </div>
+        <div className="mb-0">
+          <Label>Anniversary Start Date</Label>
+          <TextInput type="date" value={cin.startDate || ''} onChange={e => upCin('startDate', e.target.value)} />
+          <p className="text-[11px] text-slate-500 mt-1">Used to count exact years, months, days, hours, and seconds.</p>
+        </div>
+      </Card>
+
+      <Card title="Cinematic Video Elements">
+        <VideoField
+          label="Intro Interaction Video"
+          hint="Plays in full screen when 'Tap to Open' is clicked. Short reveal teaser clip."
+          value={cin.introVideoUrl}
+          onChange={v => upCin('introVideoUrl', v)}
+        />
+        <VideoField
+          label="Background Loop Video"
+          hint="Smooth muted looping atmospheric background video shown in the Hero section."
+          value={cin.bgVideoUrl}
+          onChange={v => upCin('bgVideoUrl', v)}
+        />
+        <ImageField
+          label="Fallback Hero Image"
+          hint="Shown if background video is empty or fails to load."
+          value={cin.heroImageUrl || doc.images?.heroImageUrl}
+          onChange={v => {
+            upCin('heroImageUrl', v);
+            setDoc(d => ({ ...d, images: { ...(d.images || {}), heroImageUrl: v } }));
+          }}
+        />
+      </Card>
+    </>
+  );
+}
+
+// ── Cinematic: Music & Lyrics tab ───────────────────────────────────
+function CinMusicTab({ doc, setDoc }) {
+  const m = doc.music || {};
+  const cin = doc.cinematic || {};
+  
+  const up = (f, v) => setDoc(d => ({ ...d, music: { ...d.music, [f]: v } }));
+  const upCin = (f, v) => setDoc(d => ({ ...d, cinematic: { ...(d.cinematic || {}), [f]: v } }));
+
+  return (
+    <>
+      <Card title="Global Music Player">
+        <div className="mb-6">
+          <Toggle checked={m.isEnabled ?? true} onChange={v => up('isEnabled', v)} label="Enable Music Player" />
+        </div>
+
+        <div className={`transition-opacity ${m.isEnabled === false ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className="mb-6">
+            <AudioField
+              label="Background Audio"
+              hint="Upload an MP3/WAV file or paste a direct audio URL"
+              value={m.audioUrl}
+              onChange={v => up('audioUrl', v)}
+            />
+          </div>
+          <div>
+            <ImageField
+              label="Record Thumbnail"
+              hint="Spinning record cover image"
+              value={m.thumbnailUrl}
+              onChange={v => up('thumbnailUrl', v)}
+            />
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Song Lyrics">
+        <Label>Favorite Song Lyrics</Label>
+        <p className="text-[11px] text-slate-500 mb-2">Display lyrics below the music player on the client page.</p>
+        <TextArea
+          value={cin.songLyrics || ''}
+          onChange={e => upCin('songLyrics', e.target.value)}
+          placeholder="Paste song lyrics here…"
+          rows={10}
+        />
+      </Card>
+    </>
+  );
+}
+
+// ── Cinematic: Love Letter tab ──────────────────────────────────────
+function CinLoveLetterTab({ doc, setDoc }) {
+  const g = doc.general || {};
+  const up = (field, val) => setDoc(d => ({ ...d, general: { ...d.general, [field]: val } }));
+
+  return (
+    <Card title="Love Letter">
+      <Label>Love Letter Text</Label>
+      <p className="text-[11px] text-slate-500 mb-2">Write a special message to be shown in the premium glassmorphic section.</p>
+      <TextArea
+        value={g.loveLetterText || ''}
+        onChange={e => up('loveLetterText', e.target.value)}
+        placeholder="Dear..., Everyday with you is a gift..."
+        rows={12}
+      />
+    </Card>
+  );
+}
+
+// ── Cinematic: Why I Love You tab ──────────────────────────────────
+function CinReasonsTab({ doc, setDoc }) {
+  const reasons = doc.cinematic?.reasons || [];
+  
+  const add = () => setDoc(d => ({
+    ...d,
+    cinematic: {
+      ...(d.cinematic || {}),
+      reasons: [...(d.cinematic?.reasons || []), '']
+    }
+  }));
+
+  const del = i => setDoc(d => {
+    const r = [...(d.cinematic?.reasons || [])];
+    r.splice(i, 1);
+    return {
+      ...d,
+      cinematic: { ...(d.cinematic || {}), reasons: r }
+    };
+  });
+
+  const upR = (i, v) => setDoc(d => {
+    const r = [...(d.cinematic?.reasons || [])];
+    r[i] = v;
+    return {
+      ...d,
+      cinematic: { ...(d.cinematic || {}), reasons: r }
+    };
+  });
+
+  return (
+    <Card title="Why I Love You">
+      <p className="text-[11px] text-slate-500 mb-5">These reasons will display as beautiful badges in a premium mason/grid layout.</p>
+      <div className="space-y-3 mb-4">
+        {reasons.map((r, i) => (
+          <div key={i} className="flex gap-2 items-center">
+            <span className="text-rose-400 font-mono text-xs w-5 flex-shrink-0">#{i + 1}</span>
+            <TextInput value={r} onChange={e => upR(i, e.target.value)} placeholder={`Reason ${i + 1}…`} />
+            <button
+              type="button"
+              onClick={() => del(i)}
+              className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-slate-700 rounded-lg transition flex-shrink-0"
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        ))}
+        {reasons.length === 0 && (
+          <p className="text-center py-8 text-slate-600 text-sm border-2 border-dashed border-slate-700 rounded-xl">No reasons yet. Add one below.</p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        className="flex items-center gap-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+      >
+        <Plus size={14} /> Add Reason
+      </button>
+    </Card>
+  );
+}
+
+// ── Cinematic Birthday: General & Videos ──────────────────────────
+function CinBdayGeneralTab({ doc, setDoc }) {
+  const g  = doc.general  || {};
+  const cb = doc.cinematicBirthday || {};
+  const bd = doc.birthday || {};
+
+  const upG  = (f, v) => setDoc(d => ({ ...d, general:          { ...d.general,          [f]: v } }));
+  const upCb = (f, v) => setDoc(d => ({ ...d, cinematicBirthday:{ ...(d.cinematicBirthday||{}), [f]: v } }));
+  const upBd = (f, v) => setDoc(d => ({ ...d, birthday:         { ...d.birthday,         [f]: v } }));
+
+  return (
+    <>
+      <Card title="Birthday Subject">
+        <div className="mb-5">
+          <Label>Recipient Name</Label>
+          <TextInput value={g.coupleName} onChange={e => upG('coupleName', e.target.value)} placeholder="Maleesha, Kavindu…" />
+        </div>
+        <div className="mb-5">
+          <Label>Birthday Message Subtitle</Label>
+          <TextInput value={g.heroSubtitle} onChange={e => upG('heroSubtitle', e.target.value)} placeholder="Wishing you a magical birthday!" />
+        </div>
+        <div className="mb-0">
+          <Label>Birth Date</Label>
+          <TextInput type="date" value={bd.birthDate ? bd.birthDate.slice(0,10) : ''} onChange={e => upBd('birthDate', e.target.value)} />
+        </div>
+      </Card>
+
+      <Card title="Cinematic Video Elements">
+        <VideoField
+          label="Intro Interaction Video"
+          hint="Full-screen video played after 'Tap to Open' is clicked."
+          value={cb.introVideoUrl}
+          onChange={v => upCb('introVideoUrl', v)}
+        />
+        <VideoField
+          label="Background Loop Video"
+          hint="Muted atmospheric looping video behind the Hero section."
+          value={cb.bgVideoUrl}
+          onChange={v => upCb('bgVideoUrl', v)}
+        />
+      </Card>
+    </>
+  );
+}
+
+// ── Cinematic Birthday: Gift Reveal ───────────────────────────────
+function CinBdayGiftTab({ doc, setDoc }) {
+  const cb = doc.cinematicBirthday || {};
+  const up = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+
+  return (
+    <Card title="Interactive Gift Box Reveal">
+      <p className="text-[11px] text-slate-500 mb-5">Upload a gift image and write a reveal message. Visitors tap a 3D gift box to open it and reveal your content.</p>
+      <ImageField
+        label="Gift Reveal Image"
+        hint="Shown inside the gift box after tapping."
+        value={cb.giftImageUrl}
+        onChange={v => up('giftImageUrl', v)}
+      />
+      <div className="mt-4">
+        <Label>Gift Reveal Message</Label>
+        <TextArea
+          value={cb.giftRevealText || ''}
+          onChange={e => up('giftRevealText', e.target.value)}
+          placeholder="Happy Birthday! 🎂 This is your special gift…"
+          rows={4}
+        />
+      </div>
+    </Card>
+  );
+}
+
+// ── Cinematic Birthday: Year Recap & Bucket List ──────────────────
+function CinBdayRecapTab({ doc, setDoc }) {
+  const cb     = doc.cinematicBirthday || {};
+  const bucket = cb.birthdayBucketList || [];
+  const up     = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+
+  const addItem    = ()    => up('birthdayBucketList', [...bucket, '']);
+  const delItem    = (i)   => up('birthdayBucketList', bucket.filter((_, j) => j !== i));
+  const updateItem = (i,v) => { const a=[...bucket]; a[i]=v; up('birthdayBucketList', a); };
+
+  return (
+    <>
+      <Card title="Year Recap">
+        <Label>Year Recap Text</Label>
+        <p className="text-[11px] text-slate-500 mb-2">A heartfelt summary of their year — shown in the Year Recap section.</p>
+        <TextArea
+          value={cb.yearRecapText || ''}
+          onChange={e => up('yearRecapText', e.target.value)}
+          placeholder="What a year it has been! From the highs to the unforgettable moments…"
+          rows={8}
+        />
+      </Card>
+
+      <Card title="Birthday Bucket List">
+        <p className="text-[11px] text-slate-500 mb-4">Things to do on their birthday. Each item is revealed with a scroll animation.</p>
+        <div className="space-y-3 mb-4">
+          {bucket.map((item, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <span className="text-amber-400 font-mono text-xs w-5 flex-shrink-0">#{i+1}</span>
+              <TextInput value={item} onChange={e => updateItem(i, e.target.value)} placeholder={`Bucket list item ${i+1}…`} />
+              <button type="button" onClick={() => delItem(i)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-slate-700 rounded-lg transition flex-shrink-0">
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+          {bucket.length === 0 && (
+            <p className="text-center py-8 text-slate-600 text-sm border-2 border-dashed border-slate-700 rounded-xl">No items yet. Add one below.</p>
+          )}
+        </div>
+        <button type="button" onClick={addItem} className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+          <Plus size={14} /> Add Item
+        </button>
+      </Card>
+    </>
+  );
+}
+
+// ── Cinematic Birthday: Music & Lyrics ────────────────────────────
+function CinBdayMusicTab({ doc, setDoc }) {
+  const cb = doc.cinematicBirthday || {};
+  const up = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+
+  return (
+    <>
+      <Card title="Song Audio">
+        <AudioField
+          label="Birthday Song"
+          hint="Upload an MP3 or paste a direct audio URL"
+          value={cb.songAudioUrl}
+          onChange={v => up('songAudioUrl', v)}
+        />
+      </Card>
+      <Card title="Song Lyrics">
+        <Label>Lyrics</Label>
+        <p className="text-[11px] text-slate-500 mb-2">Displayed below the audio player with a soft glow effect.</p>
+        <TextArea
+          value={cb.songLyrics || ''}
+          onChange={e => up('songLyrics', e.target.value)}
+          placeholder="Paste song lyrics here…"
+          rows={10}
+        />
+      </Card>
+    </>
+  );
+}
+
+// ── Cinematic Birthday: Photo Gallery ────────────────────────────
+function CinBdayGalleryTab({ doc, setDoc }) {
+  const cb     = doc.cinematicBirthday || {};
+  const images = cb.galleryImages || [];
+  const [uploading, setUploading] = useState(false);
+
+  const upImages = (arr) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), galleryImages: arr } }));
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setUploading(true);
+    const newUrls = [];
+    for (const file of files) {
+      const res = await uploadImage(file);
+      if (res.success) newUrls.push(res.url);
+    }
+    upImages([...images, ...newUrls]);
+    setUploading(false);
+    e.target.value = '';
+  };
+
+  const remove = (i) => upImages(images.filter((_, j) => j !== i));
+
+  return (
+    <Card title="Photo Gallery">
+      <p className="text-[11px] text-slate-500 mb-5">These photos appear in the masonry gallery grid on the birthday page.</p>
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        {images.map((url, i) => (
+          <div key={i} className="relative group rounded-xl overflow-hidden border border-white/10">
+            <img src={url} alt={`gallery ${i}`} className="w-full h-28 object-cover" />
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+        ))}
+        {images.length === 0 && (
+          <div className="col-span-2 text-center py-8 text-slate-600 text-sm border-2 border-dashed border-slate-700 rounded-xl">No photos yet.</div>
+        )}
+      </div>
+      <label className={`flex items-center justify-center gap-2 border-2 border-dashed border-slate-600 hover:border-amber-400 rounded-xl py-4 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+        {uploading ? <Loader2 size={16} className="animate-spin text-amber-400" /> : <Upload size={16} className="text-slate-400" />}
+        <span className="text-sm text-slate-400 font-medium">{uploading ? 'Uploading…' : 'Upload Photos'}</span>
+        <input type="file" accept="image/*" multiple className="hidden" onChange={handleUpload} />
+      </label>
+    </Card>
+  );
+}
+
 // ── Main Editor Page ──────────────────────────────────────────────
 export default function AdminEditor() {
   const { siteId } = useParams();
@@ -1545,15 +2020,19 @@ export default function AdminEditor() {
     </div>
   );
 
-  const isValentine = doc.templateType === 'valentine';
-  const isProposal  = doc.templateType === 'proposal';
-  const isCustom    = doc.templateType === 'custom';
-  const isBirthday  = doc.category === 'birthday';
+  const isValentine        = doc.templateType === 'valentine';
+  const isProposal         = doc.templateType === 'proposal';
+  const isCustom           = doc.templateType === 'custom';
+  const isBirthday         = doc.category === 'birthday' && doc.templateType !== 'bday5';
+  const isBirthdayCinematic= doc.templateType === 'bday5';
+  const isCinematic        = doc.templateType === 'cinematic';
   
-  const availableTabs = isBirthday ? BIRTHDAY_TABS
+  const availableTabs = isBirthdayCinematic ? CINEMATIC_BDAY_TABS
+    : isBirthday ? BIRTHDAY_TABS
     : isValentine ? VALENTINE_TABS
     : isProposal ? PROPOSAL_TABS
     : isCustom   ? CUSTOM_TABS
+    : isCinematic ? CINEMATIC_TABS
     : doc.templateType === 'modern' ? TABS.filter(t => t.id !== 'milestones')
     : TABS;
   const ActiveTab = availableTabs.find(t => t.id === activeTab) || availableTabs[0];
@@ -1643,6 +2122,15 @@ export default function AdminEditor() {
                 {activeTab === 'thingsToDo' && <ThingsToDoTab      doc={doc} setDoc={setDoc} />}
                 {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
               </>
+            ) : isBirthdayCinematic ? (
+              <>
+                {activeTab === 'cinbday_general' && <CinBdayGeneralTab doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_gift'    && <CinBdayGiftTab    doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_recap'   && <CinBdayRecapTab   doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_music'   && <CinBdayMusicTab   doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_gallery' && <CinBdayGalleryTab doc={doc} setDoc={setDoc} />}
+                {activeTab === 'socialLinks'     && <SocialLinksTab    doc={doc} setDoc={setDoc} />}
+              </>
             ) : isBirthday ? (
               <>
                 {activeTab === 'bday_general' && <BirthdayGeneralTab doc={doc} setDoc={setDoc} />}
@@ -1650,6 +2138,16 @@ export default function AdminEditor() {
                 {activeTab === 'music'        && <MusicTab           doc={doc} setDoc={setDoc} />}
                 {activeTab === 'sectionOrder' && <SectionOrderTab    doc={doc} setDoc={setDoc} />}
                 {activeTab === 'socialLinks'  && <SocialLinksTab     doc={doc} setDoc={setDoc} />}
+              </>
+            ) : isCinematic ? (
+              <>
+                {activeTab === 'general'    && <CinGeneralTab    doc={doc} setDoc={setDoc} />}
+                {activeTab === 'music'      && <CinMusicTab      doc={doc} setDoc={setDoc} />}
+                {activeTab === 'loveLetter' && <CinLoveLetterTab doc={doc} setDoc={setDoc} />}
+                {activeTab === 'milestones' && <MilestonesTab    doc={doc} setDoc={setDoc} />}
+                {activeTab === 'gallery'    && <GalleryTab       doc={doc} setDoc={setDoc} />}
+                {activeTab === 'reasons'    && <CinReasonsTab    doc={doc} setDoc={setDoc} />}
+                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
               </>
             ) : doc.templateType === 'polaroid' || doc.templateType === 'modern' || !doc.templateType ? (
               <>
@@ -1679,6 +2177,8 @@ export default function AdminEditor() {
               ? `${doc.proposal?.scratchGallery?.length||0} scratch cards · ${doc.proposal?.activities?.length||0} activities · ${doc.proposal?.foods?.length||0} foods · ${doc.thingsToDo?.length||0} bucket items`
               : isCustom
               ? `Lockscreen: ${doc.customModules?.lockscreenType || 'tap'} · ${doc.thingsToDo?.length||0} bucket items · ${Object.values(doc.customModules||{}).filter(v=>v===true).length} modules active`
+              : isCinematic
+              ? `Cinematic · ${doc.cinematic?.reasons?.length || 0} reasons · ${doc.milestones?.length || 0} milestones · ${doc.general?.loveLetterText ? 'Love Letter configured' : 'No Love Letter'}`
               : `${doc.milestones?.length||0} milestones · ${doc.gallery?.supporting?.length||0} gallery photos · ${doc.thingsToDo?.length||0} bucket items`
             } · Unsaved changes not persisted
           </span>

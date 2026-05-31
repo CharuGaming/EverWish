@@ -146,6 +146,27 @@ const SiteSchema = new mongoose.Schema(
         default: [],
       },
     },
+    // ── Cinematic Template ────────────────────────────────────────
+    cinematic: {
+      introVideoUrl: { type: String, default: '' },
+      bgVideoUrl:    { type: String, default: '' },
+      heroImageUrl:  { type: String, default: '' },
+      songLyrics:    { type: String, default: '' },
+      reasons:       { type: [String], default: [] },
+      startDate:     { type: String, default: '' },
+    },
+    // ── Cinematic Birthday Template ───────────────────────────────
+    cinematicBirthday: {
+      introVideoUrl:      { type: String, default: '' },
+      bgVideoUrl:         { type: String, default: '' },
+      giftImageUrl:       { type: String, default: '' },
+      giftRevealText:     { type: String, default: '' },
+      yearRecapText:      { type: String, default: '' },
+      birthdayBucketList: { type: [String], default: [] },
+      songAudioUrl:       { type: String, default: '' },
+      songLyrics:         { type: String, default: '' },
+      galleryImages:      { type: [String], default: [] },
+    },
     // ── Birthday Templates ────────────────────────────────────────
     birthday: {
       recipientAge:    { type: Number, default: null },

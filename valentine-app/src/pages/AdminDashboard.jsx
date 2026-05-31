@@ -5,7 +5,7 @@ import {
   Heart, Plus, ExternalLink, Trash2, Edit3,
   Search, AlertCircle, Loader2, CheckCircle2,
   Sun, Moon, LayoutGrid, List, Copy, ToggleLeft, ToggleRight, AlertTriangle,
-  Store, Users, Save, Star, Upload, Image as ImageIcon, ShoppingBag, X, Music, Eye
+  Store, Users, Save, Star, Upload, Image as ImageIcon, ShoppingBag, X, Music, Eye, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -530,20 +530,25 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{formatDate(order.createdAt)}</td>
                         <td className="px-5 py-4">
-                          <select
-                            value={order.status}
-                            onChange={async (e) => {
-                              await updateOrderStatus(order.orderId, e.target.value);
-                              setOrders(prev => prev.map(o => o.orderId === order.orderId ? { ...o, status: e.target.value } : o));
-                              showToast('Status updated!');
-                            }}
-                            className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest cursor-pointer border-0 outline-none ${statusColors[order.status]}`}
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
+                          <div className="relative inline-block">
+                            <select
+                              value={order.status}
+                              onChange={async (e) => {
+                                await updateOrderStatus(order.orderId, e.target.value);
+                                setOrders(prev => prev.map(o => o.orderId === order.orderId ? { ...o, status: e.target.value } : o));
+                                showToast('Status updated!');
+                              }}
+                              className={`appearance-none pr-8 pl-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest cursor-pointer outline-none transition-all ${statusColors[order.status]}`}
+                            >
+                              <option value="pending" className="bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400">Pending</option>
+                              <option value="in_progress" className="bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400">In Progress</option>
+                              <option value="completed" className="bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400">Completed</option>
+                              <option value="cancelled" className="bg-white dark:bg-slate-900 text-neutral-500 dark:text-neutral-400">Cancelled</option>
+                            </select>
+                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-60">
+                              <ChevronDown size={12} />
+                            </div>
+                          </div>
                         </td>
                         <td className="px-5 py-4">
                           <button
@@ -601,22 +606,36 @@ export default function AdminDashboard() {
                   <button onClick={() => removeTemplate(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100">
                     <Trash2 size={16} />
                   </button>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                     <div>
                       <label className="text-[10px] uppercase font-bold text-slate-500">Name</label>
-                      <input value={tpl.name} onChange={e => handleTemplateChange(i, 'name', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                      <input value={tpl.name || ''} onChange={e => handleTemplateChange(i, 'name', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="text-[10px] uppercase font-bold text-slate-500">ID / Route</label>
-                      <input value={tpl.id} onChange={e => handleTemplateChange(i, 'id', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                      <input value={tpl.id || ''} onChange={e => handleTemplateChange(i, 'id', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-500">Price (e.g. Rs. 2,500)</label>
-                      <input value={tpl.price} onChange={e => handleTemplateChange(i, 'price', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Category</label>
+                      <select value={tpl.category || 'valentine'} onChange={e => handleTemplateChange(i, 'category', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm">
+                        <option value="valentine">Valentine & Proposal</option>
+                        <option value="birthday">Birthday</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Price</label>
+                      <input value={tpl.price || ''} onChange={e => handleTemplateChange(i, 'price', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="text-[10px] uppercase font-bold text-slate-500">Tag / Badge</label>
-                      <input value={tpl.tag} onChange={e => handleTemplateChange(i, 'tag', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                      <input value={tpl.tag || ''} onChange={e => handleTemplateChange(i, 'tag', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-slate-500">Emoji & Gradient</label>
+                      <div className="flex gap-2">
+                        <input value={tpl.emoji || '✨'} onChange={e => handleTemplateChange(i, 'emoji', e.target.value)} className="w-12 text-center bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-2 py-2 text-sm" title="Emoji" />
+                        <input value={tpl.gradient || 'from-gray-400 to-gray-500'} onChange={e => handleTemplateChange(i, 'gradient', e.target.value)} className="flex-1 bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" title="Tailwind Gradient Classes" />
+                      </div>
                     </div>
                   </div>
                   <div>
@@ -763,6 +782,7 @@ export default function AdminDashboard() {
                         <option value="valentine">Template 3 - Valentine (Interactive)</option>
                         <option value="proposal">Template 4 - Proposal (Interactive)</option>
                         <option value="custom">Template 5 - Custom (Mix &amp; Match)</option>
+                        <option value="cinematic">Template 6 - Cinematic Anniversary</option>
                       </>
                     ) : (
                       <>
@@ -770,6 +790,7 @@ export default function AdminDashboard() {
                         <option value="bday2">Birthday Template 2 - The Balloon Pop</option>
                         <option value="bday3">Birthday Template 3 - The Card Flip</option>
                         <option value="bday4">Birthday Template 4 - The Surprise Party</option>
+                        <option value="bday5">Birthday Template 5 - Cinematic Birthday</option>
                       </>
                     )}
                   </select>

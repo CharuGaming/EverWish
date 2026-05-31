@@ -1204,51 +1204,250 @@
         "balloonColor": "#e11d48"
       },
       "updatedAt": "2026-05-29T09:45:38.767Z"
+    },
+    {
+      "siteId": "malee",
+      "createdAt": "2026-05-30T16:05:09.903Z",
+      "category": "valentine",
+      "templateType": "polaroid",
+      "general": {
+        "coupleName": "Name & Name",
+        "coupleEmoji": "💌",
+        "heroSubtitle": "A little corner of the internet, made just for you 💕",
+        "heroDate": "February 14 · Forever",
+        "loveLetterText": "Write your love letter here…",
+        "lockScreenPrompt": "Tap until the screen is full red",
+        "valentineMessage": "Happy Valentine's Day! 💕",
+        "timelineDates": {
+          "startDate": "2020",
+          "endDate": "2026"
+        }
+      },
+      "images": {
+        "heroImageUrl": "",
+        "bouquetImageUrl": ""
+      },
+      "music": {
+        "audioUrl": "",
+        "thumbnailUrl": "",
+        "isEnabled": true
+      },
+      "gift": {
+        "recipient": "",
+        "message": "You deserve all the flowers…"
+      },
+      "milestones": [],
+      "gallery": {
+        "centerImage": "",
+        "centerCaption": "Us, always ❤️",
+        "supporting": []
+      },
+      "valentine": {
+        "matchImages": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "reasons": [],
+        "scratchMemories": []
+      },
+      "proposal": {
+        "proposalText": "Will you be my Valentine? 💕",
+        "loveLetter": "",
+        "giftImageUrl": "",
+        "giftMessage": "You deserve all the love in the world 💖",
+        "activities": [
+          "Movies 🎬",
+          "Dinner 🍽️",
+          "Picnic 🌸",
+          "Stargazing ✨"
+        ],
+        "foods": [
+          "Pizza 🍕",
+          "Sushi 🍣",
+          "Chocolate 🍫",
+          "Ice Cream 🍦"
+        ],
+        "scratchGallery": []
+      },
+      "thingsToDo": [],
+      "themeColors": {
+        "polaroid": {
+          "primary": "#e11d48",
+          "background": "#fff0f5"
+        },
+        "modern": {
+          "primary": "#e11d48",
+          "background": "#f7f5f0"
+        },
+        "valentine": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "proposal": {
+          "primary": "#e11d48",
+          "background": "#fdf2f8",
+          "cardColor": "#c084fc"
+        },
+        "custom": {
+          "primary": "#e11d48",
+          "background": "#fff0f5",
+          "cardColor": "#ffccd5"
+        },
+        "bday1": {
+          "primary": "#f59e0b",
+          "background": "#fffbeb"
+        },
+        "bday2": {
+          "primary": "#3b82f6",
+          "background": "#eff6ff"
+        },
+        "bday3": {
+          "primary": "#10b981",
+          "background": "#ecfdf5"
+        },
+        "bday4": {
+          "primary": "#8b5cf6",
+          "background": "#f5f3ff"
+        }
+      },
+      "customModules": {
+        "lockscreenType": "tap",
+        "showMilestones": false,
+        "showScratchGallery": false,
+        "showWhyILoveYou": false,
+        "showDatePlanner": false,
+        "showVirtualGift": false
+      },
+      "birthday": {
+        "recipientAge": null,
+        "birthdayMessage": "Wishing you the happiest of birthdays! 🥳",
+        "balloonColor": "#e11d48"
+      },
+      "updatedAt": "2026-05-30T16:05:13.220Z"
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "orderId": "EW-D81BD1",
+      "customerName": "Charu Maleesha",
+      "customerPhone": "+94741965443",
+      "templateId": "v1",
+      "templateName": "The Polaroid Love Story",
+      "category": "valentine",
+      "formData": {
+        "initials": "Maleesha Divyanjalee",
+        "reasons": [
+          "She treats me like a mother",
+          "She loves me more ",
+          "She love me a lot"
+        ]
+      },
+      "images": [
+        "https://res.cloudinary.com/daczoccvq/image/upload/f_auto,q_auto/v1780159630/everwish-celebrations/l3ykywzqih2nwajczlc9.jpg",
+        "https://res.cloudinary.com/daczoccvq/image/upload/f_auto,q_auto/v1780159640/everwish-celebrations/ovz5skiiev6dgeqgdjov.jpg",
+        "https://res.cloudinary.com/daczoccvq/image/upload/f_auto,q_auto/v1780159651/everwish-celebrations/msjvdimoe1x7crvoqwyi.jpg"
+      ],
+      "audioUrl": "https://res.cloudinary.com/daczoccvq/video/upload/v1780159343/everwish-celebrations/br4mxwpzghn69kyxqfo8.mp3",
+      "status": "pending",
+      "createdAt": "2026-05-30T16:47:35.492Z",
+      "updatedAt": "2026-05-30T16:47:35.492Z"
+    }
+  ],
   "storefront": {
     "isGlobal": true,
     "templates": [
       {
-        "id": "c-1780137561505",
-        "name": "New Template",
+        "id": "v1",
+        "name": "The Polaroid Love Story",
+        "price": "Rs. 750",
+        "emoji": "📸",
+        "tag": "Bestseller",
+        "category": "valentine",
+        "description": "Vintage polaroid gallery with a love-letter reveal.",
+        "gradient": "from-rose-400 to-pink-500"
+      },
+      {
+        "id": "v2",
+        "name": "The Modern Romance",
         "price": "Rs. 2,500",
-        "tag": "New",
-        "description": "Description"
+        "emoji": "💫",
+        "tag": "Elegant",
+        "category": "valentine",
+        "description": "Sleek, cinematic design with smooth scroll sections.",
+        "gradient": "from-purple-400 to-rose-400"
+      },
+      {
+        "id": "v3",
+        "name": "The Valentine Experience",
+        "price": "Rs. 3,000",
+        "emoji": "💝",
+        "tag": "Interactive",
+        "category": "valentine",
+        "description": "Interactive floating hearts, surprise gifts & confetti.",
+        "gradient": "from-red-400 to-rose-500"
+      },
+      {
+        "id": "v4",
+        "name": "The Proposal Suite",
+        "price": "Rs. 3,500",
+        "emoji": "💍",
+        "tag": "Premium",
+        "category": "valentine",
+        "description": "A full proposal journey — question, countdown & ring reveal.",
+        "gradient": "from-rose-500 to-amber-400"
+      },
+      {
+        "id": "b1",
+        "name": "The Unwrapping Experience",
+        "price": "Rs. 2,500",
+        "emoji": "🎁",
+        "tag": "Fun",
+        "category": "birthday",
+        "description": "Tap to unwrap a digital birthday gift box with wishes inside.",
+        "gradient": "from-amber-400 to-orange-500"
+      },
+      {
+        "id": "b2",
+        "name": "The Balloon Pop",
+        "price": "Rs. 2,500",
+        "emoji": "🎈",
+        "tag": "Playful",
+        "category": "birthday",
+        "description": "Pop colourful balloons to reveal personalised messages.",
+        "gradient": "from-sky-400 to-violet-500"
+      },
+      {
+        "id": "b3",
+        "name": "The Card Flip",
+        "price": "Rs. 2,500",
+        "emoji": "🃏",
+        "tag": "Classic",
+        "category": "birthday",
+        "description": "Elegant flip-card gallery with a heartfelt birthday note.",
+        "gradient": "from-emerald-400 to-teal-500"
+      },
+      {
+        "id": "b4",
+        "name": "The Surprise Party",
+        "price": "Rs. 3,000",
+        "emoji": "🎉",
+        "tag": "Immersive",
+        "category": "birthday",
+        "description": "Full party experience with confetti, music & a wishes wall.",
+        "gradient": "from-fuchsia-400 to-pink-500"
       }
     ],
     "testimonials": [
       {
-        "name": "Maleesha R.",
-        "avatar": "👩",
+        "name": "New User",
+        "templateName": "Custom",
         "rating": 5,
-        "text": "I gifted my boyfriend the Proposal Suite and he was absolutely speechless! Every detail was perfect. EverWish made it magical.",
-        "templateName": "Proposal Suite",
-        "screenshotUrl": ""
-      },
-      {
-        "name": "Kavindu S.",
-        "avatar": "👨",
-        "rating": 5,
-        "text": "The Balloon Pop birthday page for my best friend had everyone at the party screaming with joy. Worth every rupee!",
-        "templateName": "Balloon Pop",
-        "screenshotUrl": ""
-      },
-      {
-        "name": "Anuki P.",
-        "avatar": "👩‍🦱",
-        "rating": 5,
-        "text": "Setup was so fast and the support was amazing. My partner cried happy tears — mission accomplished 😭❤️",
-        "templateName": "Polaroid Love Story",
-        "screenshotUrl": ""
-      },
-      {
-        "name": "Tharindu M.",
-        "avatar": "🧑",
-        "rating": 5,
-        "text": "A completely unique gift idea. I've used EverWish twice now and will definitely keep coming back for every occasion!",
-        "templateName": "The Unwrapping",
+        "text": "Great template!",
+        "avatar": "👤",
         "screenshotUrl": ""
       }
     ]

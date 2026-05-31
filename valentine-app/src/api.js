@@ -275,6 +275,25 @@ export function toComponentData(doc) {
       message:    doc.timeCapsule.message    || '',
       mediaUrl:   doc.timeCapsule.mediaUrl   || '',
     } : null,
+    cinematic: doc.cinematic ? {
+      introVideoUrl: doc.cinematic.introVideoUrl || '',
+      bgVideoUrl:    doc.cinematic.bgVideoUrl    || '',
+      heroImageUrl:  doc.cinematic.heroImageUrl  || '',
+      songLyrics:    doc.cinematic.songLyrics    || '',
+      reasons:       doc.cinematic.reasons       || [],
+      startDate:     doc.cinematic.startDate     || '',
+    } : null,
+    cinematicBirthday: doc.cinematicBirthday ? {
+      introVideoUrl:      doc.cinematicBirthday.introVideoUrl      || '',
+      bgVideoUrl:         doc.cinematicBirthday.bgVideoUrl         || '',
+      giftImageUrl:       doc.cinematicBirthday.giftImageUrl       || '',
+      giftRevealText:     doc.cinematicBirthday.giftRevealText     || '',
+      yearRecapText:      doc.cinematicBirthday.yearRecapText      || '',
+      birthdayBucketList: doc.cinematicBirthday.birthdayBucketList || [],
+      songAudioUrl:       doc.cinematicBirthday.songAudioUrl       || '',
+      songLyrics:         doc.cinematicBirthday.songLyrics         || '',
+      galleryImages:      doc.cinematicBirthday.galleryImages      || [],
+    } : null,
   };
 }
 
@@ -333,6 +352,25 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       recipientAge: null,
       birthdayMessage: 'Wishing you the happiest of birthdays! 🥳',
       balloonColor: '#e11d48',
+    },
+    cinematic: {
+      introVideoUrl: '',
+      bgVideoUrl: '',
+      heroImageUrl: '',
+      songLyrics: '',
+      reasons: [],
+      startDate: '2022-01-01',
+    },
+    cinematicBirthday: {
+      introVideoUrl:      '',
+      bgVideoUrl:         '',
+      giftImageUrl:       '',
+      giftRevealText:     'Happy Birthday! 🎂 A gift made just for you.',
+      yearRecapText:      '',
+      birthdayBucketList: [],
+      songAudioUrl:       '',
+      songLyrics:         '',
+      galleryImages:      [],
     }
   };
 }

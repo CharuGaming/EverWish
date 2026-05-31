@@ -24,6 +24,8 @@ import BirthdayTemplate4 from '../components/BirthdayTemplate4';
 import ThingsToDoSection from '../components/ThingsToDoSection';
 import HeartBurst        from '../components/HeartBurst';
 import FloatingBalloons  from '../components/FloatingBalloons';
+import CinematicAnniversary from '../components/CinematicAnniversary';
+import CinematicBirthday   from '../components/CinematicBirthday';
 
 // ── Romantic loading spinner ──────────────────────────────────────
 function LoadingScreen() {
@@ -129,6 +131,22 @@ export default function ClientPage() {
     lockScreenPrompt:  siteData.lockScreenPrompt,
     valentineMessage:  siteData.valentineMessage,
   };
+
+  if (siteData.templateType === 'cinematic') {
+    return (
+      <div className="relative min-h-screen">
+        <CinematicAnniversary siteData={siteData} />
+      </div>
+    );
+  }
+
+  if (siteData.templateType === 'bday5') {
+    return (
+      <div className="relative min-h-screen">
+        <CinematicBirthday siteData={siteData} />
+      </div>
+    );
+  }
 
   // Birthday templates
   if (siteData.category === 'birthday') {

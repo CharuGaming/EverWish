@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   Heart, Star, MessageCircle, Mail, Share2, Eye,
-  ChevronDown, Sparkles, Gift, PartyPopper, ArrowRight, Check, Loader2, X
+  ChevronDown, ChevronRight, Sparkles, Gift, PartyPopper, ArrowRight, Check, Loader2, X
 } from 'lucide-react';
-import PreviewModal from '../components/PreviewModal';
+
 import { getStorefront } from '../api';
 
 // ── Data ─────────────────────────────────────────────────────────────
@@ -20,58 +20,85 @@ function waLink(text) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+const STANDARD_PRICE = 'Rs. 750';
+
+const CUSTOM_CARD = {
+  id: 'custom-design',
+  name: 'Your Unique Vision',
+  price: 'Rs. 750 + Custom Quote',
+  emoji: '✦',
+  tag: 'PREMIUM CUSTOM',
+  isCustom: true,
+  desc: 'Have a specific design or animation idea? We will build it completely from scratch, tailored to your exact requirements.',
+  gradient: 'from-violet-600 to-indigo-600',
+};
+
 const TEMPLATES = {
   valentine: [
     {
-      id: 'v1', name: 'The Polaroid Love Story', price: 'Rs. 2,500',
+      id: 'v1', name: 'The Polaroid Love Story', price: STANDARD_PRICE,
       emoji: '📸', tag: 'Bestseller',
       desc: 'Vintage polaroid gallery with a love-letter reveal.',
       gradient: 'from-rose-400 to-pink-500',
     },
     {
-      id: 'v2', name: 'The Modern Romance', price: 'Rs. 2,500',
+      id: 'v2', name: 'The Modern Romance', price: STANDARD_PRICE,
       emoji: '💫', tag: 'Elegant',
       desc: 'Sleek, cinematic design with smooth scroll sections.',
       gradient: 'from-purple-400 to-rose-400',
     },
     {
-      id: 'v3', name: 'The Valentine Experience', price: 'Rs. 3,000',
+      id: 'v3', name: 'The Valentine Experience', price: STANDARD_PRICE,
       emoji: '💝', tag: 'Interactive',
       desc: 'Interactive floating hearts, surprise gifts & confetti.',
       gradient: 'from-red-400 to-rose-500',
     },
     {
-      id: 'v4', name: 'The Proposal Suite', price: 'Rs. 3,500',
+      id: 'v4', name: 'The Proposal Suite', price: STANDARD_PRICE,
       emoji: '💍', tag: 'Premium',
       desc: 'A full proposal journey — question, countdown & ring reveal.',
       gradient: 'from-rose-500 to-amber-400',
     },
+    {
+      id: 'v5', name: 'The Cinematic Anniversary', price: STANDARD_PRICE,
+      emoji: '🎬', tag: 'Cinematic',
+      desc: 'Video intro, live relationship timer, timeline & custom audio player.',
+      gradient: 'from-slate-700 to-rose-800',
+    },
+    CUSTOM_CARD,
   ],
   birthday: [
     {
-      id: 'b1', name: 'The Unwrapping Experience', price: 'Rs. 2,500',
+      id: 'b1', name: 'The Unwrapping Experience', price: STANDARD_PRICE,
       emoji: '🎁', tag: 'Fun',
       desc: 'Tap to unwrap a digital birthday gift box with wishes inside.',
       gradient: 'from-amber-400 to-orange-500',
     },
     {
-      id: 'b2', name: 'The Balloon Pop', price: 'Rs. 2,500',
+      id: 'b2', name: 'The Balloon Pop', price: STANDARD_PRICE,
       emoji: '🎈', tag: 'Playful',
       desc: 'Pop colourful balloons to reveal personalised messages.',
       gradient: 'from-sky-400 to-violet-500',
     },
     {
-      id: 'b3', name: 'The Card Flip', price: 'Rs. 2,500',
+      id: 'b3', name: 'The Card Flip', price: STANDARD_PRICE,
       emoji: '🃏', tag: 'Classic',
       desc: 'Elegant flip-card gallery with a heartfelt birthday note.',
       gradient: 'from-emerald-400 to-teal-500',
     },
     {
-      id: 'b4', name: 'The Surprise Party', price: 'Rs. 3,000',
+      id: 'b4', name: 'The Surprise Party', price: STANDARD_PRICE,
       emoji: '🎉', tag: 'Immersive',
       desc: 'Full party experience with confetti, music & a wishes wall.',
       gradient: 'from-fuchsia-400 to-pink-500',
     },
+    {
+      id: 'b5', name: 'The Cinematic Birthday', price: STANDARD_PRICE,
+      emoji: '🎬', tag: 'Cinematic',
+      desc: 'Video intro, gift box reveal, year recap & custom audio player.',
+      gradient: 'from-amber-500 to-orange-600',
+    },
+    CUSTOM_CARD,
   ],
 };
 
@@ -132,58 +159,91 @@ function Section({ children, className = '' }) {
 
 // ── Template Card ─────────────────────────────────────────────────────
 function TemplateCard({ tpl, index, onPreview }) {
+  const isCustom = tpl.isCustom;
+
   return (
     <motion.div
       variants={fadeUp}
       custom={index * 0.15}
-      className="group relative flex flex-col bg-white/60 backdrop-blur-xl border border-white/70 rounded-3xl overflow-hidden shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-rose-200/40 hover:-translate-y-2 transition-all duration-300 h-full"
+      className={`group relative flex flex-col backdrop-blur-xl border rounded-3xl overflow-hidden shadow-lg transition-all duration-300 h-full hover:-translate-y-2 ${
+        isCustom
+          ? 'bg-gradient-to-br from-violet-900/60 to-indigo-900/60 border-violet-400/40 hover:shadow-2xl hover:shadow-violet-500/30'
+          : 'bg-white/60 border-white/70 hover:shadow-2xl hover:shadow-rose-200/40'
+      }`}
     >
       {/* Thumbnail */}
       <div className={`relative h-44 bg-gradient-to-br ${tpl.gradient} flex items-center justify-center overflow-hidden shrink-0`}>
-        <span className="text-7xl select-none drop-shadow-lg group-hover:scale-110 transition-transform duration-500">{tpl.emoji}</span>
+        {isCustom ? (
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-5xl font-black text-white/90 drop-shadow-lg" style={{ fontFamily: 'Georgia, serif' }}>✦</span>
+            <span className="text-white/80 text-xs font-bold uppercase tracking-[0.2em]">Bespoke</span>
+          </div>
+        ) : (
+          <span className="text-7xl select-none drop-shadow-lg group-hover:scale-110 transition-transform duration-500">{tpl.emoji}</span>
+        )}
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
         {/* Tag badge */}
-        <span className="absolute top-3 right-3 bg-white/20 backdrop-blur-md border border-white/40 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full">
+        <span className={`absolute top-3 right-3 backdrop-blur-md border text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+          isCustom
+            ? 'bg-violet-400/30 border-violet-300/50 text-violet-100'
+            : 'bg-white/20 border-white/40 text-white'
+        }`}>
           {tpl.tag}
         </span>
-        {/* Preview overlay on hover */}
-        <button
-          onClick={() => onPreview(tpl.id)}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-        >
-          <Eye size={28} className="text-white drop-shadow" />
-          <span className="text-white text-xs font-bold uppercase tracking-widest">Live Preview</span>
-        </button>
+        {/* Sparkle decoration for custom */}
+        {isCustom && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-6 left-6 w-1 h-1 bg-violet-300 rounded-full animate-ping opacity-60" />
+            <div className="absolute bottom-8 right-8 w-1.5 h-1.5 bg-indigo-300 rounded-full animate-ping opacity-40" style={{ animationDelay: '0.7s' }} />
+            <div className="absolute top-1/2 left-4 w-1 h-1 bg-pink-300 rounded-full animate-ping opacity-50" style={{ animationDelay: '1.2s' }} />
+          </div>
+        )}
+        {/* Preview overlay on hover (only for standard templates) */}
+        {!isCustom && (
+          <button
+            onClick={() => onPreview(tpl.id)}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+          >
+            <Eye size={28} className="text-white drop-shadow" />
+            <span className="text-white text-xs font-bold uppercase tracking-widest">Live Preview</span>
+          </button>
+        )}
       </div>
 
       {/* Content */}
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-bold text-slate-900 text-base mb-1 leading-snug">{tpl.name}</h3>
-          <p className="text-slate-500 text-xs mb-4 leading-relaxed">{tpl.desc}</p>
+          <h3 className={`font-bold text-base mb-1 leading-snug ${isCustom ? 'text-violet-100' : 'text-slate-900'}`}>{tpl.name}</h3>
+          <p className={`text-xs mb-4 leading-relaxed ${isCustom ? 'text-violet-300/80' : 'text-slate-500'}`}>{tpl.desc}</p>
         </div>
         <div className="flex flex-col gap-3 mt-auto pt-2">
-          <div className="flex items-center justify-between border-t border-slate-100/50 pt-3">
-            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Price</span>
-            <span className="text-rose-600 font-extrabold text-lg">{tpl.price}</span>
+          <div className={`flex items-center justify-between border-t pt-3 ${isCustom ? 'border-violet-400/20' : 'border-slate-100/50'}`}>
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${isCustom ? 'text-violet-400' : 'text-slate-400'}`}>Price</span>
+            <span className={`font-extrabold text-base ${isCustom ? 'text-violet-300' : 'text-rose-600'}`}>{tpl.price}</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {/* Preview button */}
-            <button
-              onClick={() => onPreview(tpl.id)}
-              className="flex items-center justify-center gap-1 bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50/20 text-slate-700 hover:text-rose-600 text-xs font-bold py-2.5 rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
-              title="Live Preview"
-            >
-              <Eye size={13} />
-              Preview
-            </button>
-            {/* Buy Now button → Order Form */}
+          <div className={`grid gap-2 ${isCustom ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            {/* Preview button (standard only) */}
+            {!isCustom && (
+              <button
+                onClick={() => onPreview(tpl.id)}
+                className="flex items-center justify-center gap-1 bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50/20 text-slate-700 hover:text-rose-600 text-xs font-bold py-2.5 rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                title="Live Preview"
+              >
+                <Eye size={13} />
+                Preview
+              </button>
+            )}
+            {/* Buy Now / Get a Quote */}
             <Link
               to={`/order/${tpl.id}`}
-              className="flex items-center justify-center gap-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-xs font-bold py-2.5 rounded-2xl shadow-md shadow-rose-400/20 transition-all hover:scale-105 active:scale-95"
+              className={`flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 ${
+                isCustom
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white shadow-violet-500/30'
+                  : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-rose-400/20'
+              }`}
             >
-              <ChevronRight size={13} strokeWidth={2.5} />
-              Buy Now
+              {isCustom ? <Sparkles size={13} /> : <ChevronRight size={13} strokeWidth={2.5} />}
+              {isCustom ? 'Get a Custom Quote' : 'Buy Now'}
             </Link>
           </div>
         </div>
@@ -222,7 +282,7 @@ export default function Storefront() {
     });
   }, []);
 
-  const openPreview  = (id) => setPreview({ isOpen: true,  templateId: id });
+  const openPreview  = (id) => window.open(`/demo/${id}?demo=1`, '_blank');
   const closePreview = ()   => setPreview({ isOpen: false, templateId: null });
 
   const scrollToShop = () => shopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -386,6 +446,23 @@ export default function Storefront() {
           </motion.div>
         </Section>
 
+        {/* Flat-rate pricing banner */}
+        <motion.div
+          variants={fadeUp}
+          custom={2.5}
+          className="mb-8"
+        >
+          <div className="relative overflow-hidden flex flex-col sm:flex-row items-center justify-center gap-3 bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-purple-500/10 border border-rose-300/40 rounded-2xl px-6 py-4 text-center backdrop-blur-md">
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-400/5 to-purple-400/5" />
+            <span className="text-xl">✨</span>
+            <p className="relative text-sm text-slate-700 font-semibold">
+              <span className="font-black text-rose-600">Flat Rate:</span> Any standard template for just{' '}
+              <span className="font-black text-rose-600 text-base">Rs. 750</span>
+              <span className="text-slate-500 font-medium"> — includes custom content setup, photos, music &amp; 1 month free hosting.</span>
+            </p>
+          </div>
+        </motion.div>
+
         {/* Grid */}
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-rose-500">
@@ -399,7 +476,7 @@ export default function Storefront() {
             animate="visible"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {storefrontData.templates?.filter(t => t.category === activeTab).map((tpl, i) => (
+            {TEMPLATES[activeTab].map((tpl, i) => (
               <TemplateCard key={tpl.id} tpl={tpl} index={i} onPreview={openPreview} />
             ))}
           </motion.div>
@@ -627,13 +704,7 @@ export default function Storefront() {
         )}
       </AnimatePresence>
 
-      {/* ── Preview Modal ── */}
-      <PreviewModal
-        isOpen={preview.isOpen}
-        templateId={preview.templateId}
-        whatsappNumber={WHATSAPP_NUMBER}
-        onClose={closePreview}
-      />
+
     </div>
   );
 }

@@ -171,6 +171,30 @@ export const MOCK_DATA = {
   v3: { ...valentineBase, templateType: 'valentine' },
   v4: { ...valentineBase, templateType: 'proposal' },
 
+  v5: {
+    ...valentineBase,
+    templateType: 'cinematic',
+    category: 'valentine',
+    cinematic: {
+      introVideoUrl: '',
+      bgVideoUrl: '',
+      heroImageUrl: UNSPLASH.couple1,
+      songLyrics: `I found a love, for me\nDarling just dive right in, and follow my lead\nWell I found a girl, beautiful and sweet\nOh I never knew you were the someone waiting for me...`,
+      reasons: [
+        'You make ordinary days extraordinary ✨',
+        'Your laugh is my favourite sound 😂',
+        "You believe in me when I don't 💛",
+        'You make every place feel like home 🏡',
+        'Adventure is better with you 🌍',
+        'You are my safe place 🤍',
+        'Your kindness is boundless 🌟',
+        'You always know what to say 🌸',
+        'You make even Mondays good ☀️',
+      ],
+      startDate: '2022-03-12',
+    },
+  },
+
   // Birthday templates
   b1: { ...birthdayBase, templateType: 'bday1' },
   b2: { ...birthdayBase, templateType: 'bday2' },

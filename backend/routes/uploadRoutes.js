@@ -16,13 +16,13 @@ cloudinary.config({
 // ─── Multer: keep uploaded file in RAM ───────────────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB max
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB max (covers video clips)
   fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp|mp3|mpeg|wav|ogg|m4a|audio/;
-    const extOk   = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk  = allowed.test(file.mimetype) || file.mimetype.startsWith('audio/');
-    if (extOk || mimeOk) return cb(null, true);
-    cb(new Error('Only image files (jpeg, jpg, png, gif, webp) and audio files (mp3, wav, ogg, m4a) are allowed.'));
+    const isImage = /jpeg|jpg|png|gif|webp/.test(path.extname(file.originalname).toLowerCase()) || file.mimetype.startsWith('image/');
+    const isAudio = /mp3|mpeg|wav|ogg|m4a/.test(path.extname(file.originalname).toLowerCase()) || file.mimetype.startsWith('audio/');
+    const isVideo = /mp4|webm|mov|avi|mkv/.test(path.extname(file.originalname).toLowerCase()) || file.mimetype.startsWith('video/');
+    if (isImage || isAudio || isVideo) return cb(null, true);
+    cb(new Error('Only image, audio, and video files are allowed.'));
   },
 });
 

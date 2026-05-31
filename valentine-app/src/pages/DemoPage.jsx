@@ -27,6 +27,8 @@ import BirthdayTemplate1 from '../components/BirthdayTemplate1';
 import BirthdayTemplate2 from '../components/BirthdayTemplate2';
 import BirthdayTemplate3 from '../components/BirthdayTemplate3';
 import BirthdayTemplate4 from '../components/BirthdayTemplate4';
+import CinematicAnniversary from '../components/CinematicAnniversary';
+import CinematicBirthday   from '../components/CinematicBirthday';
 
 // ── Demo banner overlaid at the top ──────────────────────────
 function DemoBanner() {
@@ -85,6 +87,24 @@ export default function DemoPage() {
   };
 
   // ── Birthday templates ──────────────────────────────────────
+  if (siteData.templateType === 'cinematic') {
+    return (
+      <div className="relative min-h-screen pt-8">
+        <DemoBanner />
+        <CinematicAnniversary siteData={siteData} />
+      </div>
+    );
+  }
+
+  if (siteData.templateType === 'bday5') {
+    return (
+      <div className="relative min-h-screen pt-8">
+        <DemoBanner />
+        <CinematicBirthday siteData={siteData} />
+      </div>
+    );
+  }
+
   if (siteData.category === 'birthday') {
     const bdayMap = { bday1: BirthdayTemplate1, bday2: BirthdayTemplate2, bday3: BirthdayTemplate3, bday4: BirthdayTemplate4 };
     const TemplateComponent = bdayMap[siteData.templateType] || BirthdayTemplate1;
