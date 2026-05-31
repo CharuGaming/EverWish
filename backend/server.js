@@ -58,28 +58,10 @@ async function connectDB() {
   if (cached.fallback) return null; // Already entered fallback mode
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      serverSelectionTimeoutMS: 2000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-      minPoolSize: 1
-    };
-    try {
-      cached.promise = mongoose.connect(process.env.MONGO_URI, opts)
-        .then((mongoose) => mongoose)
-        .catch((err) => {
-          console.warn('⚠️ MongoDB connection failed (async), enabling JSON fallback:', err.message);
-          cached.fallback = true;
-          enableJsonFallback();
-          return null;
-        });
-    } catch (err) {
-      console.warn('⚠️ MongoDB connection failed (sync), enabling JSON fallback:', err.message);
-      cached.promise = Promise.resolve(null);
-      cached.fallback = true;
-      enableJsonFallback();
-    }
+    console.log("Forcing JSON fallback mode for debugging...");
+    cached.fallback = true;
+    try { enableJsonFallback(); } catch(e) { console.error(e); }
+    cached.promise = Promise.resolve(null);
   }
   
   cached.conn = await cached.promise;
