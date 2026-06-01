@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 'lucide-react';
+import { mergeDemoData } from '../utils/demoData';
 
 // ── Google Fonts ───────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -143,7 +144,9 @@ function GiftBoxReveal({ giftImageUrl, giftRevealText }) {
 }
 
 // ── Main Component ─────────────────────────────────────────────────
-export default function CinematicBirthday({ siteData = {} }) {
+export default function CinematicBirthday({ siteData: rawSiteData = {}, isDemo = false }) {
+  const siteData = mergeDemoData(rawSiteData, 'birthday', isDemo);
+
   const {
     coupleName    = 'Happy Birthday!',
     heroSubtitle  = 'Today is all about you ✨',

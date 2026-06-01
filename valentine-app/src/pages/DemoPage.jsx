@@ -100,7 +100,7 @@ export default function DemoPage() {
     return (
       <div className="relative min-h-screen pt-8">
         <DemoBanner />
-        <CinematicBirthday siteData={siteData} />
+        <CinematicBirthday siteData={siteData} isDemo={isDemo} />
       </div>
     );
   }
