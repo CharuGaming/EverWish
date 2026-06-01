@@ -200,6 +200,33 @@ export const MOCK_DATA = {
   b2: { ...birthdayBase, templateType: 'bday2' },
   b3: { ...birthdayBase, templateType: 'bday3' },
   b4: { ...birthdayBase, templateType: 'bday4' },
+  b5: { 
+    ...birthdayBase, 
+    templateType: 'bday5',
+    category: 'birthday',
+    cinematicBirthday: {
+      introVideoUrl: '',
+      bgVideoUrl: '',
+      giftImageUrl: UNSPLASH.bday2,
+      giftRevealText: 'A special gift just for you! 🎁',
+      yearRecapText: 'This year has been amazing, and it is all because of you.',
+      birthdayBucketList: [
+        'More road trips 🚗',
+        'Late night ice cream 🍦',
+        'Learn a new skill together 🎸',
+        'Binge-watch our favorite shows 📺'
+      ],
+      songAudioUrl: '',
+      songLyrics: 'Happy birthday to you,\nHappy birthday to you...',
+      galleryImages: [
+        UNSPLASH.bday1,
+        UNSPLASH.bday2,
+        UNSPLASH.bday3,
+        UNSPLASH.couple1,
+        UNSPLASH.couple2
+      ]
+    }
+  },
 };
 
 // WhatsApp number (single source of truth shared with Storefront)
