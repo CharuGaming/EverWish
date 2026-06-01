@@ -1,13 +1,18 @@
 import { optimizeCloudinaryUrl } from './imageHelpers';
 
-// Premium Unsplash URLs for Valentines/Romantic theme
+// Premium User Uploaded Cloudinary URLs for Valentines/Romantic theme
 const romanticImages = [
-  'https://images.unsplash.com/photo-1518199266791-5375a83164ba?q=80&w=2940&auto=format&fit=crop', // Couple silhouette at sunset
-  'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2787&auto=format&fit=crop', // Hands holding flowers
-  'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?q=80&w=2940&auto=format&fit=crop', // Romantic coffee and flowers
-  'https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?q=80&w=2787&auto=format&fit=crop', // Polaroid style couple
-  'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=2940&auto=format&fit=crop', // Abstract romance
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333160/A_couple_holding_hands_while_202606010130_xhjqm0.webp',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333171/A_couple_taking_a_selfie_202606010133_ftzm7b.jpg',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333180/Couple_holding_hands_whimsical_sky_202606010148_sitlfu.jpg',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333181/Couple_enjoying_romantic_dinner___202606010144_reaiwl.jpg',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333172/A_couple_sitting_together_on_202606010132_pqzx0w.jpg',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333181/Couple_standing_on_hill_202606010145_xtbtrl.jpg',
+  'https://res.cloudinary.com/daczoccvq/image/upload/v1780333169/A_couple_in_a_car_202606010134_hdfjoh.jpg',
 ];
+
+// Placeholder for cinematic videos
+const cinematicVideoUrl = 'https://res.cloudinary.com/demo/video/upload/q_auto,f_auto/v1689254848/video/couple-sunset.mp4';
 
 // Premium Unsplash URLs for Birthday/Celebration theme
 const birthdayImages = [
@@ -111,6 +116,8 @@ export function mergeDemoData(siteData, theme = 'valentine', isDemo = false) {
     merged.cinematic.heroImageUrl = demoFallback.heroImageUrl;
     merged.cinematic.songLyrics = demoFallback.songLyrics;
     merged.cinematic.reasons = demoFallback.reasons;
+    merged.cinematic.bgVideoUrl = cinematicVideoUrl;
+    merged.cinematic.introVideoUrl = cinematicVideoUrl;
   }
 
   // 6. Valentine / Custom / Proposal
@@ -131,6 +138,8 @@ export function mergeDemoData(siteData, theme = 'valentine', isDemo = false) {
     merged.cinematicBirthday.songLyrics = demoFallback.songLyrics;
     merged.cinematicBirthday.yearRecapText = demoFallback.yearRecapText;
     merged.cinematicBirthday.birthdayBucketList = demoFallback.birthdayBucketList;
+    merged.cinematicBirthday.bgVideoUrl = cinematicVideoUrl;
+    merged.cinematicBirthday.introVideoUrl = cinematicVideoUrl;
   }
 
   // 8. General Birthday (bday1-4)
