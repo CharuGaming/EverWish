@@ -154,15 +154,19 @@ exports.initAdmin = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Forbidden. Invalid init secret.' });
     }
 
-    const existing = await Admin.findOne();
-    if (existing && process.env.ALLOW_MULTIPLE_ADMINS !== 'true') {
-      return res.status(400).json({ success: false, message: 'Admin user already exists.' });
-    }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const admin = new Admin({
+    let admin = await Admin.findOne();
+    if (admin && process.env.ALLOW_MULTIPLE_ADMINS !== 'true') {
+      admin.username = username;
+      admin.email = email.toLowerCase();
+      admin.password = hashedPassword;
+      await admin.save();
+      return res.status(200).json({ success: true, message: 'Admin user updated successfully.' });
+    }
+
+    admin = new Admin({
       username,
       email: email.toLowerCase(),
       password: hashedPassword
