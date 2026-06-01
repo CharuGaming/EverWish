@@ -81,17 +81,63 @@ export function mergeDemoData(siteData, theme = 'valentine', isDemo = false) {
 
   // Helper to check if an array is empty or missing
   const isArrayEmpty = (arr) => !arr || (Array.isArray(arr) && arr.length === 0);
-  // Helper to check if string is empty
-  const isStringEmpty = (str) => !str || str.trim() === '';
+  // Force overwrite with premium demo data when isDemo is true
+  
+  // 1. General Hero & Bouquet Images
+  if (!merged.images) merged.images = {};
+  merged.images.heroImageUrl = demoFallback.heroImageUrl;
+  merged.images.bouquetImageUrl = demoFallback.giftImageUrl;
+  merged.heroImageUrl = demoFallback.heroImageUrl; // Some templates use flat heroImageUrl
 
-  // Merge specific fields based on theme logic
-  if (theme === 'birthday' && merged.cinematicBirthday) {
-    if (isStringEmpty(merged.cinematicBirthday.giftImageUrl)) merged.cinematicBirthday.giftImageUrl = demoFallback.giftImageUrl;
-    if (isArrayEmpty(merged.cinematicBirthday.galleryImages)) merged.cinematicBirthday.galleryImages = demoFallback.galleryImages.map(g => g.url);
-    if (isStringEmpty(merged.cinematicBirthday.songAudioUrl)) merged.cinematicBirthday.songAudioUrl = demoFallback.music.audioUrl;
-    if (isStringEmpty(merged.cinematicBirthday.songLyrics)) merged.cinematicBirthday.songLyrics = demoFallback.songLyrics;
-    if (isStringEmpty(merged.cinematicBirthday.yearRecapText)) merged.cinematicBirthday.yearRecapText = demoFallback.yearRecapText;
-    if (isArrayEmpty(merged.cinematicBirthday.birthdayBucketList)) merged.cinematicBirthday.birthdayBucketList = demoFallback.birthdayBucketList;
+  // 2. Music Player
+  if (!merged.music) merged.music = {};
+  merged.music.audioUrl = demoFallback.music.audioUrl;
+  merged.music.thumbnailUrl = demoFallback.music.thumbnailUrl;
+  merged.music.isEnabled = true;
+
+  // 3. Gift
+  if (!merged.gift) merged.gift = {};
+  merged.gift.imageUrl = demoFallback.giftImageUrl;
+  if (!merged.gift.bouquetUrl) merged.gift.bouquetUrl = demoFallback.giftImageUrl;
+
+  // 4. Memory Grid / Gallery
+  if (!merged.gallery) merged.gallery = { supporting: [] };
+  merged.gallery.centerImage = demoFallback.heroImageUrl;
+  merged.gallery.supporting = demoFallback.galleryImages;
+
+  // 5. Cinematic Anniversary (templateType: 'cinematic')
+  if (merged.templateType === 'cinematic') {
+    if (!merged.cinematic) merged.cinematic = {};
+    merged.cinematic.heroImageUrl = demoFallback.heroImageUrl;
+    merged.cinematic.songLyrics = demoFallback.songLyrics;
+    merged.cinematic.reasons = demoFallback.reasons;
+  }
+
+  // 6. Valentine / Custom / Proposal
+  if (['valentine', 'custom', 'proposal', 'polaroid', 'modern'].includes(merged.templateType)) {
+    if (!merged.valentine) merged.valentine = { matchImages: [], reasons: [] };
+    merged.valentine.reasons = demoFallback.reasons;
+    merged.valentine.matchImages = demoFallback.galleryImages.slice(0, 5).map(g => g.url);
+    if (!merged.milestones) merged.milestones = [];
+    merged.milestones = merged.milestones.map((m, i) => ({ ...m, imageUrl: demoFallback.galleryImages[i % demoFallback.galleryImages.length].url }));
+  }
+
+  // 7. Cinematic Birthday (bday5)
+  if (merged.templateType === 'bday5' || theme === 'birthday') {
+    if (!merged.cinematicBirthday) merged.cinematicBirthday = {};
+    merged.cinematicBirthday.giftImageUrl = demoFallback.giftImageUrl;
+    merged.cinematicBirthday.galleryImages = demoFallback.galleryImages.map(g => g.url);
+    merged.cinematicBirthday.songAudioUrl = demoFallback.music.audioUrl;
+    merged.cinematicBirthday.songLyrics = demoFallback.songLyrics;
+    merged.cinematicBirthday.yearRecapText = demoFallback.yearRecapText;
+    merged.cinematicBirthday.birthdayBucketList = demoFallback.birthdayBucketList;
+  }
+
+  // 8. General Birthday (bday1-4)
+  if (merged.category === 'birthday') {
+    if (!merged.virtualGift) merged.virtualGift = {};
+    merged.virtualGift.imageUrl = demoFallback.giftImageUrl;
+    merged.birthdayGallery = demoFallback.galleryImages;
   }
 
   return merged;
