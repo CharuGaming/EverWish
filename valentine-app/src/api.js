@@ -2,9 +2,42 @@
 // Set VITE_API_URL in .env.local to override for production
 const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('adminToken');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
+// ── Auth ──────────────────────────────────────────────────────────
+export async function loginAdmin(username, password) {
+  const r = await fetch(`${BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  return r.json();
+}
+
+export async function requestPasswordReset(email) {
+  const r = await fetch(`${BASE}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return r.json();
+}
+
+export async function resetPassword(email, otp, newPassword) {
+  const r = await fetch(`${BASE}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp, newPassword }),
+  });
+  return r.json();
+}
+
 // ── Sites ─────────────────────────────────────────────────────────
 export async function listSites() {
-  const r = await fetch(`${BASE}/api/sites`);
+  const r = await fetch(`${BASE}/api/sites`, { headers: getAuthHeaders() });
   if (!r.ok) {
     let msg = 'API error';
     try {
@@ -31,14 +64,14 @@ export async function getSite(siteId) {
 export async function saveSite(siteId, payload) {
   const r = await fetch(`${BASE}/api/sites/${siteId}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(payload),
   });
   return r.json();
 }
 
 export async function deleteSite(siteId) {
-  const r = await fetch(`${BASE}/api/sites/${siteId}`, { method: 'DELETE' });
+  const r = await fetch(`${BASE}/api/sites/${siteId}`, { method: 'DELETE', headers: getAuthHeaders() });
   return r.json();
 }
 
@@ -105,14 +138,14 @@ export async function createOrder(payload) {
 }
 
 export async function listOrders() {
-  const r = await fetch(`${BASE}/api/orders`);
+  const r = await fetch(`${BASE}/api/orders`, { headers: getAuthHeaders() });
   return r.json();
 }
 
 export async function updateOrderStatus(orderId, status) {
   const r = await fetch(`${BASE}/api/orders/${orderId}/status`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ status }),
   });
   return r.json();

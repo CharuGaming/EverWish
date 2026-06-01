@@ -9,6 +9,7 @@ import ClientPage     from "./pages/ClientPage";
 import Storefront     from "./pages/Storefront";
 import DemoPage       from "./pages/DemoPage";
 import OrderForm      from "./pages/OrderForm";
+import Login          from "./pages/Login";
 
 // Static demo components (hardcoded siteData — the original demo at /)
 import LockScreen    from "./components/LockScreen";
@@ -52,6 +53,15 @@ function StaticDemo() {
   );
 }
 
+// ── Protected Route Wrapper ───────────────────────────────────────
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 // ── App with Router ───────────────────────────────────────────────
 export default function App() {
   useEffect(() => {
@@ -76,9 +86,12 @@ export default function App() {
         {/* Template live previews — must come before /:siteId */}
         <Route path="/demo/:templateId"      element={<DemoPage />} />
 
+        {/* Auth */}
+        <Route path="/login"             element={<Login />} />
+
         {/* Admin portal */}
-        <Route path="/admin"             element={<AdminDashboard />} />
-        <Route path="/admin/edit/:siteId" element={<AdminEditor />} />
+        <Route path="/admin"             element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/edit/:siteId" element={<ProtectedRoute><AdminEditor /></ProtectedRoute>} />
 
         {/* Order form — /order/:templateId */}
         <Route path="/order/:templateId"    element={<OrderForm />} />

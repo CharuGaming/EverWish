@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const Site    = require('../models/Site');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // ─────────────────────────────────────────────────────────────────
 //  GET /api/sites/:siteId
@@ -30,7 +31,7 @@ router.get('/:siteId', async (req, res) => {
 //  Uses upsert so the Admin Dashboard can call this for both
 //  "create new client" and "update existing client".
 // ─────────────────────────────────────────────────────────────────
-router.post('/:siteId', async (req, res) => {
+router.post('/:siteId', authMiddleware, async (req, res) => {
   try {
     const siteId = req.params.siteId.toLowerCase();
 
@@ -68,7 +69,7 @@ router.post('/:siteId', async (req, res) => {
 //  GET /api/sites
 //  List all sites (for Admin Dashboard index page)
 // ─────────────────────────────────────────────────────────────────
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     // Projection: only fetch lightweight summary fields — never pull full image arrays/messages
     const sites = await Site
@@ -85,7 +86,7 @@ router.get('/', async (req, res) => {
 //  DELETE /api/sites/:siteId
 //  Remove a client site (for admin cleanup)
 // ─────────────────────────────────────────────────────────────────
-router.delete('/:siteId', async (req, res) => {
+router.delete('/:siteId', authMiddleware, async (req, res) => {
   try {
     const deleted = await Site.findOneAndDelete({ siteId: req.params.siteId.toLowerCase() });
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const Order   = require('../models/Order');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // ─────────────────────────────────────────────────────────────────
 //  POST /api/orders
@@ -58,7 +59,7 @@ router.post('/', async (req, res) => {
 //  GET /api/orders
 //  Fetch all orders for the Admin Dashboard (newest first).
 // ─────────────────────────────────────────────────────────────────
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const orders = await Order.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: orders });
@@ -72,7 +73,7 @@ router.get('/', async (req, res) => {
 //  PATCH /api/orders/:orderId/status
 //  Update order status (pending → in_progress → completed).
 // ─────────────────────────────────────────────────────────────────
-router.patch('/:orderId/status', async (req, res) => {
+router.patch('/:orderId/status', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
     const allowed = ['pending', 'in_progress', 'completed', 'cancelled'];

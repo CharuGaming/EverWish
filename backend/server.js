@@ -102,7 +102,10 @@ app.use(async (req, res, next) => {
   }
 });
 
+const authRoutes       = require('./routes/authRoutes');
+
 // ── Mount Routes ──────────────────────────────────────────────────
+app.use('/api/auth',       authRoutes);
 app.use('/api/sites',      siteRoutes);
 app.use('/api/upload',     uploadRoutes);
 app.use('/api/storefront', storefrontRoutes);
