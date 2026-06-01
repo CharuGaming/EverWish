@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, getStorefront, updateStorefront, uploadImage, listOrders, updateOrderStatus } from '../api';
+import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, setSiteDemo, getStorefront, updateStorefront, uploadImage, listOrders, updateOrderStatus } from '../api';
 import {
   Heart, Plus, ExternalLink, Trash2, Edit3,
   Search, AlertCircle, Loader2, CheckCircle2,
@@ -175,6 +175,19 @@ export default function AdminDashboard() {
       showToast(updatedStatus ? "Site activated!" : "Site deactivated!", true);
     } catch (err) {
       showToast("Failed to update status", false);
+    }
+  };
+
+  const handleSetDemo = async (dbId) => {
+    try {
+      showToast("Setting as Demo...", true);
+      const res = await setSiteDemo(dbId);
+      if (res.success) {
+        showToast("Demo successfully updated!");
+        load(); // reload sites to reflect demo flags correctly
+      }
+    } catch (err) {
+      showToast("Failed to set demo.", false);
     }
   };
 
@@ -430,7 +443,14 @@ export default function AdminDashboard() {
                         <p className="font-bold text-slate-900 dark:text-white text-base truncate flex items-center gap-3">
                           {site.general?.coupleName || site.siteId}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">/{site.siteId}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">
+                          /{site.siteId}
+                          {site.isDemoPreview && (
+                            <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                              <Star size={10} className="fill-amber-500" /> Active Demo
+                            </span>
+                          )}
+                        </p>
                         
                         <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
                           <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
@@ -453,6 +473,9 @@ export default function AdminDashboard() {
                       </span>
 
                       <div className="flex items-center gap-1.5 ml-auto md:ml-0">
+                        <button onClick={() => handleSetDemo(site._id)} title="Set as Demo" className={`p-2 rounded-xl transition shadow-sm border ${site.isDemoPreview ? 'text-amber-500 bg-amber-50 border-amber-200 cursor-default' : 'text-slate-500 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 border-transparent hover:border-amber-200'}`}>
+                          <Star size={16} className={site.isDemoPreview ? "fill-current" : ""} />
+                        </button>
                         <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
                           <Copy size={16} />
                         </button>

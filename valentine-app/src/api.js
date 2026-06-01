@@ -84,6 +84,22 @@ export async function toggleSiteStatus(siteId, isActive) {
   return r.json();
 }
 
+export async function setSiteDemo(siteId) {
+  const r = await fetch(`${BASE}/api/sites/${siteId}/set-demo`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+  });
+  return r.json();
+}
+
+export async function getDemoSite(templateId) {
+  const r = await fetch(`${BASE}/api/sites/demo/${templateId}`);
+  if (!r.ok) {
+    throw new Error('Failed to fetch demo site');
+  }
+  return r.json();
+}
+
 // ── Storefront Configuration ──────────────────────────────────────
 export async function getStorefront() {
   const r = await fetch(`${BASE}/api/storefront`);

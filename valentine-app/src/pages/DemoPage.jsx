@@ -2,10 +2,12 @@
 // Reached via route /demo/:templateId  (e.g. /demo/v1, /demo/b2)
 // Mirrors ClientPage's render logic but skips the API fetch entirely.
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MOCK_DATA } from '../mockData';
+import { mergeDemoData } from '../utils/demoData';
+import { getDemoSite, toComponentData } from '../api';
 
 import LockScreen        from '../components/LockScreen';
 import Hero              from '../components/Hero';
@@ -61,7 +63,37 @@ export default function DemoPage() {
   // When loaded inside PreviewModal's iframe, ?demo=1 is appended
   // — skip CPU-heavy particle effects to keep mobile smooth
   const isDemo = searchParams.get('demo') === '1';
-  const siteData = MOCK_DATA[templateId];
+  const [siteData, setSiteData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function loadDemo() {
+      const rawSiteData = MOCK_DATA[templateId];
+      const actualTemplateType = rawSiteData ? rawSiteData.templateType : templateId;
+
+      try {
+        const res = await getDemoSite(actualTemplateType);
+        if (res.success && res.data) {
+          // Use the real site configured as demo
+          setSiteData(toComponentData(res.data));
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.log("No CMS demo found for this template, falling back to mock data.");
+      }
+      
+      // Fallback gracefully to MOCK_DATA if no demo is set
+      if (rawSiteData) {
+        const themeCategory = rawSiteData.category === 'birthday' ? 'birthday' : 'valentine';
+        setSiteData(mergeDemoData(rawSiteData, themeCategory, isDemo));
+      } else {
+        setSiteData(null);
+      }
+      setLoading(false);
+    }
+    loadDemo();
+  }, [templateId, isDemo]);
 
   const [isUnlocked, setIsUnlocked]   = useState(false);
   const [playTrigger, setPlayTrigger] = useState(false);
@@ -78,6 +110,14 @@ export default function DemoPage() {
   }, [triggerBurst]);
 
   const handleUnlockImmediate = useCallback(() => setPlayTrigger(true), []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#fff0f5' }}>
+        <p className="text-slate-500 font-medium tracking-widest uppercase animate-pulse">Loading Demo...</p>
+      </div>
+    );
+  }
 
   if (!siteData) return <UnknownTemplate id={templateId} />;
 
@@ -100,7 +140,7 @@ export default function DemoPage() {
     return (
       <div className="relative min-h-screen pt-8">
         <DemoBanner />
-        <CinematicBirthday siteData={siteData} isDemo={isDemo} />
+        <CinematicBirthday siteData={siteData} />
       </div>
     );
   }

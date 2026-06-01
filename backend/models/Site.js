@@ -28,6 +28,12 @@ const SiteSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    // ── Demo System ────────────────────────────────────────────
+    isDemoPreview: {
+      type: Boolean,
+      default: false
+    },
+
     // ── Template Selection ─────────────────────────────────────
     category: {
       type: String,
