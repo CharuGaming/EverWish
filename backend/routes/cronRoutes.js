@@ -64,7 +64,8 @@ router.get('/cleanup', async (req, res) => {
     // Find all sites that are active but whose expiration date has passed
     const expiredSites = await Site.find({
       isActive: true,
-      expiresAt: { $lt: new Date() }
+      expiresAt: { $lt: new Date() },
+      isDemoPreview: { $ne: true }
     });
 
     if (expiredSites.length === 0) {
