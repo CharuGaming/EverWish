@@ -302,7 +302,7 @@ export default function AdminDashboard() {
       <header className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm relative z-10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="EverWish Logo" className="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-rose-500/20" />
+            <img loading="lazy" src="/logo.png" alt="EverWish Logo" className="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-rose-500/20" />
             <div>
               <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">EverWish</h1>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Admin Portal</p>
@@ -710,7 +710,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-3">
                       {test.screenshotUrl ? (
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-black/5 flex-shrink-0 group/img">
-                          <img src={test.screenshotUrl} alt="Proof" className="w-full h-full object-cover" />
+                          <img loading="lazy" src={test.screenshotUrl} alt="Proof" className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => handleTestimonialChange(i, 'screenshotUrl', '')}
@@ -938,7 +938,7 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-3 gap-3">
                     {selectedOrder.images.map((url, i) => (
                       <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block">
-                        <img src={url} alt={`Photo ${i+1}`} className="w-full h-28 object-cover rounded-2xl border border-slate-200 dark:border-white/10 hover:scale-105 transition-transform" loading="lazy" decoding="async" />
+                        <img loading="lazy" src={url} alt={`Photo ${i+1}`} className="w-full h-28 object-cover rounded-2xl border border-slate-200 dark:border-white/10 hover:scale-105 transition-transform" loading="lazy" decoding="async" />
                       </a>
                     ))}
                   </div>

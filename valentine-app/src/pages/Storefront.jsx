@@ -303,7 +303,7 @@ export default function Storefront() {
       <nav className="sticky top-0 z-40 bg-white/40 backdrop-blur-xl border-b border-white/60 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="EverWish Logo" className="w-9 h-9 rounded-2xl object-cover shadow-lg shadow-rose-400/25" />
+            <img loading="lazy" src="/logo.png" alt="EverWish Logo" className="w-9 h-9 rounded-2xl object-cover shadow-lg shadow-rose-400/25" />
             <span className="text-lg font-extrabold text-slate-900 tracking-tight">EverWish</span>
           </div>
           <div className="flex items-center gap-3">
@@ -631,7 +631,7 @@ export default function Storefront() {
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="EverWish Logo" className="w-9 h-9 rounded-2xl object-cover shadow" />
+            <img loading="lazy" src="/logo.png" alt="EverWish Logo" className="w-9 h-9 rounded-2xl object-cover shadow" />
             <div>
               <p className="font-extrabold text-slate-900 leading-none">EverWish</p>
               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Digital Celebrations</p>
@@ -690,7 +690,7 @@ export default function Storefront() {
 
               {/* Image Container */}
               <div className="relative rounded-[1.6rem] overflow-hidden max-h-[80vh] bg-slate-950 flex justify-center">
-                <img 
+                <img loading="lazy" 
                   src={selectedProof} 
                   alt="Customer Chat Proof" 
                   className="w-full object-contain max-h-[75vh]" 

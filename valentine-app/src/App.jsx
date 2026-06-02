@@ -2,14 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Pages
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminEditor    from "./pages/AdminEditor";
-import ClientPage     from "./pages/ClientPage";
-import Storefront     from "./pages/Storefront";
-import DemoPage       from "./pages/DemoPage";
-import OrderForm      from "./pages/OrderForm";
-import Login          from "./pages/Login";
+import { lazy, Suspense } from 'react';
+
+// Lazy loaded pages
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminEditor    = lazy(() => import("./pages/AdminEditor"));
+const ClientPage     = lazy(() => import("./pages/ClientPage"));
+const Storefront     = lazy(() => import("./pages/Storefront"));
+const DemoPage       = lazy(() => import("./pages/DemoPage"));
+const OrderForm      = lazy(() => import("./pages/OrderForm"));
+const Login          = lazy(() => import("./pages/Login"));
 
 // Static demo components (hardcoded siteData — the original demo at /)
 import LockScreen    from "./components/LockScreen";
@@ -76,32 +78,34 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public storefront — default landing page */}
-        <Route path="/"                  element={<Storefront />} />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-500"><div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+        <Routes>
+          {/* Public storefront — default landing page */}
+          <Route path="/"                  element={<Storefront />} />
 
-        {/* Static hardcoded demo (original) */}
-        <Route path="/demo"                  element={<StaticDemo />} />
+          {/* Static hardcoded demo (original) */}
+          <Route path="/demo"                  element={<StaticDemo />} />
 
-        {/* Template live previews — must come before /:siteId */}
-        <Route path="/demo/:templateId"      element={<DemoPage />} />
+          {/* Template live previews — must come before /:siteId */}
+          <Route path="/demo/:templateId"      element={<DemoPage />} />
 
-        {/* Auth */}
-        <Route path="/login"             element={<Login />} />
+          {/* Auth */}
+          <Route path="/login"             element={<Login />} />
 
-        {/* Admin portal */}
-        <Route path="/admin"             element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-        <Route path="/admin/edit/:siteId" element={<ProtectedRoute><AdminEditor /></ProtectedRoute>} />
+          {/* Admin portal */}
+          <Route path="/admin"             element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/edit/:siteId" element={<ProtectedRoute><AdminEditor /></ProtectedRoute>} />
 
-        {/* Order form — /order/:templateId */}
-        <Route path="/order/:templateId"    element={<OrderForm />} />
+          {/* Order form — /order/:templateId */}
+          <Route path="/order/:templateId"    element={<OrderForm />} />
 
-        {/* Dynamic client celebration page — must stay last */}
-        <Route path="/:siteId"           element={<ClientPage />} />
+          {/* Dynamic client celebration page — must stay last */}
+          <Route path="/:siteId"           element={<ClientPage />} />
 
-        {/* Fallback */}
-        <Route path="*"                  element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*"                  element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
