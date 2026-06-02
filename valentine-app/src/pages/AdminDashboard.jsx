@@ -12,7 +12,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 // REMINDER: Add the following route to backend siteRoutes.js:
 // PATCH /api/sites/:siteId/status -> updates isActive boolean.
 
-function calculateStatus(isActive, expiresAt) {
+function calculateStatus(isActive, expiresAt, isDemo) {
+  if (isDemo) {
+    return { text: "Active Demo (No Expiry)", color: "bg-fuchsia-100/50 dark:bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-400 border border-fuchsia-200/50 dark:border-fuchsia-500/20" };
+  }
+
   if (!isActive) {
     return { text: "Inactive", color: "bg-neutral-200/50 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400 border border-neutral-300/50 dark:border-neutral-700/50" };
   }
@@ -43,7 +47,8 @@ function formatDate(dateStringOrObj) {
   }
 }
 
-function getExpirationInfo(createdAt, expiresAt) {
+function getExpirationInfo(createdAt, expiresAt, isDemo) {
+  if (isDemo) return { date: null, isUrgent: false };
   if (!createdAt && !expiresAt) return { date: null, isUrgent: false };
   const expDate = expiresAt ? new Date(expiresAt) : new Date(new Date(createdAt).getTime() + 14 * 24 * 60 * 60 * 1000);
   const now = new Date();
@@ -426,7 +431,7 @@ export default function AdminDashboard() {
           ) : (
             <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
               {filtered.map((site, idx) => {
-                const status = calculateStatus(site.isActive, site.expiresAt);
+                const status = calculateStatus(site.isActive, site.expiresAt, site.isDemoPreview);
                 return (
                   <motion.div
                     key={site.siteId}
@@ -456,7 +461,8 @@ export default function AdminDashboard() {
                           <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
                           {viewMode==='list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
                           {(() => {
-                            const expInfo = getExpirationInfo(site.createdAt, site.expiresAt);
+                            const expInfo = getExpirationInfo(site.createdAt, site.expiresAt, site.isDemoPreview);
+                            if (!expInfo.date) return null;
                             return (
                               <span className={expInfo.isUrgent ? 'text-red-500 font-bold' : ''}>
                                 <strong className={`font-semibold ${expInfo.isUrgent ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>Expires On:</strong> {formatDate(expInfo.date)}
