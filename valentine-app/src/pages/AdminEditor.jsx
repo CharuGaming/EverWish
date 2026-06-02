@@ -150,7 +150,7 @@ function ImageField({ label, hint, value, onChange }) {
             onClick={handleDelete}
             disabled={uploading}
             title="Delete File from Cloud"
-            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-transform hover:scale-110 disabled:opacity-50"
           >
             <Trash2 size={12} />
           </button>
@@ -234,17 +234,17 @@ function AudioField({ label, hint, value, onChange }) {
       )}
 
       {value && !error && (
-        <div className="mt-3 relative group w-full md:w-2/3 lg:w-1/2">
-          <div className="p-3 bg-slate-900 border border-slate-700 rounded-lg">
+        <div className="mt-3 relative w-full md:w-2/3 lg:w-1/2 flex items-center gap-3">
+          <div className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg">
             <audio controls src={value} className="w-full h-8" />
           </div>
           <button
             onClick={handleDelete}
             disabled={uploading}
             title="Delete Audio from Cloud"
-            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            className="flex-shrink-0 p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md transition-colors disabled:opacity-50"
           >
-            <Trash2 size={12} />
+            <Trash2 size={16} />
           </button>
         </div>
       )}
@@ -327,8 +327,18 @@ function VideoField({ label, hint, value, onChange }) {
       )}
 
       {value && !error && (
-        <div className="mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg max-w-xs">
-          <video src={value} controls className="w-full rounded-md max-h-40 object-cover" />
+        <div className="mt-3 relative inline-block group">
+          <div className="p-3 bg-slate-900 border border-slate-700 rounded-lg max-w-xs">
+            <video src={value} controls className="w-full rounded-md max-h-40 object-cover" />
+          </div>
+          <button
+            onClick={handleDelete}
+            disabled={uploading}
+            title="Delete Video from Cloud"
+            className="absolute -top-3 -right-3 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-transform hover:scale-110 disabled:opacity-50"
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       )}
     </div>
