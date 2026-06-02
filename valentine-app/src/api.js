@@ -137,10 +137,39 @@ export async function updateStorefront(payload) {
   return data;
 }
 export async function uploadImage(file) {
-  const fd = new FormData();
-  fd.append('image', file);
-  const r = await fetch(`${BASE}/api/upload`, { method: 'POST', body: fd });
-  return r.json();
+  try {
+    // 1. Fetch upload signature from backend
+    const sigRes = await fetch(`${BASE}/api/upload/signature`);
+    if (!sigRes.ok) throw new Error('Failed to fetch upload signature');
+    const { timestamp, signature, cloudName, apiKey } = await sigRes.json();
+
+    // 2. Upload directly to Cloudinary
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('api_key', apiKey);
+    fd.append('timestamp', timestamp);
+    fd.append('signature', signature);
+    fd.append('folder', 'everwish-celebrations');
+
+    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+      method: 'POST',
+      body: fd,
+    });
+
+    const data = await uploadRes.json();
+    if (data.error) throw new Error(data.error.message);
+
+    // 3. Optimize image URLs if it's an image
+    let optimizedUrl = data.secure_url;
+    if (data.resource_type === 'image' && optimizedUrl.includes('/upload/')) {
+      optimizedUrl = optimizedUrl.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+
+    return { success: true, url: optimizedUrl };
+  } catch (err) {
+    console.error("Direct upload failed:", err);
+    return { success: false, message: err.message || 'Upload failed' };
+  }
 }
 
 export async function deleteImage(url) {

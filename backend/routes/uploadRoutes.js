@@ -35,6 +35,35 @@ function bufferToStream(buffer) {
 }
 
 // ─────────────────────────────────────────────────────────────────
+//  GET /api/upload/signature
+//  Returns a signature to allow direct uploads from the frontend,
+//  bypassing Vercel's 4.5MB serverless payload limit.
+// ─────────────────────────────────────────────────────────────────
+router.get('/signature', (req, res) => {
+  try {
+    const timestamp = Math.round((new Date).getTime() / 1000);
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp: timestamp,
+        folder: 'everwish-celebrations',
+      },
+      process.env.CLOUDINARY_API_SECRET
+    );
+
+    res.json({
+      success: true,
+      timestamp,
+      signature,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+    });
+  } catch (err) {
+    console.error('[GET /api/upload/signature] error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to generate upload signature' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
 //  POST /api/upload
 //  Accepts a single image, uploads it to Cloudinary,
 //  and returns a permanent, CDN-optimised direct URL.
