@@ -106,6 +106,53 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────
+//  DELETE /api/upload
+//  Accepts a Cloudinary URL and deletes it from Cloudinary
+// ─────────────────────────────────────────────────────────────────
+router.delete('/', async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || !url.includes('cloudinary.com')) {
+      return res.status(400).json({ success: false, message: 'Valid Cloudinary URL required.' });
+    }
+
+    // Extract resource_type
+    let resourceType = 'image';
+    if (url.includes('/video/upload/')) resourceType = 'video';
+    else if (url.includes('/raw/upload/')) resourceType = 'raw';
+
+    // Extract public_id
+    const parts = url.split('/');
+    const uploadIndex = parts.indexOf('upload');
+    if (uploadIndex === -1) {
+      return res.status(400).json({ success: false, message: 'Invalid Cloudinary URL format.' });
+    }
+
+    let pathParts = parts.slice(uploadIndex + 1);
+    // Remove transformations (if any) e.g., f_auto,q_auto or w_1200,c_limit
+    if (pathParts[0].includes(',')) pathParts.shift();
+    // Remove version (if any) e.g., v1689254848
+    if (/^v\d+$/.test(pathParts[0])) pathParts.shift();
+
+    const publicIdWithExt = pathParts.join('/');
+    const lastDotIndex = publicIdWithExt.lastIndexOf('.');
+    const publicId = lastDotIndex !== -1 ? publicIdWithExt.substring(0, lastDotIndex) : publicIdWithExt;
+
+    // Delete from Cloudinary
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+    
+    if (result.result === 'ok') {
+      res.status(200).json({ success: true, message: 'Asset deleted successfully.' });
+    } else {
+      res.status(400).json({ success: false, message: 'Failed to delete asset or asset not found.', details: result });
+    }
+  } catch (err) {
+    console.error('[DELETE /api/upload] error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to delete asset.', error: err.message });
+  }
+});
+
 // ─── Multer error handler ─────────────────────────────────────────
 router.use((err, _req, res, _next) => {
   if (err instanceof multer.MulterError || err.message.includes('Only image') || err.message.includes('Only image files')) {

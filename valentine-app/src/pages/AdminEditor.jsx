@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getSite, saveSite, uploadImage } from '../api';
+import { getSite, saveSite, uploadImage, deleteImage } from '../api';
 import {
   Save, ArrowLeft, Upload, Loader2, CheckCircle2,
   Plus, Trash2, Settings, Music, Gift, MapPin, Image,
@@ -96,8 +96,26 @@ function ImageField({ label, hint, value, onChange }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!value) return;
+    if (!confirm('Are you sure you want to delete this file from the cloud?')) return;
+    
+    setUploading(true);
+    try {
+      if (value.includes('cloudinary.com')) {
+        await deleteImage(value);
+      }
+      onChange(''); // clear field
+    } catch {
+      setError('Failed to delete file. It might already be removed.');
+      onChange(''); // clear field anyway
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
-    <div className="mb-5">
+    <div className="mb-5 relative">
       <Label>{label}</Label>
       {hint && <p className="text-[11px] text-slate-500 mb-2">{hint}</p>}
 
@@ -126,7 +144,17 @@ function ImageField({ label, hint, value, onChange }) {
       )}
 
       {value && !error && (
-        <img src={value} alt="preview" className="mt-3 h-20 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />
+        <div className="mt-3 relative inline-block group">
+          <img src={value} alt="preview" className="h-20 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />
+          <button
+            onClick={handleDelete}
+            disabled={uploading}
+            title="Delete File from Cloud"
+            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
       )}
     </div>
   );
@@ -158,8 +186,26 @@ function AudioField({ label, hint, value, onChange }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!value) return;
+    if (!confirm('Are you sure you want to delete this audio from the cloud?')) return;
+    
+    setUploading(true);
+    try {
+      if (value.includes('cloudinary.com')) {
+        await deleteImage(value);
+      }
+      onChange('');
+    } catch {
+      setError('Failed to delete audio.');
+      onChange('');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
-    <div className="mb-5">
+    <div className="mb-5 relative">
       <Label>{label}</Label>
       {hint && <p className="text-[11px] text-slate-500 mb-2">{hint}</p>}
 
@@ -188,8 +234,18 @@ function AudioField({ label, hint, value, onChange }) {
       )}
 
       {value && !error && (
-        <div className="mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg">
-          <audio controls src={value} className="w-full h-8" />
+        <div className="mt-3 relative group w-full md:w-2/3 lg:w-1/2">
+          <div className="p-3 bg-slate-900 border border-slate-700 rounded-lg">
+            <audio controls src={value} className="w-full h-8" />
+          </div>
+          <button
+            onClick={handleDelete}
+            disabled={uploading}
+            title="Delete Audio from Cloud"
+            className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Trash2 size={12} />
+          </button>
         </div>
       )}
     </div>
@@ -222,8 +278,26 @@ function VideoField({ label, hint, value, onChange }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!value) return;
+    if (!confirm('Are you sure you want to delete this video from the cloud?')) return;
+    
+    setUploading(true);
+    try {
+      if (value.includes('cloudinary.com')) {
+        await deleteImage(value);
+      }
+      onChange('');
+    } catch {
+      setError('Failed to delete video.');
+      onChange('');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
-    <div className="mb-5">
+    <div className="mb-5 relative">
       <Label>{label}</Label>
       {hint && <p className="text-[11px] text-slate-500 mb-2">{hint}</p>}
 

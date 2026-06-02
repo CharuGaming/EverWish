@@ -143,6 +143,15 @@ export async function uploadImage(file) {
   return r.json();
 }
 
+export async function deleteImage(url) {
+  const r = await fetch(`${BASE}/api/upload`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  });
+  return r.json();
+}
+
 // ── Orders ────────────────────────────────────────────────────────
 export async function createOrder(payload) {
   const r = await fetch(`${BASE}/api/orders`, {
