@@ -24,6 +24,12 @@ export default function GlobalMusicPlayer({ musicData }) {
     const attemptPlay = () => {
       if (!audio.paused) return;
       
+      const otherAudioPlaying = Array.from(document.querySelectorAll('audio')).some(el => el !== audio && !el.paused);
+      if (otherAudioPlaying) {
+        setHasInteracted(true);
+        return;
+      }
+      
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise
@@ -38,6 +44,7 @@ export default function GlobalMusicPlayer({ musicData }) {
     };
 
     const handleInteraction = () => {
+      removeListeners();
       attemptPlay();
     };
 
@@ -66,6 +73,9 @@ export default function GlobalMusicPlayer({ musicData }) {
     if (isPlaying) {
       audio.pause();
     } else {
+      document.querySelectorAll('audio').forEach(el => {
+        if (el !== audio) el.pause();
+      });
       audio.play().then(() => {
         setHasInteracted(true);
       }).catch(err => console.error("Play failed", err));

@@ -166,7 +166,7 @@ export default function VoiceMessage({ audioUrl, primary = '#f59e0b' }) {
           {/* Play / Pause */}
           <div className="flex justify-center">
             <motion.button
-              onClick={toggle}
+              onClick={(e) => { e.stopPropagation(); toggle(); }}
               whileTap={{ scale: 0.93 }}
               whileHover={{ scale: 1.06 }}
               className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl cursor-pointer"
