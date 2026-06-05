@@ -213,6 +213,10 @@ export default function AdminDashboard() {
     s.general?.coupleName?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Split into demos vs regular client sites
+  const demoSites    = filtered.filter(s => s.isDemoPreview === true);
+  const regularSites = filtered.filter(s => !s.isDemoPreview);
+
   const handleSaveStorefront = async () => {
     setSavingStorefront(true);
     try {
@@ -435,82 +439,189 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-24 text-slate-500 dark:text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 bg-white/20 dark:bg-black/20 rounded-3xl">
-              <AlertCircle size={36} className="mx-auto mb-4 opacity-50" />
-              <p className="text-sm font-medium">{search ? 'No clients match your search.' : 'No clients yet. Create one above!'}</p>
-            </div>
           ) : (
-            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-              {filtered.map((site, idx) => {
-                const status = calculateStatus(site.isActive, site.expiresAt, site.isDemoPreview);
-                return (
-                  <motion.div
-                    key={site.siteId}
-                    initial={{ opacity: 0, scale: viewMode === 'grid' ? 0.95 : 1, y: viewMode === 'list' ? 10 : 0 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className={`group bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-3xl p-5 flex transition-all duration-300 hover:shadow-lg shadow-black/5 hover:-translate-y-1 hover:border-rose-300 dark:hover:border-rose-500/30 ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row md:items-center justify-between gap-6'}`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-500/20 dark:to-rose-500/5 border border-rose-200 dark:border-rose-500/20 flex-shrink-0 flex items-center justify-center text-xl shadow-sm">
-                        💌
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-900 dark:text-white text-base truncate flex items-center gap-3">
-                          {site.general?.coupleName || site.siteId}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">
-                          /{site.siteId}
-                          {site.isDemoPreview && (
-                            <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
-                              <Star size={10} className="fill-amber-500" /> Active Demo
+            <div className="space-y-10">
+
+              {/* ══ Section 1: Storefront Demos ═══════════════════════════ */}
+              <div>
+                <h3 className="text-xl font-black text-white/90 mb-5 flex items-center gap-2.5">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-400/20 border border-amber-400/30 text-base">🌟</span>
+                  Active Storefront Demos
+                  {demoSites.length > 0 && (
+                    <span className="ml-1 text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-400 border border-amber-400/20">
+                      {demoSites.length}
+                    </span>
+                  )}
+                </h3>
+
+                {demoSites.length === 0 ? (
+                  <div className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-dashed border-white/10 bg-white/5 text-white/30 text-sm font-medium">
+                    <span className="opacity-50">✦</span>
+                    {search ? 'No demos match your search.' : 'No active demos set — click the ⭐ star icon on a site to promote it.'}
+                  </div>
+                ) : (
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                    {demoSites.map((site, idx) => {
+                      const status = calculateStatus(site.isActive, site.expiresAt, site.isDemoPreview);
+                      return (
+                        <motion.div
+                          key={site.siteId}
+                          initial={{ opacity: 0, scale: viewMode === 'grid' ? 0.95 : 1, y: viewMode === 'list' ? 10 : 0 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className={`group bg-amber-500/5 border border-amber-400/20 hover:border-amber-400/50 rounded-3xl p-5 flex transition-all duration-300 hover:shadow-lg hover:shadow-amber-400/10 hover:-translate-y-1 ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row md:items-center justify-between gap-6'}`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/30 to-amber-300/10 border border-amber-400/30 flex-shrink-0 flex items-center justify-center text-xl shadow-sm">
+                              ⭐
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-white text-base truncate">
+                                {site.general?.coupleName || site.siteId}
+                              </p>
+                              <p className="text-xs text-amber-300/70 mt-1 mb-2 font-mono tracking-tight truncate">
+                                /{site.siteId}
+                                <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-400 border border-amber-400/30 text-[10px] font-bold uppercase tracking-wider">
+                                  <Star size={9} className="fill-amber-400" /> Active Demo
+                                </span>
+                              </p>
+                              <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
+                                <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
+                                {viewMode === 'list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
+                                {(() => {
+                                  const expInfo = getExpirationInfo(site.createdAt, site.expiresAt, site.isDemoPreview);
+                                  if (!expInfo.date) return null;
+                                  return (
+                                    <span className={expInfo.isUrgent ? 'text-red-500 font-bold' : ''}>
+                                      <strong className={`font-semibold ${expInfo.isUrgent ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>Expires On:</strong> {formatDate(expInfo.date)}
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={`flex items-center gap-3 mt-4 md:mt-0 ${viewMode === 'grid' ? 'pt-4 border-t border-amber-400/10 justify-between' : ''}`}>
+                            <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
+                              {status.text}
                             </span>
-                          )}
-                        </p>
-                        
-                        <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
-                          <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
-                          {viewMode==='list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
-                          {(() => {
-                            const expInfo = getExpirationInfo(site.createdAt, site.expiresAt, site.isDemoPreview);
-                            if (!expInfo.date) return null;
-                            return (
-                              <span className={expInfo.isUrgent ? 'text-red-500 font-bold' : ''}>
-                                <strong className={`font-semibold ${expInfo.isUrgent ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>Expires On:</strong> {formatDate(expInfo.date)}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
+                            <div className="flex items-center gap-1.5 ml-auto md:ml-0">
+                              <button onClick={() => handleSetDemo(site._id)} title="Active Demo" className="p-2 rounded-xl transition shadow-sm border text-amber-500 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 cursor-default">
+                                <Star size={16} className="fill-current" />
+                              </button>
+                              <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                <Copy size={16} />
+                              </button>
+                              <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? 'Deactivate Site' : 'Activate Site'} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
+                              </button>
+                              <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                <Edit3 size={16} />
+                              </button>
+                              <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-                    <div className={`flex items-center gap-3 mt-4 md:mt-0 ${viewMode === 'grid' ? 'pt-4 border-t border-slate-200 dark:border-slate-800 justify-between' : ''}`}>
-                      <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
-                        {status.text}
-                      </span>
+              {/* ── Visual divider ─────────────────────────────────────── */}
+              <div className="relative flex items-center gap-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <span className="text-white/20 text-xs font-bold uppercase tracking-[0.3em] select-none">Client Sites</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+              </div>
 
-                      <div className="flex items-center gap-1.5 ml-auto md:ml-0">
-                        <button onClick={() => handleSetDemo(site._id)} title="Set as Demo" className={`p-2 rounded-xl transition shadow-sm border ${site.isDemoPreview ? 'text-amber-500 bg-amber-50 border-amber-200 cursor-default' : 'text-slate-500 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 border-transparent hover:border-amber-200'}`}>
-                          <Star size={16} className={site.isDemoPreview ? "fill-current" : ""} />
-                        </button>
-                        <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                          <Copy size={16} />
-                        </button>
-                        <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? "Deactivate Site" : "Activate Site"} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                          {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
-                        </button>
-                        <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                          <Edit3 size={16} />
-                        </button>
-                        <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+              {/* ══ Section 2: Regular Client Orders ══════════════════════ */}
+              <div>
+                <h3 className="text-xl font-black text-white/90 mb-5 flex items-center gap-2.5">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/30 text-base">👥</span>
+                  Client Orders
+                  {regularSites.length > 0 && (
+                    <span className="ml-1 text-xs font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/20">
+                      {regularSites.length}
+                    </span>
+                  )}
+                </h3>
+
+                {regularSites.length === 0 ? (
+                  <div className="text-center py-16 text-slate-500 dark:text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 bg-white/20 dark:bg-black/20 rounded-3xl">
+                    <AlertCircle size={32} className="mx-auto mb-3 opacity-40" />
+                    <p className="text-sm font-medium">{search ? 'No clients match your search.' : 'No client sites yet. Create one above!'}</p>
+                  </div>
+                ) : (
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
+                    {regularSites.map((site, idx) => {
+                      const status = calculateStatus(site.isActive, site.expiresAt, site.isDemoPreview);
+                      return (
+                        <motion.div
+                          key={site.siteId}
+                          initial={{ opacity: 0, scale: viewMode === 'grid' ? 0.95 : 1, y: viewMode === 'list' ? 10 : 0 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className={`group bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-3xl p-5 flex transition-all duration-300 hover:shadow-lg shadow-black/5 hover:-translate-y-1 hover:border-rose-300 dark:hover:border-rose-500/30 ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row md:items-center justify-between gap-6'}`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-500/20 dark:to-rose-500/5 border border-rose-200 dark:border-rose-500/20 flex-shrink-0 flex items-center justify-center text-xl shadow-sm">
+                              💌
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-slate-900 dark:text-white text-base truncate">
+                                {site.general?.coupleName || site.siteId}
+                              </p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">
+                                /{site.siteId}
+                              </p>
+                              <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
+                                <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
+                                {viewMode === 'list' && <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />}
+                                {(() => {
+                                  const expInfo = getExpirationInfo(site.createdAt, site.expiresAt, site.isDemoPreview);
+                                  if (!expInfo.date) return null;
+                                  return (
+                                    <span className={expInfo.isUrgent ? 'text-red-500 font-bold' : ''}>
+                                      <strong className={`font-semibold ${expInfo.isUrgent ? 'text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-300'}`}>Expires On:</strong> {formatDate(expInfo.date)}
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={`flex items-center gap-3 mt-4 md:mt-0 ${viewMode === 'grid' ? 'pt-4 border-t border-slate-200 dark:border-slate-800 justify-between' : ''}`}>
+                            <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
+                              {status.text}
+                            </span>
+                            <div className="flex items-center gap-1.5 ml-auto md:ml-0">
+                              <button onClick={() => handleSetDemo(site._id)} title="Set as Demo" className="p-2 rounded-xl transition shadow-sm border text-slate-500 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 border-transparent hover:border-amber-200">
+                                <Star size={16} />
+                              </button>
+                              <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                <Copy size={16} />
+                              </button>
+                              <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? 'Deactivate Site' : 'Activate Site'} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
+                              </button>
+                              <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                <Edit3 size={16} />
+                              </button>
+                              <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
         </motion.div>
