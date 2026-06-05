@@ -9,24 +9,18 @@ export default function MusicPlayer({ isUnlocked, playTrigger, musicUrl }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Initialize and mount Audio element immediately on component mount (early load)
   useEffect(() => {
-    const audio = new Audio(audioUrl);
-    audio.loop = true;
-    audio.volume = 0.5; // Good background level
-    audioRef.current = audio;
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      audioRef.current = null;
-    };
+    if (audioRef.current) {
+      audioRef.current.volume = 0.5;
+    }
   }, []);
 
   // Trigger play on unlock (from the trusted click event stack trace)
   useEffect(() => {
     if (playTrigger && audioRef.current) {
+      document.querySelectorAll('audio').forEach(el => {
+        if (el !== audioRef.current) el.pause();
+      });
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);
@@ -44,6 +38,9 @@ export default function MusicPlayer({ isUnlocked, playTrigger, musicUrl }) {
 
     // If it hasn't started playing yet due to browser restrictions, start it on click
     if (!isPlaying) {
+      document.querySelectorAll('audio').forEach(el => {
+        if (el !== audioRef.current) el.pause();
+      });
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);
@@ -85,8 +82,15 @@ export default function MusicPlayer({ isUnlocked, playTrigger, musicUrl }) {
       )}
       {/* Mini note details on hover */}
       <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-out whitespace-nowrap text-xs font-medium text-rose-500 pl-0 group-hover:pl-2">
-        Chopin Nocturne
+        Background Music
       </span>
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        loop
+        onPlay={() => { setIsPlaying(true); setIsMuted(false); }}
+        onPause={() => setIsPlaying(false)}
+      />
     </button>
   );
 }
