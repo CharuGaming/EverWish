@@ -7,6 +7,7 @@ import BirthdayGift     from './BirthdayGift';
 import VoiceMessage     from './VoiceMessage';
 import YearInReview     from './YearInReview';
 import ScratchCoupon    from './ScratchCoupon';
+import GreetingVideo    from './GreetingVideo';
 
 // Scroll-triggered fade-in-up wrapper
 function FadeUp({ children, delay = 0 }) {
@@ -50,8 +51,8 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
     >
       {order.map((section) => {
         switch (section) {
-          case 'hero':
-            return (
+          case 'hero': {
+            const heroSection = (
               <section key="hero" className="relative py-24 px-6 text-center overflow-hidden">
                 {/* Subtle radial glow */}
                 <div
@@ -105,19 +106,13 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                   className="flex justify-center mt-8 relative z-10"
                 >
                   <svg width="180" height="190" viewBox="0 0 200 200" className="drop-shadow-2xl">
-                    {/* Plate */}
                     <ellipse cx="100" cy="182" rx="88" ry="13" fill="#e2e8f0" />
-                    {/* Bottom Tier */}
                     <path d="M28 170 Q100 190 172 170 L172 112 Q100 132 28 112 Z" fill={primary} opacity="0.82" />
                     <ellipse cx="100" cy="112" rx="72" ry="14" fill={primary} opacity="0.92" />
-                    {/* Frosting drips bottom */}
                     <path d="M30 112 Q42 130 55 112 Q68 126 80 112 Q92 134 104 112 Q116 128 128 112 Q140 130 152 112 Q164 126 172 112" fill="#fff" opacity="0.75" />
-                    {/* Top Tier */}
                     <path d="M50 112 Q100 130 150 112 L150 72 Q100 90 50 72 Z" fill={primary} />
                     <ellipse cx="100" cy="72" rx="50" ry="10" fill="#fff" opacity="0.82" />
-                    {/* Frosting drips top */}
                     <path d="M52 72 Q62 90 72 72 Q82 85 92 72 Q102 88 112 72 Q122 86 132 72 Q142 90 148 72" fill="#fff" opacity="0.75" />
-                    {/* Candles */}
                     {Array.from({ length: Math.min(b.recipientAge || 3, 5) }).map((_, i, arr) => {
                       const cx = 100 + (i - (arr.length - 1) / 2) * 16;
                       return (
@@ -141,6 +136,13 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                 </motion.div>
               </section>
             );
+            return [
+              heroSection,
+              siteData?.greetingVideoUrl
+                ? <GreetingVideo key="greetingVideo" videoUrl={siteData.greetingVideoUrl} primary={primary} />
+                : null,
+            ];
+          }
           case 'message':
             return b.birthdayMessage ? (
               <FadeUp key="message" delay={0}>

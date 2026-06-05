@@ -1600,6 +1600,25 @@ function BirthdayGeneralTab({ doc, setDoc }) {
         )}
       </Card>
 
+      {/* ── Greeting Video ─────────────────────────────────── */}
+      <Card title="🎬 Personal Greeting Video (Optional)">
+        <p className="text-[11px] text-slate-500 mb-4">
+          Upload a short personal video greeting (e.g. recorded on your phone). It will appear as a premium video player just below the main hero section on the birthday page.
+        </p>
+        <VideoField
+          label="Greeting Video"
+          hint="Upload an MP4/MOV file. Keep it under 50MB for fast loading."
+          value={doc.greetingVideoUrl}
+          onChange={v => setDoc(d => ({ ...d, greetingVideoUrl: v }))}
+        />
+        {doc.greetingVideoUrl && (
+          <button onClick={() => setDoc(d => ({ ...d, greetingVideoUrl: '' }))}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 block">
+            Remove greeting video
+          </button>
+        )}
+      </Card>
+
       {/* ── Scratch & Win ──────────────────────────────────── */}
       <Card title="🎠 Scratch & Win (Optional)">
         <p className="text-[11px] text-slate-500 mb-4">

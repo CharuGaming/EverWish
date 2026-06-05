@@ -183,6 +183,7 @@ const SiteSchema = new mongoose.Schema(
     // ── Birthday Exclusive Features ───────────────────────────────
     unlockTime:   { type: Date,   default: null },
     voiceNoteUrl: { type: String, default: '' },
+    greetingVideoUrl: { type: String, default: '' },
     scratchPrize: { type: String, default: '' },
     yearInReview: {
       type: [{ label: { type: String, default: '' }, value: { type: String, default: '' } }],
