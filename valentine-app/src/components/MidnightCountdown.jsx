@@ -7,17 +7,18 @@ function pad(n) { return String(Math.max(0, n)).padStart(2, '0'); }
 function getTimeLeft(target) {
   const diff = new Date(target) - Date.now();
   if (diff <= 0) return null;
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  return { h, m, s };
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+  return { d, h, m, s };
 }
 
 function Digit({ value, label, color }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        className="relative w-20 h-24 md:w-28 md:h-32 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden"
+        className="relative w-16 h-20 sm:w-20 sm:h-24 md:w-28 md:h-32 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden"
         style={{ background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.15)' }}
       >
         {/* Subtle top shine */}
@@ -31,7 +32,7 @@ function Digit({ value, label, color }) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="text-4xl md:text-6xl font-black tabular-nums relative z-10"
+            className="text-3xl sm:text-4xl md:text-6xl font-black tabular-nums relative z-10"
             style={{ color }}
           >
             {value}
@@ -141,11 +142,17 @@ export default function MidnightCountdown({ unlockTime, children }) {
 
             {/* Timer digits */}
             {timeLeft ? (
-              <div className="flex items-start justify-center gap-4 md:gap-6">
+              <div className="flex items-start justify-center gap-2 sm:gap-4 md:gap-6 flex-wrap max-w-2xl mx-auto">
+                {timeLeft.d > 0 && (
+                  <>
+                    <Digit value={pad(timeLeft.d)} label="Days"   color="#8b5cf6" />
+                    <span className="text-2xl sm:text-4xl font-black text-white/30 mt-6 sm:mt-8 animate-pulse">:</span>
+                  </>
+                )}
                 <Digit value={pad(timeLeft.h)} label="Hours"   color={accent} />
-                <span className="text-4xl font-black text-white/30 mt-8 animate-pulse">:</span>
+                <span className="text-2xl sm:text-4xl font-black text-white/30 mt-6 sm:mt-8 animate-pulse">:</span>
                 <Digit value={pad(timeLeft.m)} label="Minutes" color="#ec4899" />
-                <span className="text-4xl font-black text-white/30 mt-8 animate-pulse">:</span>
+                <span className="text-2xl sm:text-4xl font-black text-white/30 mt-6 sm:mt-8 animate-pulse">:</span>
                 <Digit value={pad(timeLeft.s)} label="Seconds" color="#22d3ee" />
               </div>
             ) : (
