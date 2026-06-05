@@ -1,5 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { requestPlay, onAudioRequest } from '../utils/audioController';
+
+const MY_ID = 'voiceNote';
 
 export default function VoiceMessage({ audioUrl, primary = '#f59e0b' }) {
   const audioRef = useRef(null);
@@ -16,21 +19,27 @@ export default function VoiceMessage({ audioUrl, primary = '#f59e0b' }) {
     return `${m}:${String(sec).padStart(2, '0')}`;
   };
 
-  const toggle = () => {
+  // Pause when background music or another player starts
+  useEffect(() => {
+    return onAudioRequest((sourceId) => {
+      if (sourceId !== MY_ID && audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause();
+      }
+    });
+  }, []);
+
+  const toggle = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     if (playing) {
       audio.pause();
     } else {
-      // Pause all other audio elements on the page (like background music)
-      document.querySelectorAll('audio').forEach(el => {
-        if (el !== audio) el.pause();
-      });
+      requestPlay(MY_ID); // tell background music to pause
       audio.play().catch(err => {
-        console.error("Audio play failed:", err);
+        console.error('Audio play failed:', err);
       });
     }
-  };
+  }, [playing]);
 
   const handleTimeUpdate = () => {
     const audio = audioRef.current;

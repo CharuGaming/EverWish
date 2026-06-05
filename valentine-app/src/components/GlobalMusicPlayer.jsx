@@ -1,18 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Music } from 'lucide-react';
+import { requestPlay, onAudioRequest } from '../utils/audioController';
+
+const MY_ID = 'bgMusic';
 
 export default function GlobalMusicPlayer({ musicData }) {
   const { audioUrl, thumbnailUrl, isEnabled } = musicData || {};
-  
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const audioRef = useRef(null);
 
-  // Fallback thumbnail if none is provided
   const defaultThumbnail = "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=300";
   const displayThumbnail = thumbnailUrl || defaultThumbnail;
 
+  // Pause this player when another audio source requests to play
+  useEffect(() => {
+    return onAudioRequest((sourceId) => {
+      if (sourceId !== MY_ID && audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause();
+      }
+    });
+  }, []);
+
+  // Auto-play on first user interaction (scroll/click/touch)
   useEffect(() => {
     if (!isEnabled || !audioUrl) return;
 
@@ -21,43 +33,31 @@ export default function GlobalMusicPlayer({ musicData }) {
 
     audio.volume = 0.5;
 
-    const attemptPlay = () => {
-      if (!audio.paused) return;
-      
-      const otherAudioPlaying = Array.from(document.querySelectorAll('audio')).some(el => el !== audio && !el.paused);
-      if (otherAudioPlaying) {
-        setHasInteracted(true);
-        return;
-      }
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setHasInteracted(true);
-            removeListeners();
-          })
-          .catch((error) => {
-            console.log("Autoplay prevented:", error);
-          });
-      }
-    };
+    let triggered = false;
 
     const handleInteraction = () => {
+      if (triggered) return;
+      triggered = true;
       removeListeners();
-      attemptPlay();
-    };
 
-    // Listeners for first interaction to trigger audio
-    window.addEventListener('scroll', handleInteraction, { once: true, passive: true });
-    window.addEventListener('click', handleInteraction, { once: true, passive: true });
-    window.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
+      // Only auto-play if no other audio is currently playing
+      if (audio.paused && !Array.from(document.querySelectorAll('audio')).some(el => el !== audio && !el.paused)) {
+        audio.play()
+          .then(() => setHasInteracted(true))
+          .catch(() => {});
+      } else {
+        setHasInteracted(true);
+      }
+    };
 
     const removeListeners = () => {
       window.removeEventListener('scroll', handleInteraction);
-      window.removeEventListener('click', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
     };
+
+    // Only listen to scroll/touch — NOT click, so click events on VoiceMessage won't trigger this
+    window.addEventListener('scroll', handleInteraction, { passive: true });
+    window.addEventListener('touchstart', handleInteraction, { passive: true });
 
     return () => {
       removeListeners();
@@ -73,12 +73,10 @@ export default function GlobalMusicPlayer({ musicData }) {
     if (isPlaying) {
       audio.pause();
     } else {
-      document.querySelectorAll('audio').forEach(el => {
-        if (el !== audio) el.pause();
-      });
-      audio.play().then(() => {
-        setHasInteracted(true);
-      }).catch(err => console.error("Play failed", err));
+      requestPlay(MY_ID);
+      audio.play()
+        .then(() => setHasInteracted(true))
+        .catch(err => console.error('Play failed', err));
     }
   };
 
@@ -94,7 +92,7 @@ export default function GlobalMusicPlayer({ musicData }) {
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
-      
+
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.8 }}
@@ -124,7 +122,7 @@ export default function GlobalMusicPlayer({ musicData }) {
           >
             {/* The Record (Spinning image) */}
             <div className={`w-full h-full rounded-full overflow-hidden border-4 border-slate-900 bg-black ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
-              <img src={displayThumbnail} alt="Music Record" className="w-full h-full object-cover opacity-80" />
+              <img loading="lazy" src={displayThumbnail} alt="Music Record" className="w-full h-full object-cover opacity-80" />
               {/* Record center hole */}
               <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full border border-slate-300" />
             </div>
