@@ -340,7 +340,7 @@ export function toComponentData(doc) {
     // ── Birthday Exclusive Features ───────────────────────────────
     unlockTime:   doc.unlockTime || null,
     voiceNoteUrl: doc.voiceNoteUrl || '',
-    greetingVideoUrl: doc.greetingVideoUrl || '',
+    heroBackgroundMediaUrl: doc.heroBackgroundMediaUrl || '',
     scratchPrize: doc.scratchPrize || '',
     yearInReview: doc.yearInReview || [],
     virtualGift:  doc.virtualGift ? {

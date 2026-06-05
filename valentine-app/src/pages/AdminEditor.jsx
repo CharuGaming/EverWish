@@ -1600,21 +1600,21 @@ function BirthdayGeneralTab({ doc, setDoc }) {
         )}
       </Card>
 
-      {/* ── Greeting Video ─────────────────────────────────── */}
-      <Card title="🎬 Personal Greeting Video (Optional)">
+      {/* ── Hero Background Media ─────────────────────────── */}
+      <Card title="🎬 Hero Background (Video or Image)">
         <p className="text-[11px] text-slate-500 mb-4">
-          Upload a short personal video greeting (e.g. recorded on your phone). It will appear as a premium video player just below the main hero section on the birthday page.
+          Upload a looping background video (MP4/WebM — great for Veo AI-generated cinematic clips) or a background image. It will fill the entire hero section with the greeting text overlaid on top.
         </p>
         <VideoField
-          label="Greeting Video"
-          hint="Upload an MP4/MOV file. Keep it under 50MB for fast loading."
-          value={doc.greetingVideoUrl}
-          onChange={v => setDoc(d => ({ ...d, greetingVideoUrl: v }))}
+          label="Hero Background Media"
+          hint="Upload an MP4/WebM video or JPG/PNG image. Videos loop silently. Keep under 20MB for fast load."
+          value={doc.heroBackgroundMediaUrl}
+          onChange={v => setDoc(d => ({ ...d, heroBackgroundMediaUrl: v }))}
         />
-        {doc.greetingVideoUrl && (
-          <button onClick={() => setDoc(d => ({ ...d, greetingVideoUrl: '' }))}
+        {doc.heroBackgroundMediaUrl && (
+          <button onClick={() => setDoc(d => ({ ...d, heroBackgroundMediaUrl: '' }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 block">
-            Remove greeting video
+            Remove hero background
           </button>
         )}
       </Card>
