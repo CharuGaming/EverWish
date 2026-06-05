@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BirthdayLandingPage from './BirthdayLandingPage';
 import MidnightCountdown from './MidnightCountdown';
+import { getContrastYIQ } from '../utils/colorHelpers';
 
 export default function BirthdayTemplate2({ siteData, onUnlock }) {
   const [taps, setTaps] = useState(0);
   const [popped, setPopped] = useState(false);
   
   const b = siteData?.birthday || {};
-  const balloonColor = b.balloonColor || '#3b82f6';
   const primary = siteData?.themeColors?.bday2?.primary || '#3b82f6';
+  const balloonColor = b.balloonColor || primary;
   const bg = siteData?.themeColors?.bday2?.background || '#eff6ff';
+  const onPrimary = getContrastYIQ(primary);
 
   const MAX_TAPS = 7;
 

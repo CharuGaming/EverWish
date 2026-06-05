@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart } from 'lucide-react';
 import ThingsToDoSection from './ThingsToDoSection';
 import LoveLock    from './LoveLock';
+import { getContrastYIQ } from '../utils/colorHelpers';
 import ReasonsJar  from './ReasonsJar';
 import Heartbeat   from './Heartbeat';
 import TimeCapsule from './TimeCapsule';
@@ -129,6 +130,7 @@ function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
   const primaryColor = valColors.primary || '#e11d48';
   const backgroundColor = valColors.background || '#fff0f5';
   const cardColor = valColors.cardColor || '#ffccd5';
+  const onPrimary = getContrastYIQ(primaryColor);
 
   return (
     <motion.div
@@ -638,6 +640,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
   const primaryColor = colors.primary || '#e11d48';
   const backgroundColor = colors.background || '#fff0f5';
   const cardColor = colors.cardColor || '#ffccd5';
+  const onPrimaryColor = getContrastYIQ(primaryColor);
 
   return (
     <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }}
@@ -671,7 +674,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
         .template-valentine-root .bg-rose-500 *,
         .template-valentine-root .bg-rose-600 *,
         .template-valentine-root .bg-pink-500 * {
-          color: #ffffff !important;
+          color: ${onPrimaryColor} !important;
         }
 
         /* Ribbon colors on Gift Box */

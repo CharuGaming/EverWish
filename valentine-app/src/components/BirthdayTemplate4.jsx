@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BirthdayLandingPage from './BirthdayLandingPage';
 import confetti from 'canvas-confetti';
 import MidnightCountdown from './MidnightCountdown';
+import { getContrastYIQ } from '../utils/colorHelpers';
 
 export default function BirthdayTemplate4({ siteData, onUnlock }) {
   const [lightsOn, setLightsOn] = useState(false);
   const primary = siteData?.themeColors?.bday4?.primary || '#8b5cf6';
+  const onPrimary = getContrastYIQ(primary);
 
   const handleSwitch = () => {
     setLightsOn(true);

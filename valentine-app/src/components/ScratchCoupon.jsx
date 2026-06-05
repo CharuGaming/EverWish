@@ -1,10 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getContrastYIQ } from '../utils/colorHelpers';
 
 const SCRATCH_THRESHOLD = 45;
 
 export default function ScratchCoupon({ prize, primary = '#f59e0b' }) {
   const canvasRef = useRef(null);
+  const onPrimary = getContrastYIQ(primary);
   const [revealed, setRevealed] = useState(false);
   const [pct, setPct] = useState(0);
   const isDrawing = useRef(false);
@@ -91,8 +93,8 @@ export default function ScratchCoupon({ prize, primary = '#f59e0b' }) {
           {/* Header */}
           <div className="px-6 py-4 flex items-center justify-between" style={{ background: `linear-gradient(90deg,${primary},${primary}bb)` }}>
             <div>
-              <p className="text-white font-black text-lg tracking-wide">🎁 BIRTHDAY TICKET</p>
-              <p className="text-white/60 text-xs font-mono">LUCKY DRAW</p>
+              <p className="font-black text-lg tracking-wide" style={{ color: onPrimary }}>🎁 BIRTHDAY TICKET</p>
+              <p className="text-xs font-mono" style={{ color: onPrimary, opacity: 0.65 }}>LUCKY DRAW</p>
             </div>
             <span className="text-3xl">🏆</span>
           </div>
