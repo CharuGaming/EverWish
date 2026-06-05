@@ -486,7 +486,10 @@ function ValentineFeaturesTab({ doc, setDoc }) {
           <input
             type="datetime-local"
             value={toLocalDateTimeString(tc.unlockDate)}
-            onChange={e => upTC('unlockDate', e.target.value || null)}
+            onChange={e => {
+              const val = e.target.value;
+              upTC('unlockDate', val ? new Date(val).toISOString() : null);
+            }}
             className="w-full bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 shadow-inner transition-all"
           />
           {tc.unlockDate && (
@@ -1564,7 +1567,10 @@ function BirthdayGeneralTab({ doc, setDoc }) {
         <input
           type="datetime-local"
           value={toLocalDateTimeString(doc.unlockTime)}
-          onChange={e => setDoc(d => ({ ...d, unlockTime: e.target.value || null }))}
+          onChange={e => {
+            const val = e.target.value;
+            setDoc(d => ({ ...d, unlockTime: val ? new Date(val).toISOString() : null }));
+          }}
           className="w-full bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 shadow-inner transition-all mb-2"
         />
         {doc.unlockTime && (
