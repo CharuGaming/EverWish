@@ -125,6 +125,12 @@ export default function AdminDashboard() {
       if (storeRes.data) setStorefront(storeRes.data);
     } catch (e) {
       console.error(e);
+      const msg = e.message.toLowerCase();
+      if (msg.includes('token') || msg.includes('unauthorized')) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/login';
+        return;
+      }
       showToast(`Failed to load data: ${e.message}`, false);
     }
     setLoading(false);
@@ -136,6 +142,12 @@ export default function AdminDashboard() {
       const res = await listOrders();
       setOrders(res.data || []);
     } catch (e) {
+      const msg = e.message.toLowerCase();
+      if (msg.includes('token') || msg.includes('unauthorized')) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/login';
+        return;
+      }
       showToast(`Failed to load orders: ${e.message}`, false);
     }
     setOrdersLoading(false);

@@ -2073,9 +2073,24 @@ export default function AdminEditor() {
       if (res.success) {
         setDoc(res.data);
       } else {
+        const msg = (res.message || '').toLowerCase();
+        if (msg.includes('token') || msg.includes('unauthorized')) {
+          localStorage.removeItem('adminToken');
+          window.location.href = '/login';
+          return;
+        }
         setError(res.message);
       }
       setLoading(false);
+    }).catch(e => {
+        const msg = (e.message || '').toLowerCase();
+        if (msg.includes('token') || msg.includes('unauthorized')) {
+          localStorage.removeItem('adminToken');
+          window.location.href = '/login';
+          return;
+        }
+        setError(e.message);
+        setLoading(false);
     });
   }, [siteId]);
 
