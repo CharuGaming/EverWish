@@ -2,6 +2,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { Heart, X } from "lucide-react";
 import { siteData } from "../siteData";
+import ScratchPhoto from "./ScratchPhoto";
 
 // Layout offsets for the 6 surrounding images (relative to center card)
 const surroundLayout = [
@@ -18,6 +19,9 @@ export default function Gallery({ siteDataOverride }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [selectedImg, setSelectedImg] = useState(null);
+
+  // Theme primary – fall back to rose
+  const primary = siteDataOverride?.themeColors?.primary || '#f43f5e';
 
   return (
     <section
@@ -39,6 +43,9 @@ export default function Gallery({ siteDataOverride }) {
         <h2 className="serif text-4xl md:text-5xl font-bold text-rose-700 mt-2">
           Our Gallery
         </h2>
+        <p className="text-sm text-rose-400/70 mt-2 font-medium">
+          ✦ Scratch each photo to reveal the memory
+        </p>
         <div className="mt-4 flex items-center justify-center gap-2">
           <div className="h-px w-16 bg-rose-200" />
           <Heart size={14} fill="#fda4af" color="#fda4af" />
@@ -54,20 +61,20 @@ export default function Gallery({ siteDataOverride }) {
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        {/* Central ripped-paper image */}
+        {/* Central image with scratch */}
         <motion.div
-          className="relative z-10 mx-auto cursor-pointer"
+          className="relative z-10 mx-auto"
           style={{ width: "65%", aspectRatio: "1" }}
-          whileHover={{ scale: 1.03 }}
-          transition={{ type: "spring", stiffness: 200 }}
-          onClick={() => setSelectedImg({ url: gallery.centerImage, caption: gallery.centerCaption })}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="ripped-paper w-full h-full overflow-hidden shadow-2xl shadow-rose-200/60">
-            <img
+          <div className="ripped-paper w-full h-full overflow-hidden shadow-2xl shadow-rose-200/60 rounded-2xl">
+            <ScratchPhoto
               src={gallery.centerImage}
               alt={gallery.centerCaption}
-              loading="lazy"
-              className="w-full h-full object-cover"
+              primary={primary}
+              onClick={() => setSelectedImg({ url: gallery.centerImage, caption: gallery.centerCaption })}
             />
           </div>
           {/* Caption badge */}
@@ -76,33 +83,34 @@ export default function Gallery({ siteDataOverride }) {
           </div>
         </motion.div>
 
-        {/* Supporting photos — absolute positioned around center */}
+        {/* Supporting photos */}
         {gallery.supporting.map((img, i) => {
           const pos = surroundLayout[i] || {};
           return (
             <motion.div
               key={img.id}
-              className={`polaroid absolute ${pos.rotate ?? ""} hover:rotate-0 transition-transform duration-300 cursor-pointer`}
+              className={`polaroid absolute ${pos.rotate ?? ""} hover:rotate-0 transition-transform duration-300`}
               style={{
-                top: pos.top,
-                left: pos.left,
-                right: pos.right,
+                top:    pos.top,
+                left:   pos.left,
+                right:  pos.right,
                 bottom: pos.bottom,
                 zIndex: pos.zIdx,
-                width: "auto",
+                width:  "auto",
               }}
               initial={{ opacity: 0, scale: 0.75, y: 20 }}
               animate={inView ? { opacity: 1, scale: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
               whileHover={{ scale: 1.08, zIndex: 50 }}
-              onClick={() => setSelectedImg({ url: img.url, caption: img.caption })}
             >
-              <img
-                src={img.url}
-                alt={img.caption}
-                loading="lazy"
-                className={`object-cover block ${pos.w ?? "w-32 h-32"}`}
-              />
+              <div className={`overflow-hidden rounded-xl ${pos.w ?? "w-32 h-32"}`}>
+                <ScratchPhoto
+                  src={img.url}
+                  alt={img.caption}
+                  primary={primary}
+                  onClick={() => setSelectedImg({ url: img.url, caption: img.caption })}
+                />
+              </div>
               <p className="serif text-center text-xs text-gray-400 italic mt-1">
                 {img.caption}
               </p>
@@ -121,7 +129,6 @@ export default function Gallery({ siteDataOverride }) {
             exit={{ opacity: 0 }}
             onClick={() => setSelectedImg(null)}
           >
-            {/* Close Button */}
             <button
               className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors duration-200 z-50 cursor-pointer"
               onClick={() => setSelectedImg(null)}
@@ -130,16 +137,14 @@ export default function Gallery({ siteDataOverride }) {
               <X size={24} />
             </button>
 
-            {/* Modal Content */}
             <motion.div
               className="relative max-w-4xl max-h-[85vh] flex flex-col items-center justify-center pointer-events-auto cursor-default"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+              onClick={e => e.stopPropagation()}
             >
-              {/* Polaroid Frame for Zoomed Image */}
               <div className="bg-white p-3 md:p-4 pb-12 md:pb-16 rounded-sm shadow-2xl max-w-full">
                 <img
                   src={selectedImg.url}
