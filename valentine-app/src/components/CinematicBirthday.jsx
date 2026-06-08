@@ -5,6 +5,7 @@ import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 
 import ScratchPhoto from './ScratchPhoto';
 import InteractiveHero from './InteractiveHero';
 import LoveLetterEnvelope from './LoveLetterEnvelope';
+import HeartMemoryGallery from './HeartMemoryGallery';
 
 // ── Google Fonts ────────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -305,6 +306,22 @@ export default function CinematicBirthday({ siteData = {} }) {
                   <span className="text-[10px] uppercase tracking-widest">Scroll to explore</span>
                   <ChevronDown size={20}/>
                 </motion.button>
+              </section>
+            )}
+
+            {/* ── HEART MEMORY GALLERY ─────────────────────────── */}
+            {heroPhotos?.length > 0 && (
+              <section className="py-10 px-6">
+                <div className="max-w-2xl mx-auto">
+                  <Reveal className="text-center mb-6">
+                    <span className="text-3xl block mb-3">💝</span>
+                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Our Memories</h2>
+                    <p className="text-white/50 text-sm mt-2">Tap a photo to relive the moment</p>
+                  </Reveal>
+                  <Reveal delay={0.15}>
+                    <HeartMemoryGallery photos={heroPhotos} />
+                  </Reveal>
+                </div>
               </section>
             )}
 
