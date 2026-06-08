@@ -37,24 +37,6 @@ app.use(cors({
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ── Health check ──────────────────────────────────────────────────
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status:   'OK',
-    service:  'Celebration SaaS API',
-    time:     new Date().toISOString(),
-    mongo:    mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    mongoReadyState: mongoose.connection.readyState,
-    mongoUriExists: !!process.env.MONGO_URI,
-    mongoUriLength: process.env.MONGO_URI ? process.env.MONGO_URI.length : 0,
-    cachedStatus: {
-      hasConn: !!cached.conn,
-      hasPromise: !!cached.promise,
-      fallback: cached.fallback,
-      error: cached.error
-    }
-  });
-});
 // ── Serverless MongoDB Connection ─────────────────────────────────
 let cached = global.mongoose;
 if (!cached) {
@@ -112,6 +94,25 @@ app.use(async (req, res, next) => {
     try { enableJsonFallback(); } catch(e) {}
     return next();
   }
+});
+
+// ── Health check ──────────────────────────────────────────────────
+app.get('/api/health', (_req, res) => {
+  res.json({
+    status:   'OK',
+    service:  'Celebration SaaS API',
+    time:     new Date().toISOString(),
+    mongo:    mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    mongoReadyState: mongoose.connection.readyState,
+    mongoUriExists: !!process.env.MONGO_URI,
+    mongoUriLength: process.env.MONGO_URI ? process.env.MONGO_URI.length : 0,
+    cachedStatus: {
+      hasConn: !!cached.conn,
+      hasPromise: !!cached.promise,
+      fallback: cached.fallback,
+      error: cached.error
+    }
+  });
 });
 
 const authRoutes       = require('./routes/authRoutes');
