@@ -1,18 +1,19 @@
 /**
- * LoveLetterEnvelope.jsx
- * Premium scroll-triggered envelope — sticky scroll track pattern.
+ * LoveLetterEnvelope.jsx — Sticky Scroll Track Edition
  *
  * Scroll architecture:
- *   ┌─ Outer div: h-[150vh], ref={containerRef}         ← scroll space
- *   │   useScroll target=containerRef, offset=['start start','end end']
- *   │   → scrollYProgress goes 0→1 over exactly 150vh of scroll
- *   └─ Inner div: sticky top-0 h-screen                 ← viewport pin
- *       The envelope + letter live here, centered.
+ *   ┌─ Outer div: h-[150vh], ref={containerRef}      ← scroll "track"
+ *   │   useScroll target=containerRef
+ *   │   offset=['start start', 'end end']
+ *   │   → progress 0 when top of track hits top of viewport
+ *   │   → progress 1 when bottom of track hits bottom of viewport
+ *   └─ Inner div: sticky top-0, h-screen             ← pinned stage
+ *       The envelope lives here, centred, while user scrolls the track.
  *
  * Z-index layers (inside the 280px envelope assembly):
  *   z-0:  Envelope back  — static linen gradient
- *   z-5:  Top flap       — rotateX open, sits BELOW the letter
- *   z-10: Letter card    — ONLY moving element, slides up
+ *   z-5:  Top flap       — rotateX open, BELOW the letter
+ *   z-10: Letter card    — the ONLY moving element
  *   z-20: Front pocket   — clip-path polygon, masks letter bottom
  *   z-40: Heading        — fades out before letter reaches it
  */
@@ -36,29 +37,28 @@ const C = {
 };
 
 export default function LoveLetterEnvelope({ content }) {
-  /* ── The outer 150vh div is the scroll target ──────────────────── */
   const containerRef = useRef(null);
 
+  /* ── Scroll progress: 0 → 1 over exactly 150vh ─────────────────── */
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    // Perfect 1:1 mapping: progress=0 when container top hits viewport top,
-    // progress=1 when container bottom hits viewport bottom.
     offset: ['start start', 'end end'],
   });
 
-  /* ── Animation transforms (spread across 0 → 1) ────────────────── */
-  // Heading: fades in at 0→0.12, holds, fades out 0.28→0.42
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.10, 0.30, 0.44], [0, 1, 1, 0]);
-  const headingY       = useTransform(scrollYProgress, [0, 0.12], [20, 0]);
+  /* ── Animation transforms ──────────────────────────────────────── */
+  // Heading: slides in 0→0.10, stays until 0.25, fades out by 0.38
+  const headingOpacity = useTransform(scrollYProgress, [0, 0.10, 0.25, 0.38], [0, 1, 1, 0]);
+  const headingY       = useTransform(scrollYProgress, [0, 0.10], [22, 0]);
 
-  // Flap: opens 0.10 → 0.45
-  const flapRotateX    = useTransform(scrollYProgress, [0.10, 0.45], [0, -180]);
+  // Flap: opens 0.08 → 0.42
+  const flapRotateX    = useTransform(scrollYProgress, [0.08, 0.42], [0, -180]);
 
-  // Letter: fades in 0.12→0.28, slides up 0.15→0.90
-  const letterOpacity  = useTransform(scrollYProgress, [0.12, 0.28], [0, 1]);
-  const letterY        = useTransform(scrollYProgress, [0.15, 0.90], ['20%', '-82%']);
-  const letterScale    = useTransform(scrollYProgress, [0.15, 0.90], [0.90, 1]);
-  const letterRotate   = useTransform(scrollYProgress, [0.15, 0.90], [1.5, 0]);
+  // Letter: fades in 0.10→0.25, slides from inside (18%) to fully out (-78%)
+  // Completes at 0.82 so the last 18% of scroll is a nice "rest" on the full letter
+  const letterOpacity  = useTransform(scrollYProgress, [0.10, 0.25], [0, 1]);
+  const letterY        = useTransform(scrollYProgress, [0.12, 0.82], ['18%', '-78%']);
+  const letterScale    = useTransform(scrollYProgress, [0.12, 0.82], [0.91, 1]);
+  const letterRotate   = useTransform(scrollYProgress, [0.12, 0.82], [1.5, 0]);
 
   if (!content) return null;
 
@@ -67,20 +67,25 @@ export default function LoveLetterEnvelope({ content }) {
       <link href={FONT_LINK} rel="stylesheet" />
 
       {/*
-        ┌────────────────────────────────────────────────────────────┐
-        │  OUTER: 150vh scroll space — the "track" for the animation │
-        └────────────────────────────────────────────────────────────┘
+        ┌──────────────────────────────────────────────────────────────┐
+        │  OUTER: 150vh — the scroll "track" for the animation        │
+        │  The user scrolls through this height while the inner       │
+        │  sticky div stays pinned to the viewport centre.            │
+        └──────────────────────────────────────────────────────────────┘
       */}
       <div ref={containerRef} style={{ height: '150vh' }}>
 
         {/*
-          ┌──────────────────────────────────────────────────────────┐
-          │  INNER: sticky to top-0 for the full 150vh scroll        │
-          └──────────────────────────────────────────────────────────┘
+          ┌────────────────────────────────────────────────────────────┐
+          │  INNER: pinned to top-0, fills the viewport               │
+          └────────────────────────────────────────────────────────────┘
         */}
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-4">
+        <div
+          className="sticky top-0 h-screen flex flex-col items-center justify-center px-4"
+          style={{ overflow: 'visible' }}
+        >
 
-          {/* ── Heading (fades out before letter reaches it) ─────── */}
+          {/* ── Heading — fades out before letter overlaps it ──── */}
           <motion.div
             className="text-center pointer-events-none"
             style={{
@@ -102,7 +107,7 @@ export default function LoveLetterEnvelope({ content }) {
             </p>
           </motion.div>
 
-          {/* ── Envelope assembly (380px wide, 280px tall) ──────── */}
+          {/* ── Envelope assembly: 380px × 280px ─────────────── */}
           <div
             className="relative w-full max-w-[380px] flex-shrink-0"
             style={{ height: '280px' }}
@@ -136,7 +141,7 @@ export default function LoveLetterEnvelope({ content }) {
 
             {/* ╔══════════════════════════════════════╗
                 ║  L2 — Top flap (z-5) — OPENS        ║
-                ║  z-5 < z-10 so opened flap always   ║
+                ║  z-5 < z-10: opened flap always     ║
                 ║  sits BEHIND the letter card.        ║
                 ╚══════════════════════════════════════╝ */}
             <motion.div
@@ -190,8 +195,8 @@ export default function LoveLetterEnvelope({ content }) {
 
             {/* ╔══════════════════════════════════════╗
                 ║  L3 — Letter card (z-10) — MOVES    ║
-                ║  Slides up from behind the pocket.   ║
-                ║  Always above the opened flap (z-5). ║
+                ║  Slides up from behind the pocket.  ║
+                ║  Always above the opened flap (z-5).║
                 ╚══════════════════════════════════════╝ */}
             <motion.div
               className="absolute left-3 right-3 rounded-xl overflow-hidden"
@@ -208,7 +213,7 @@ export default function LoveLetterEnvelope({ content }) {
                 background: `linear-gradient(175deg, ${C.paper} 0%, #FBF7F1 100%)`,
                 boxShadow: `
                   0 -8px 30px rgba(0,0,0,0.12),
-                  0 4px 20px rgba(0,0,0,0.08),
+                  0  4px 20px rgba(0,0,0,0.08),
                   inset 0 1px 0 rgba(255,255,255,0.9)
                 `,
                 border: '1px solid rgba(200,190,175,0.35)',
@@ -264,7 +269,7 @@ export default function LoveLetterEnvelope({ content }) {
 
             {/* ╔══════════════════════════════════════╗
                 ║  L4 — Front pocket (z-20) — STATIC  ║
-                ║  Letter slides up from BEHIND this.  ║
+                ║  Letter emerges from BEHIND this.   ║
                 ╚══════════════════════════════════════╝ */}
             <div
               className="absolute inset-0 rounded-b-[20px] pointer-events-none"
@@ -276,7 +281,7 @@ export default function LoveLetterEnvelope({ content }) {
                 border: '1px solid rgba(255,255,255,0.2)',
               }}
             >
-              {/* Subtle diagonal fold creases */}
+              {/* Subtle fold creases */}
               <div
                 className="absolute bottom-0 left-0 right-0"
                 style={{
