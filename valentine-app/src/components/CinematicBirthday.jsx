@@ -353,13 +353,13 @@ export default function CinematicBirthday({ siteData = {} }) {
                     <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-3">Memories</h2>
                     <p className="text-white/40 text-sm">Moments captured in time 📸</p>
                   </Reveal>
-                  <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+                  <div className="flex flex-wrap justify-center gap-2">
                     {allGalleryImages.map((url, i) => (
-                      <Reveal key={i} delay={i * 0.07} className="break-inside-avoid">
-                        <ScratchPhoto 
-                          src={url} 
-                          alt={`Memory ${i+1}`} 
-                          primary="#fbbf24" 
+                      <Reveal key={i} delay={i * 0.07}>
+                        <ScratchPhoto
+                          src={url}
+                          alt={`Memory ${i+1}`}
+                          primary="#fbbf24"
                         />
                       </Reveal>
                     ))}

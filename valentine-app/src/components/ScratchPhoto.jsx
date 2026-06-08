@@ -1,31 +1,54 @@
 /**
- * ScratchPhoto.jsx
- * A canvas-based scratch-to-reveal wrapper for a single photo.
- * Renders a frosted scratch overlay; when the user has scratched
- * enough of the surface, the photo underneath is fully revealed.
- *
- * Props
- *  src       {string}  – image URL
- *  alt       {string}  – alt text / caption
- *  primary   {string}  – theme accent hex (for glow & hint text)
- *  threshold {number}  – % of canvas that must be cleared (default 45)
+ * ScratchPhoto.jsx — Heart-shaped scratch-to-reveal card
+ * CSS mask clips everything (image + canvas) to a heart.
+ * On reveal: photo springs in + hearts burst outward.
  */
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
 
-const DEFAULT_THRESHOLD = 42; // percent
+const DEFAULT_THRESHOLD = 42;
+
+// SVG data-URL heart mask (100×100 viewBox)
+const HEART_MASK = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z' fill='white'/%3E%3C/svg%3E")`;
+
+const BURST_EMOJIS = ['❤️','💛','🧡','💗','💖','✨','🌟','💕'];
+
+// Hearts that fly outward on reveal
+function BurstHearts() {
+  return (
+    <>
+      {Array.from({ length: 10 }).map((_, i) => {
+        const angle = (i / 10) * 360;
+        const rad   = (angle * Math.PI) / 180;
+        const dist  = 90 + Math.random() * 50;
+        return (
+          <motion.div
+            key={i}
+            className="absolute text-xl pointer-events-none z-50"
+            style={{ left: '50%', top: '50%' }}
+            initial={{ opacity: 1, x: 0, y: 0, scale: 0.4 }}
+            animate={{ opacity: 0, x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, scale: 1.6 }}
+            transition={{ duration: 0.85, delay: i * 0.04, ease: 'easeOut' }}
+          >
+            {BURST_EMOJIS[i % BURST_EMOJIS.length]}
+          </motion.div>
+        );
+      })}
+    </>
+  );
+}
 
 export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', threshold = DEFAULT_THRESHOLD, onClick }) {
   const containerRef = useRef(null);
   const canvasRef    = useRef(null);
   const isDrawing    = useRef(false);
   const lastPos      = useRef(null);
-  const [revealed, setRevealed]   = useState(false);
-  const [pct,      setPct]        = useState(0);
-  const [ready,    setReady]      = useState(false); // canvas initialised?
+  const [revealed, setRevealed] = useState(false);
+  const [pct,      setPct]      = useState(0);
+  const [ready,    setReady]    = useState(false);
+  const [burst,    setBurst]    = useState(false);
 
-  // ── Draw the scratch overlay ──────────────────────────────────────
+  // ── Init canvas overlay ─────────────────────────────────────────────
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const img    = containerRef.current?.querySelector('img');
@@ -36,47 +59,43 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
     const h   = img.offsetHeight;
     if (!w || !h) return;
 
-    canvas.width  = w * dpr;
-    canvas.height = h * dpr;
+    canvas.width        = w * dpr;
+    canvas.height       = h * dpr;
     canvas.style.width  = `${w}px`;
     canvas.style.height = `${h}px`;
 
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    // ── Frosted overlay gradient ──────────────────────────────────
-    const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0,    '#1a1a2e');
-    g.addColorStop(0.45, '#16213e');
-    g.addColorStop(1,    '#0f3460');
+    // Amber/golden gradient overlay (birthday theme)
+    const g = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
+    g.addColorStop(0,   '#92400e');
+    g.addColorStop(0.6, '#78350f');
+    g.addColorStop(1,   '#3b1507');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle star/sparkle pattern
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    for (let i = 0; i < 60; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const r = Math.random() * 1.5 + 0.5;
+    // Gold sparkle dots
+    ctx.fillStyle = 'rgba(251,191,36,0.18)';
+    for (let i = 0; i < 55; i++) {
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.4, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Center hint text
-    ctx.textAlign = 'center';
+    // Heart hint text
+    ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.font = `bold ${Math.max(12, w * 0.07)}px system-ui, sans-serif`;
-    ctx.fillText('✦ Scratch Here ✦', w / 2, h / 2 - 10);
-    ctx.font = `${Math.max(10, w * 0.055)}px system-ui, sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,0.28)';
-    ctx.fillText('rub to reveal', w / 2, h / 2 + 16);
+    ctx.fillStyle    = 'rgba(251,191,36,0.95)';
+    ctx.font         = `bold ${Math.max(11, w * 0.07)}px system-ui, sans-serif`;
+    ctx.fillText('♥ Scratch Here ♥', w / 2, h / 2 - 12);
+    ctx.font      = `${Math.max(9, w * 0.05)}px system-ui, sans-serif`;
+    ctx.fillStyle = 'rgba(251,191,36,0.55)';
+    ctx.fillText('rub to reveal', w / 2, h / 2 + 14);
 
     setReady(true);
   }, [revealed]);
 
-  // ── Init after image loads ────────────────────────────────────────
   useEffect(() => {
     const img = containerRef.current?.querySelector('img');
     if (!img) return;
@@ -85,20 +104,11 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
     return () => img.removeEventListener('load', initCanvas);
   }, [initCanvas]);
 
-  // ── Pointer helpers ───────────────────────────────────────────────
+  // ── Pointer helpers ─────────────────────────────────────────────────
   const getPos = (e, canvas) => {
     const rect = canvas.getBoundingClientRect();
-    const dpr  = window.devicePixelRatio || 1;
-    if (e.touches) {
-      return {
-        x: (e.touches[0].clientX - rect.left),
-        y: (e.touches[0].clientY - rect.top),
-      };
-    }
-    return {
-      x: (e.clientX - rect.left),
-      y: (e.clientY - rect.top),
-    };
+    if (e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
   const scratch = (x, y) => {
@@ -113,100 +123,105 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
     if (lastPos.current) {
       ctx.moveTo(lastPos.current.x * dpr, lastPos.current.y * dpr);
       ctx.lineTo(x * dpr, y * dpr);
-      ctx.lineWidth  = radius * 2 * dpr;
-      ctx.lineCap    = 'round';
-      ctx.lineJoin   = 'round';
+      ctx.lineWidth = radius * 2 * dpr;
+      ctx.lineCap   = 'round';
+      ctx.lineJoin  = 'round';
       ctx.stroke();
     }
     ctx.arc(x * dpr, y * dpr, radius * dpr, 0, Math.PI * 2);
     ctx.fill();
     lastPos.current = { x, y };
 
-    // Measure transparency
-    const data        = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let transparent   = 0;
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let transparent = 0;
     for (let i = 3; i < data.length; i += 4) if (data[i] === 0) transparent++;
     const p = Math.round((transparent / (canvas.width * canvas.height)) * 100);
     setPct(p);
+
     if (p >= threshold) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       setRevealed(true);
+      setBurst(true);
+      setTimeout(() => setBurst(false), 1100);
     }
   };
 
-  const onStart = e => { e.preventDefault(); isDrawing.current = true; lastPos.current = null; const p = getPos(e, canvasRef.current); scratch(p.x, p.y); };
-  const onMove  = e => { e.preventDefault(); if (!isDrawing.current) return; const p = getPos(e, canvasRef.current); scratch(p.x, p.y); };
+  const onStart = e => { e.preventDefault(); isDrawing.current = true; lastPos.current = null; scratch(...Object.values(getPos(e, canvasRef.current))); };
+  const onMove  = e => { e.preventDefault(); if (!isDrawing.current) return; scratch(...Object.values(getPos(e, canvasRef.current))); };
   const onEnd   = () => { isDrawing.current = false; lastPos.current = null; };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative overflow-hidden rounded-2xl shadow-lg cursor-crosshair select-none"
-      style={{ touchAction: 'none' }}
-    >
-      {/* Base photo (always rendered beneath) */}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-auto object-cover block"
-        draggable={false}
-      />
+    // Outer wrapper — NOT masked, so burst hearts are visible
+    <div className="relative flex items-center justify-center py-3 select-none">
 
-      {/* Scratch canvas overlay */}
-      <AnimatePresence>
-        {!revealed && (
-          <motion.canvas
-            ref={canvasRef}
-            className="absolute inset-0 touch-none"
-            style={{ display: ready ? 'block' : 'none' }}
-            onMouseDown={onStart}
-            onMouseMove={onMove}
-            onMouseUp={onEnd}
-            onMouseLeave={onEnd}
-            onTouchStart={onStart}
-            onTouchMove={onMove}
-            onTouchEnd={onEnd}
-            exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          />
+      {/* Heart-masked container */}
+      <div
+        ref={containerRef}
+        className="relative cursor-crosshair"
+        style={{
+          width: '200px',
+          height: '190px',
+          maskImage: HEART_MASK,
+          WebkitMaskImage: HEART_MASK,
+          maskSize: '100% 100%',
+          WebkitMaskSize: '100% 100%',
+          touchAction: 'none',
+        }}
+      >
+        {/* Photo underneath */}
+        <AnimatePresence>
+          {revealed ? (
+            <motion.img
+              key="revealed"
+              src={src} alt={alt}
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1,   opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 16 }}
+              draggable={false}
+            />
+          ) : (
+            <img
+              key="hidden"
+              src={src} alt={alt}
+              loading="lazy" decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Scratch canvas */}
+        <AnimatePresence>
+          {!revealed && (
+            <motion.canvas
+              ref={canvasRef}
+              className="absolute inset-0 touch-none"
+              style={{ display: ready ? 'block' : 'none' }}
+              onMouseDown={onStart} onMouseMove={onMove} onMouseUp={onEnd} onMouseLeave={onEnd}
+              onTouchStart={onStart} onTouchMove={onMove} onTouchEnd={onEnd}
+              exit={{ opacity: 0, transition: { duration: 0.45 } }}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Progress bar */}
+        {!revealed && pct > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 pointer-events-none">
+            <motion.div className="h-full rounded-full"
+              style={{ backgroundColor: primary, width: `${pct}%` }}
+              transition={{ duration: 0.1 }} />
+          </div>
         )}
-      </AnimatePresence>
 
-      {/* Progress bar (only while scratching) */}
-      {!revealed && pct > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 pointer-events-none">
-          <motion.div
-            className="h-full rounded-full"
-            style={{ backgroundColor: primary, width: `${pct}%` }}
-            transition={{ duration: 0.1 }}
-          />
-        </div>
-      )}
+        {/* Click after reveal */}
+        {revealed && onClick && <div className="absolute inset-0 cursor-zoom-in" onClick={onClick} />}
+      </div>
 
-      {/* Revealed checkmark */}
+      {/* Burst hearts — outside mask so they're visible */}
       <AnimatePresence>
-        {revealed && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
-            style={{ backgroundColor: primary }}
-          >
-            <Sparkles size={14} className="text-white" />
-          </motion.div>
-        )}
+        {burst && <BurstHearts />}
       </AnimatePresence>
-
-      {/* Tap to open lightbox (only after reveal) */}
-      {revealed && onClick && (
-        <div
-          className="absolute inset-0 cursor-zoom-in"
-          onClick={onClick}
-        />
-      )}
     </div>
   );
 }
