@@ -44,7 +44,15 @@ app.get('/api/health', (_req, res) => {
     service:  'Celebration SaaS API',
     time:     new Date().toISOString(),
     mongo:    mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    mongoError: cached.error || null,
+    mongoReadyState: mongoose.connection.readyState,
+    mongoUriExists: !!process.env.MONGO_URI,
+    mongoUriLength: process.env.MONGO_URI ? process.env.MONGO_URI.length : 0,
+    cachedStatus: {
+      hasConn: !!cached.conn,
+      hasPromise: !!cached.promise,
+      fallback: cached.fallback,
+      error: cached.error
+    }
   });
 });
 // ── Serverless MongoDB Connection ─────────────────────────────────
