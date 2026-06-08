@@ -2,11 +2,13 @@
  * LoveLetterEnvelope.jsx
  * Premium scroll-triggered envelope with letter pull-out animation.
  *
- * Architecture — 3 z-layers inside a relative container:
- *   Layer 1 (z-0):  Envelope back   — muted linen texture, side folds
- *   Layer 2 (z-10): Letter card     — the ONLY moving element (slides up)
- *   Layer 3 (z-20): Front pocket    — clip-path polygon, hides bottom of letter
- *   Layer 4 (z-30): Top flap        — rotates open via scroll
+ * Architecture — 4 z-layers inside a relative container:
+ *   Layer 1 (z-0):  Envelope back   — muted linen texture
+ *   Layer 2 (z-5):  Top flap        — rotates open, stays BELOW the letter
+ *   Layer 3 (z-10): Letter card     — the ONLY moving element (slides up)
+ *   Layer 4 (z-20): Front pocket    — clip-path polygon, hides bottom of letter
+ *
+ * The heading sits above everything (z-40) but fades out as the letter rises.
  */
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -17,15 +19,14 @@ const FONT_LINK =
 
 /* ── Colour palette — soft, premium paper tones ────────────────────── */
 const COLORS = {
-  envelopeBack:   '#E8DDD3',   // warm linen
-  envelopeFront:  '#F5EDE4',   // lighter warm cream
-  flapOuter:      '#DDD0C4',   // slightly darker for flap contrast
-  flapInner:      '#C4B5A6',   // inner face when flap opens
-  letterPaper:    '#FDFBF7',   // soft paper white
-  letterLines:    '#E8E0D8',   // subtle ruled lines
-  ink:            '#3B2F25',   // warm dark brown ink
-  inkLight:       '#6B5D50',   // lighter brown for secondary text
-  seal:           '#C17F59',   // wax-seal copper
+  envelopeBack:   '#E8DDD3',
+  envelopeFront:  '#F5EDE4',
+  flapOuter:      '#DDD0C4',
+  flapInner:      '#C4B5A6',
+  letterPaper:    '#FDFBF7',
+  letterLines:    '#E8E0D8',
+  ink:            '#3B2F25',
+  seal:           '#C17F59',
 };
 
 export default function LoveLetterEnvelope({ content }) {
@@ -37,21 +38,17 @@ export default function LoveLetterEnvelope({ content }) {
   });
 
   /* ── Animation transforms ─────────────────────────────────────── */
-  // Letter slides from resting inside (20%) to fully extracted (-90%)
-  const letterY       = useTransform(scrollYProgress, [0.15, 0.55], ['20%', '-90%']);
+  // Letter slides from resting inside (18%) to fully extracted (-85%)
+  const letterY       = useTransform(scrollYProgress, [0.15, 0.55], ['18%', '-85%']);
   const letterScale   = useTransform(scrollYProgress, [0.15, 0.55], [0.92, 1]);
   const letterOpacity = useTransform(scrollYProgress, [0.10, 0.22], [0, 1]);
   const letterRotate  = useTransform(scrollYProgress, [0.15, 0.55], [1, 0]);
 
   // Flap opens as user scrolls
   const flapRotateX   = useTransform(scrollYProgress, [0.12, 0.38], [0, -180]);
-  const flapShadow    = useTransform(scrollYProgress, [0.12, 0.38], [
-    '0 8px 20px rgba(0,0,0,0.15)',
-    '0 -4px 12px rgba(0,0,0,0.08)',
-  ]);
 
-  // Heading fades in
-  const headingOpacity = useTransform(scrollYProgress, [0.05, 0.18], [0, 1]);
+  // Heading fades in, then fades OUT as letter covers it
+  const headingOpacity = useTransform(scrollYProgress, [0.05, 0.18, 0.35, 0.48], [0, 1, 1, 0]);
   const headingY       = useTransform(scrollYProgress, [0.05, 0.18], [30, 0]);
 
   if (!content) return null;
@@ -64,10 +61,10 @@ export default function LoveLetterEnvelope({ content }) {
       <div ref={sectionRef} style={{ height: '200vh' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-visible px-4">
 
-          {/* ── Section heading ─────────────────────────────────── */}
+          {/* ── Section heading — fades out when letter covers it ── */}
           <motion.div
             style={{ opacity: headingOpacity, y: headingY }}
-            className="text-center mb-8 relative z-40"
+            className="text-center mb-8 relative z-40 pointer-events-none"
           >
             <span className="text-3xl block mb-2">💌</span>
             <h2
@@ -91,8 +88,9 @@ export default function LoveLetterEnvelope({ content }) {
                ║  LAYER 1 — Envelope back (z-0)                   ║
                ╚═══════════════════════════════════════════════════╝ */}
             <div
-              className="absolute inset-0 rounded-[20px] z-0"
+              className="absolute inset-0 rounded-[20px]"
               style={{
+                zIndex: 0,
                 background: `linear-gradient(170deg, ${COLORS.envelopeBack} 0%, ${COLORS.envelopeFront} 100%)`,
                 boxShadow: `
                   0 30px 60px rgba(0,0,0,0.25),
@@ -102,7 +100,7 @@ export default function LoveLetterEnvelope({ content }) {
                 border: '1px solid rgba(255,255,255,0.25)',
               }}
             >
-              {/* Inner shadow to simulate depth of envelope pocket */}
+              {/* Inner shadow for pocket depth */}
               <div
                 className="absolute inset-x-3 top-[45%] bottom-3 rounded-b-[16px]"
                 style={{
@@ -113,11 +111,70 @@ export default function LoveLetterEnvelope({ content }) {
             </div>
 
             {/* ╔═══════════════════════════════════════════════════╗
-               ║  LAYER 2 — Letter card (z-10) — MOVES            ║
+               ║  LAYER 2 — Top flap (z-5) — ROTATES OPEN         ║
+               ║  z-5: sits BELOW the letter so the opened flap   ║
+               ║  never covers the letter text.                    ║
                ╚═══════════════════════════════════════════════════╝ */}
             <motion.div
-              className="absolute left-3 right-3 z-10 rounded-xl"
+              className="absolute top-0 left-0 right-0 pointer-events-none"
               style={{
+                zIndex: 5,
+                rotateX: flapRotateX,
+                transformOrigin: 'top center',
+                transformStyle: 'preserve-3d',
+                perspective: '800px',
+                height: '52%',
+              }}
+            >
+              {/* Outer face (visible when closed) */}
+              <div
+                className="absolute inset-0 rounded-t-[20px]"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                  background: `linear-gradient(180deg, ${COLORS.flapOuter} 0%, ${COLORS.envelopeBack} 80%)`,
+                  backfaceVisibility: 'hidden',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.12), inset 0 -2px 8px rgba(0,0,0,0.06)',
+                }}
+              >
+                {/* Wax seal */}
+                <div
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: '50%',
+                    top: '36%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle at 40% 35%, ${COLORS.seal}, #9A6040)`,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.3)',
+                  }}
+                >
+                  <span style={{ fontSize: '14px', color: '#fff', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }}>♥</span>
+                </div>
+              </div>
+
+              {/* Inner face (visible when rotated past 90°) */}
+              <div
+                className="absolute inset-0 rounded-t-[20px]"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                  background: `linear-gradient(180deg, ${COLORS.flapInner} 0%, ${COLORS.envelopeBack} 100%)`,
+                  transform: 'rotateX(180deg)',
+                  backfaceVisibility: 'hidden',
+                }}
+              />
+            </motion.div>
+
+            {/* ╔═══════════════════════════════════════════════════╗
+               ║  LAYER 3 — Letter card (z-10) — MOVES            ║
+               ║  Slides up from behind the front pocket (z-20).  ║
+               ║  Always sits ABOVE the opened flap (z-5).        ║
+               ╚═══════════════════════════════════════════════════╝ */}
+            <motion.div
+              className="absolute left-3 right-3 rounded-xl"
+              style={{
+                zIndex: 10,
                 y: letterY,
                 scale: letterScale,
                 opacity: letterOpacity,
@@ -173,7 +230,7 @@ export default function LoveLetterEnvelope({ content }) {
                 </p>
               </div>
 
-              {/* Subtle corner fold */}
+              {/* Subtle corner fold decoration */}
               <div
                 className="absolute top-0 right-0 w-8 h-8"
                 style={{
@@ -184,22 +241,20 @@ export default function LoveLetterEnvelope({ content }) {
             </motion.div>
 
             {/* ╔═══════════════════════════════════════════════════╗
-               ║  LAYER 3 — Front pocket (z-20) — STATIC          ║
-               ║  Letter slides up from BEHIND this layer          ║
+               ║  LAYER 4 — Front pocket (z-20) — STATIC          ║
+               ║  Letter slides up from BEHIND this layer.         ║
                ╚═══════════════════════════════════════════════════╝ */}
             <div
-              className="absolute inset-0 z-20 rounded-b-[20px] pointer-events-none"
+              className="absolute inset-0 rounded-b-[20px] pointer-events-none"
               style={{
+                zIndex: 20,
                 clipPath: 'polygon(0 42%, 50% 72%, 100% 42%, 100% 100%, 0 100%)',
                 background: `linear-gradient(180deg, ${COLORS.envelopeFront} 0%, ${COLORS.envelopeBack} 100%)`,
-                boxShadow: `
-                  0 -4px 16px rgba(0,0,0,0.06),
-                  inset 0 2px 8px rgba(255,255,255,0.5)
-                `,
+                boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.5)',
                 border: '1px solid rgba(255,255,255,0.2)',
               }}
             >
-              {/* Subtle crease lines on the front pocket */}
+              {/* Subtle diagonal crease lines */}
               <div
                 className="absolute bottom-0 left-0 right-0"
                 style={{
@@ -211,62 +266,6 @@ export default function LoveLetterEnvelope({ content }) {
                 }}
               />
             </div>
-
-            {/* ╔═══════════════════════════════════════════════════╗
-               ║  LAYER 4 — Top flap (z-30) — ROTATES OPEN        ║
-               ╚═══════════════════════════════════════════════════╝ */}
-            <motion.div
-              className="absolute top-0 left-0 right-0 z-30 pointer-events-none"
-              style={{
-                rotateX: flapRotateX,
-                transformOrigin: 'top center',
-                transformStyle: 'preserve-3d',
-                height: '52%',
-                filter: flapShadow,
-              }}
-            >
-              {/* Outer face of flap (visible when closed) */}
-              <div
-                className="absolute inset-0 rounded-t-[20px]"
-                style={{
-                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                  background: `linear-gradient(180deg, ${COLORS.flapOuter} 0%, ${COLORS.envelopeBack} 80%)`,
-                  backfaceVisibility: 'hidden',
-                  boxShadow: 'inset 0 -2px 8px rgba(0,0,0,0.06)',
-                }}
-              >
-                {/* Wax seal decoration */}
-                <div
-                  className="absolute flex items-center justify-center"
-                  style={{
-                    left: '50%',
-                    top: '38%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle at 40% 35%, ${COLORS.seal}, #9A6040)`,
-                    boxShadow: `
-                      0 2px 6px rgba(0,0,0,0.2),
-                      inset 0 1px 2px rgba(255,255,255,0.3)
-                    `,
-                  }}
-                >
-                  <span style={{ fontSize: '14px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.2))' }}>♥</span>
-                </div>
-              </div>
-
-              {/* Inner face of flap (visible when open / rotated past 90deg) */}
-              <div
-                className="absolute inset-0 rounded-t-[20px]"
-                style={{
-                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                  background: `linear-gradient(180deg, ${COLORS.flapInner} 0%, ${COLORS.envelopeBack} 100%)`,
-                  transform: 'rotateX(180deg)',
-                  backfaceVisibility: 'hidden',
-                }}
-              />
-            </motion.div>
 
           </div>
         </div>
