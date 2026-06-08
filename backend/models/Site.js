@@ -172,6 +172,11 @@ const SiteSchema = new mongoose.Schema(
       songAudioUrl:       { type: String, default: '' },
       songLyrics:         { type: String, default: '' },
       galleryImages:      { type: [String], default: [] },
+      // ── Interactive Hero & Love Letter ──────────────────────────
+      nickname:           { type: String,   default: '' },
+      heroPhotos:         { type: [String], default: [] },
+      useInteractiveHero: { type: Boolean,  default: false },
+      loveLetterContent:  { type: String,   default: '' },
     },
     // ── Birthday Templates ────────────────────────────────────────
     birthday: {

@@ -5,7 +5,7 @@ import {
   Save, ArrowLeft, Upload, Loader2, CheckCircle2,
   Plus, Trash2, Settings, Music, Gift, MapPin, Image,
   ExternalLink, AlertTriangle, ToggleLeft, ToggleRight, Layers, Sun, Moon, Heart,
-  Share2
+  Share2, Sparkles
 } from 'lucide-react';
 
 const toLocalDateTimeString = (dateOrStr) => {
@@ -404,12 +404,13 @@ const BIRTHDAY_TABS = [
 ];
 
 const CINEMATIC_BDAY_TABS = [
-  { id: 'cinbday_general', label: 'General & Videos', Icon: Settings },
-  { id: 'cinbday_gift',    label: 'Gift Reveal',      Icon: Gift     },
-  { id: 'cinbday_recap',   label: 'Year Recap',       Icon: CheckCircle2 },
-  { id: 'cinbday_music',   label: 'Music & Lyrics',   Icon: Music    },
-  { id: 'cinbday_gallery', label: 'Photo Gallery',    Icon: Image    },
-  { id: 'socialLinks',     label: 'Social Links',     Icon: Share2   },
+  { id: 'cinbday_general',     label: 'General & Videos',       Icon: Settings },
+  { id: 'cinbday_interactive', label: 'Interactive Hero & Letter', Icon: Sparkles },
+  { id: 'cinbday_gift',        label: 'Gift Reveal',             Icon: Gift     },
+  { id: 'cinbday_recap',       label: 'Year Recap',              Icon: CheckCircle2 },
+  { id: 'cinbday_music',       label: 'Music & Lyrics',          Icon: Music    },
+  { id: 'cinbday_gallery',     label: 'Photo Gallery',           Icon: Image    },
+  { id: 'socialLinks',         label: 'Social Links',            Icon: Share2   },
 ];
 
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -2065,7 +2066,105 @@ function CinBdayGalleryTab({ doc, setDoc }) {
   );
 }
 
-// ── Main Editor Page ──────────────────────────────────────────────
+// ── Cinematic Birthday: Interactive Hero & Love Letter ──────────────
+function CinBdayInteractiveTab({ doc, setDoc }) {
+  const cb = doc.cinematicBirthday || {};
+  const up = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+  const heroPhotos = cb.heroPhotos || [];
+  const [uploading, setUploading] = useState(false);
+
+  const handleHeroPhotos = async (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 5 - heroPhotos.length);
+    if (!files.length) return;
+    setUploading(true);
+    const newUrls = [];
+    for (const file of files) {
+      const res = await uploadImage(file);
+      if (res.success) newUrls.push(res.url);
+    }
+    up('heroPhotos', [...heroPhotos, ...newUrls]);
+    setUploading(false);
+    e.target.value = '';
+  };
+
+  const removeHeroPhoto = (i) => up('heroPhotos', heroPhotos.filter((_, j) => j !== i));
+
+  return (
+    <>
+      <Card title="✨ Interactive Hero Design">
+        <p className="text-[11px] text-slate-500 mb-5">
+          Enable a premium floating Polaroid hero with the recipient's nickname. Looks stunning on the first page.
+        </p>
+        <div className="mb-5">
+          <Toggle
+            checked={cb.useInteractiveHero ?? false}
+            onChange={v => up('useInteractiveHero', v)}
+            label="Enable Interactive Hero"
+          />
+        </div>
+        <div className={`space-y-4 transition-opacity ${!cb.useInteractiveHero ? 'opacity-40 pointer-events-none' : ''}`}>
+          <div>
+            <Label>Recipient Nickname</Label>
+            <p className="text-[11px] text-slate-500 mb-1">Displayed in large script font — e.g. "Babe", "Chuti", "Maleesha"</p>
+            <TextInput
+              value={cb.nickname || ''}
+              onChange={e => up('nickname', e.target.value)}
+              placeholder="e.g. Babe, Chuti, Maleesha…"
+            />
+          </div>
+          <div>
+            <Label>Hero Floating Photos (max 5)</Label>
+            <p className="text-[11px] text-slate-500 mb-3">These appear as floating Polaroid frames over the background. Upload 3–5 for best effect.</p>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              {heroPhotos.map((url, i) => (
+                <div key={i} className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 shadow">
+                  <img src={url} alt={`Hero photo ${i+1}`} className="w-full h-24 object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeHeroPhoto(i)}
+                    className="absolute top-1 right-1 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                  >
+                    <Trash2 size={11} />
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 text-center text-[9px] text-white/60 bg-black/40 py-0.5">
+                    Polaroid {i+1}
+                  </div>
+                </div>
+              ))}
+              {heroPhotos.length === 0 && (
+                <div className="col-span-3 text-center py-6 text-slate-600 text-xs border-2 border-dashed border-slate-700 rounded-xl">
+                  No photos yet. Upload 3–5 for the floating Polaroid effect.
+                </div>
+              )}
+            </div>
+            {heroPhotos.length < 5 && (
+              <label className={`flex items-center justify-center gap-2 border-2 border-dashed border-slate-600 hover:border-amber-400 rounded-xl py-3 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                {uploading ? <Loader2 size={14} className="animate-spin text-amber-400" /> : <Upload size={14} className="text-slate-400" />}
+                <span className="text-xs text-slate-400 font-medium">{uploading ? 'Uploading…' : `Upload Photos (${heroPhotos.length}/5)`}</span>
+                <input type="file" accept="image/*" multiple className="hidden" onChange={handleHeroPhotos} />
+              </label>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card title="💌 Envelope Love Letter">
+        <p className="text-[11px] text-slate-500 mb-4">
+          Write a heartfelt letter that appears inside a beautiful animated envelope. As the user scrolls, the letter is pulled out in a cinematic reveal.
+        </p>
+        <Label>Love Letter Content</Label>
+        <p className="text-[11px] text-slate-500 mb-2">Written in a premium handwritten font. Use line breaks for paragraphs.</p>
+        <TextArea
+          value={cb.loveLetterContent || ''}
+          onChange={e => up('loveLetterContent', e.target.value)}
+          placeholder={`Dear Maleesha,\n\nEvery day with you feels like a dream I never want to wake up from...\n\nWith all my love,\nCharu 💛`}
+          rows={12}
+        />
+      </Card>
+    </>
+  );
+}
+
 export default function AdminEditor() {
   const { siteId } = useParams();
   const nav = useNavigate();
@@ -2248,12 +2347,13 @@ export default function AdminEditor() {
               </>
             ) : isBirthdayCinematic ? (
               <>
-                {activeTab === 'cinbday_general' && <CinBdayGeneralTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_gift'    && <CinBdayGiftTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_recap'   && <CinBdayRecapTab   doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_music'   && <CinBdayMusicTab   doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_gallery' && <CinBdayGalleryTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks'     && <SocialLinksTab    doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_general'     && <CinBdayGeneralTab     doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_interactive'  && <CinBdayInteractiveTab doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_gift'         && <CinBdayGiftTab        doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_recap'        && <CinBdayRecapTab       doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_music'        && <CinBdayMusicTab       doc={doc} setDoc={setDoc} />}
+                {activeTab === 'cinbday_gallery'      && <CinBdayGalleryTab     doc={doc} setDoc={setDoc} />}
+                {activeTab === 'socialLinks'          && <SocialLinksTab        doc={doc} setDoc={setDoc} />}
               </>
             ) : isBirthday ? (
               <>

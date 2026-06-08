@@ -3,6 +3,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 'lucide-react';
 import ScratchPhoto from './ScratchPhoto';
+import InteractiveHero from './InteractiveHero';
+import LoveLetterEnvelope from './LoveLetterEnvelope';
 
 // ── Google Fonts ────────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -172,6 +174,10 @@ export default function CinematicBirthday({ siteData = {} }) {
     songAudioUrl       = '',
     songLyrics         = '',
     galleryImages      = [],
+    nickname           = '',
+    heroPhotos         = [],
+    useInteractiveHero = false,
+    loveLetterContent  = '',
   } = cinematicBirthday || {};
 
   const [phase, setPhase] = useState('intro');
@@ -268,29 +274,39 @@ export default function CinematicBirthday({ siteData = {} }) {
           <motion.div key="hero" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1.2 }}>
 
             {/* ── HERO SECTION ───────────────────────────────────── */}
-            <section className="relative h-screen flex flex-col items-center justify-center">
-              <div className="relative z-10 text-center px-6">
-                <motion.p initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
-                  className="text-amber-300 text-xs font-bold uppercase tracking-[0.4em] mb-4">
-                  🎂 Happy Birthday
-                </motion.p>
-                <motion.h1 initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.7, duration:1 }}
-                  className="font-serif-bday text-5xl md:text-8xl font-light text-white leading-tight mb-4">
-                  {coupleName}
-                </motion.h1>
-                <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}
-                  className="text-white/60 text-base md:text-lg max-w-md mx-auto font-light">
-                  {heroSubtitle}
-                </motion.p>
-              </div>
-              <motion.button onClick={() => window.scrollTo({ top: window.innerHeight, behavior:'smooth' })}
-                initial={{ opacity:0 }} animate={{ opacity:1, y:[0,8,0] }}
-                transition={{ opacity:{ delay:2 }, y:{ duration:2, repeat:Infinity } }}
-                className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40 hover:text-white/70 transition-colors">
-                <span className="text-[10px] uppercase tracking-widest">Scroll to explore</span>
-                <ChevronDown size={20}/>
-              </motion.button>
-            </section>
+            {useInteractiveHero && heroPhotos.length > 0 ? (
+              <InteractiveHero
+                nickname={nickname}
+                heroPhotos={heroPhotos}
+                coupleName={coupleName}
+                heroSubtitle={heroSubtitle}
+                onScroll={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+              />
+            ) : (
+              <section className="relative h-screen flex flex-col items-center justify-center">
+                <div className="relative z-10 text-center px-6">
+                  <motion.p initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
+                    className="text-amber-300 text-xs font-bold uppercase tracking-[0.4em] mb-4">
+                    🎂 Happy Birthday
+                  </motion.p>
+                  <motion.h1 initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.7, duration:1 }}
+                    className="font-serif-bday text-5xl md:text-8xl font-light text-white leading-tight mb-4">
+                    {coupleName}
+                  </motion.h1>
+                  <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}
+                    className="text-white/60 text-base md:text-lg max-w-md mx-auto font-light">
+                    {heroSubtitle}
+                  </motion.p>
+                </div>
+                <motion.button onClick={() => window.scrollTo({ top: window.innerHeight, behavior:'smooth' })}
+                  initial={{ opacity:0 }} animate={{ opacity:1, y:[0,8,0] }}
+                  transition={{ opacity:{ delay:2 }, y:{ duration:2, repeat:Infinity } }}
+                  className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40 hover:text-white/70 transition-colors">
+                  <span className="text-[10px] uppercase tracking-widest">Scroll to explore</span>
+                  <ChevronDown size={20}/>
+                </motion.button>
+              </section>
+            )}
 
             {/* ── GIFT BOX REVEAL ────────────────────────────────── */}
             <section className="py-20 px-6">
@@ -353,6 +369,13 @@ export default function CinematicBirthday({ siteData = {} }) {
                     ))}
                   </div>
                 </div>
+              </section>
+            )}
+
+            {/* ── LOVE LETTER ENVELOPE ────────────────────────────── */}
+            {loveLetterContent && (
+              <section className="py-10">
+                <LoveLetterEnvelope content={loveLetterContent} />
               </section>
             )}
 

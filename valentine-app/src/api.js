@@ -381,6 +381,10 @@ export function toComponentData(doc) {
       songAudioUrl:       doc.cinematicBirthday.songAudioUrl       || '',
       songLyrics:         doc.cinematicBirthday.songLyrics         || '',
       galleryImages:      doc.cinematicBirthday.galleryImages      || [],
+      nickname:           doc.cinematicBirthday.nickname           || '',
+      heroPhotos:         doc.cinematicBirthday.heroPhotos         || [],
+      useInteractiveHero: doc.cinematicBirthday.useInteractiveHero ?? false,
+      loveLetterContent:  doc.cinematicBirthday.loveLetterContent  || '',
     } : null,
   };
 }

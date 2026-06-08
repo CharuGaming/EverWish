@@ -1,0 +1,145 @@
+/**
+ * InteractiveHero.jsx
+ * Floating Polaroid hero with nickname in script font.
+ * Used in CinematicBirthday when useInteractiveHero = true.
+ */
+import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+
+const SCRIPT_FONT = "'Dancing Script', cursive";
+
+// Polaroid positions/rotations for up to 5 photos
+const POLAROID_CONFIG = [
+  { x: '-38%', y: '-8%',  rotate: -12, scale: 0.82, zIndex: 1 },
+  { x:  '32%', y: '-14%', rotate:  10, scale: 0.78, zIndex: 2 },
+  { x: '-44%', y:  '28%', rotate:   7, scale: 0.75, zIndex: 1 },
+  { x:  '38%', y:  '22%', rotate: -9,  scale: 0.72, zIndex: 2 },
+  { x:  '-5%', y: '-42%', rotate:   4, scale: 0.70, zIndex: 0 },
+];
+
+const FLOAT_VARIANTS = {
+  float: (i) => ({
+    y: [0, -10, 0],
+    rotate: [POLAROID_CONFIG[i]?.rotate ?? 0, (POLAROID_CONFIG[i]?.rotate ?? 0) + 3, POLAROID_CONFIG[i]?.rotate ?? 0],
+    transition: { duration: 3.5 + i * 0.7, repeat: Infinity, ease: 'easeInOut', delay: i * 0.6 },
+  }),
+};
+
+export default function InteractiveHero({ nickname, heroPhotos = [], coupleName, heroSubtitle, onScroll }) {
+  const displayName = nickname || coupleName || 'Happy Birthday!';
+  const photos = heroPhotos.slice(0, 5);
+
+  return (
+    <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
+
+      {/* Floating Polaroids */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {photos.map((url, i) => {
+          const cfg = POLAROID_CONFIG[i] || POLAROID_CONFIG[0];
+          return (
+            <motion.div
+              key={i}
+              custom={i}
+              variants={FLOAT_VARIANTS}
+              animate="float"
+              className="absolute"
+              style={{
+                x: cfg.x, y: cfg.y,
+                rotate: cfg.rotate,
+                scale: cfg.scale,
+                zIndex: cfg.zIndex,
+              }}
+            >
+              {/* Polaroid frame */}
+              <div style={{
+                background: 'rgba(255,255,255,0.92)',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
+                padding: '10px 10px 28px 10px',
+                borderRadius: '4px',
+                width: '150px',
+              }}>
+                <img src={url} alt={`Memory ${i+1}`}
+                  className="w-full object-cover rounded-sm"
+                  style={{ height: '140px' }}
+                  draggable={false}
+                />
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Center content */}
+      <div className="relative z-10 text-center px-8">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="text-amber-300 text-xs font-bold uppercase tracking-[0.4em] mb-3"
+        >
+          🎂 Happy Birthday
+        </motion.p>
+
+        {/* Large script nickname */}
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.7, type: 'spring', stiffness: 120 }}
+          style={{ fontFamily: SCRIPT_FONT, fontSize: 'clamp(3.5rem, 12vw, 8rem)', lineHeight: 1.1, color: '#fff', textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}
+        >
+          {displayName}
+        </motion.h1>
+
+        {heroSubtitle && (
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+            className="text-white/60 text-base md:text-lg max-w-sm mx-auto font-light mt-4"
+          >
+            {heroSubtitle}
+          </motion.p>
+        )}
+
+        {/* Pulsating glassmorphic CTA */}
+        <motion.button
+          onClick={onScroll}
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.6 }}
+          whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }}
+          animate={{
+            boxShadow: [
+              '0 0 0 0 rgba(251,191,36,0.5)',
+              '0 0 0 20px rgba(251,191,36,0)',
+              '0 0 0 0 rgba(251,191,36,0)',
+            ],
+          }}
+          style={{
+            marginTop: '2rem',
+            background: 'rgba(255,255,255,0.12)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            color: '#fff',
+            fontWeight: 700,
+            letterSpacing: '0.15em',
+            padding: '14px 36px',
+            borderRadius: '9999px',
+            fontSize: '0.85rem',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+          }}
+        >
+          ✨ Tap for Surprise
+        </motion.button>
+      </div>
+
+      {/* Scroll arrow */}
+      <motion.div
+        onClick={onScroll}
+        initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 8, 0] }}
+        transition={{ opacity: { delay: 2.2 }, y: { duration: 2, repeat: Infinity } }}
+        className="absolute bottom-10 flex flex-col items-center gap-2 text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+      >
+        <span className="text-[10px] uppercase tracking-widest">Scroll to explore</span>
+        <ChevronDown size={18} />
+      </motion.div>
+    </section>
+  );
+}
