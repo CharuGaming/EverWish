@@ -2,7 +2,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 'lucide-react';
-import { mergeDemoData } from '../utils/demoData';
 
 // ── Google Fonts ───────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -144,9 +143,7 @@ function GiftBoxReveal({ giftImageUrl, giftRevealText }) {
 }
 
 // ── Main Component ─────────────────────────────────────────────────
-export default function CinematicBirthday({ siteData: rawSiteData = {}, isDemo = false }) {
-  const siteData = mergeDemoData(rawSiteData, 'birthday', isDemo);
-
+export default function CinematicBirthday({ siteData = {} }) {
   const {
     coupleName    = 'Happy Birthday!',
     heroSubtitle  = 'Today is all about you ✨',
@@ -215,14 +212,11 @@ export default function CinematicBirthday({ siteData: rawSiteData = {}, isDemo =
             </div>
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 1 }} className="text-center px-8 z-10">
-              <motion.div className="text-6xl mb-6" animate={{ scale: [1,1.15,1] }} transition={{ duration: 1.5, repeat: Infinity }}>🎂</motion.div>
-              <h1 className="font-serif-bday text-5xl md:text-7xl font-light text-white mb-4">{coupleName}</h1>
-              <p className="text-amber-300/70 text-sm tracking-widest uppercase font-medium mb-12">A birthday surprise — made with love</p>
               <motion.button onClick={handleTap} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 animate={{ boxShadow: ['0 0 0 0 rgba(251,191,36,0.5)','0 0 0 24px rgba(251,191,36,0)','0 0 0 0 rgba(251,191,36,0)'] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-900 font-bold px-10 py-4 rounded-full shadow-2xl shadow-amber-500/40 text-base tracking-wide">
-                <Play size={18} fill="currentColor" /> Tap to Open
+                className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-900 font-bold px-10 py-4 rounded-full shadow-2xl shadow-amber-500/40 text-base tracking-wide">
+                Tap to Open
               </motion.button>
             </motion.div>
           </motion.div>
