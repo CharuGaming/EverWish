@@ -309,15 +309,15 @@ export default function CinematicBirthday({ siteData = {} }) {
             )}
 
             {/* ── GIFT BOX REVEAL ────────────────────────────────── */}
-            <section className="py-20 px-6">
+            <section className="py-10 px-6">
               <div className="max-w-2xl mx-auto">
-                <Reveal className="text-center mb-10">
-                  <Gift className="mx-auto mb-4 text-amber-400" size={28}/>
-                  <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-3">A Gift For You</h2>
+                <Reveal className="text-center mb-6">
+                  <Gift className="mx-auto mb-3 text-amber-400" size={28}/>
+                  <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-2">A Gift For You</h2>
                   <p className="text-white/50 text-sm">Something special, just for you 🎁</p>
                 </Reveal>
                 <Reveal delay={0.2}>
-                  <div className="rounded-3xl p-8 md:p-12 text-center" style={GLASS}>
+                  <div className="rounded-3xl p-8 text-center" style={GLASS}>
                     <GiftBoxReveal giftImageUrl={giftImageUrl} giftRevealText={giftRevealText}/>
                   </div>
                 </Reveal>
@@ -326,15 +326,14 @@ export default function CinematicBirthday({ siteData = {} }) {
 
             {/* ── YEAR RECAP ─────────────────────────────────────── */}
             {yearRecapText && (
-              <section className="py-20 px-6">
+              <section className="py-10 px-6">
                 <div className="max-w-2xl mx-auto">
-                  <Reveal className="text-center mb-10">
-                    <span className="text-3xl block mb-4">🌟</span>
+                  <Reveal className="text-center mb-6">
+                    <span className="text-3xl block mb-3">🌟</span>
                     <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Your Year in Review</h2>
                   </Reveal>
                   <Reveal delay={0.2}>
-                    <div className="relative rounded-3xl p-8 md:p-12 overflow-hidden" style={GLASS}>
-                      {/* Accent top bar */}
+                    <div className="relative rounded-3xl p-8 overflow-hidden" style={GLASS}>
                       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 rounded-t-3xl"/>
                       <span className="font-serif-bday text-8xl text-amber-500/20 absolute -top-2 left-6 leading-none select-none">"</span>
                       <p className="font-serif-bday text-xl md:text-2xl text-white/85 leading-relaxed italic relative z-10 pt-6 whitespace-pre-line">
@@ -348,17 +347,17 @@ export default function CinematicBirthday({ siteData = {} }) {
 
             {/* ── BIRTHDAY BUCKET LIST ────────────────────────────── */}
             {birthdayBucketList?.length > 0 && (
-              <section className="py-20 px-6">
+              <section className="py-10 px-6">
                 <div className="max-w-2xl mx-auto">
-                  <Reveal className="text-center mb-12">
-                    <span className="text-3xl block mb-4">✅</span>
-                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-3">Birthday Bucket List</h2>
+                  <Reveal className="text-center mb-6">
+                    <span className="text-3xl block mb-3">✅</span>
+                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-2">Birthday Bucket List</h2>
                     <p className="text-white/50 text-sm">Things to do today!</p>
                   </Reveal>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {birthdayBucketList.map((item, i) => (
-                      <Reveal key={i} delay={i * 0.1}>
-                        <div className="flex items-center gap-4 rounded-2xl p-5 transition-all group"
+                      <Reveal key={i} delay={i * 0.08}>
+                        <div className="flex items-center gap-4 rounded-2xl p-4 transition-all group"
                           style={{ ...GLASS, cursor:'default' }}>
                           <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500/40 transition-colors">
                             <Check size={14} className="text-amber-400"/>
@@ -373,23 +372,22 @@ export default function CinematicBirthday({ siteData = {} }) {
             )}
 
             {/* ── LOVE LETTER ENVELOPE ────────────────────────────── */}
+            {/* No section padding here — LoveLetterEnvelope owns its scroll height */}
             {loveLetterContent && (
-              <section className="py-10">
-                <LoveLetterEnvelope content={loveLetterContent} />
-              </section>
+              <LoveLetterEnvelope content={loveLetterContent} />
             )}
 
             {/* ── MUSIC & LYRICS ──────────────────────────────────── */}
             {songAudioUrl && (
-              <section className="py-20 px-6">
+              <section className="py-10 px-6">
                 <div className="max-w-2xl mx-auto">
-                  <Reveal className="text-center mb-10">
-                    <Music2 className="mx-auto mb-4 text-amber-400" size={28}/>
+                  <Reveal className="text-center mb-6">
+                    <Music2 className="mx-auto mb-3 text-amber-400" size={28}/>
                     <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-2">Your Birthday Song</h2>
                     <p className="text-white/50 text-sm">Play it loud 🎵</p>
                   </Reveal>
                   <Reveal delay={0.2}>
-                    <div className="rounded-3xl p-6 md:p-8" style={GLASS}>
+                    <div className="rounded-3xl p-6" style={GLASS}>
                       <AudioPlayer audioUrl={songAudioUrl} lyrics={songLyrics}/>
                     </div>
                   </Reveal>
@@ -399,15 +397,14 @@ export default function CinematicBirthday({ siteData = {} }) {
 
             {/* ── PHOTO GALLERY ───────────────────────────────────── */}
             {allGalleryImages.length > 0 && (
-              <section className="py-20 px-6">
+              <section className="py-10 px-6">
                 <div className="max-w-5xl mx-auto">
-                  <Reveal className="text-center mb-12">
-                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-3">Memories</h2>
+                  <Reveal className="text-center mb-6">
+                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-2">Memories</h2>
                     <p className="text-white/50 text-sm">Moments captured in time 📸</p>
                   </Reveal>
-                  {/* Glass backdrop for the gallery area */}
                   <Reveal delay={0.1}>
-                    <div className="rounded-3xl p-6 md:p-10" style={GLASS}>
+                    <div className="rounded-3xl p-6" style={GLASS}>
                       <div className="flex flex-wrap justify-center gap-4">
                         {allGalleryImages.map((url, i) => (
                           <motion.div key={i}
@@ -426,8 +423,8 @@ export default function CinematicBirthday({ siteData = {} }) {
             )}
 
             {/* ── FOOTER ──────────────────────────────────────────── */}
-            <footer className="py-16 text-center">
-              <motion.div className="text-4xl mb-4"
+            <footer className="py-10 text-center">
+              <motion.div className="text-4xl mb-3"
                 animate={{ scale:[1,1.15,1] }} transition={{ duration:2, repeat:Infinity }}>
                 🎂
               </motion.div>
