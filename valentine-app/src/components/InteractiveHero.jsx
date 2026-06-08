@@ -78,14 +78,38 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
           🎂 Happy Birthday
         </motion.p>
 
-        {/* Large script nickname */}
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.7, type: 'spring', stiffness: 120 }}
-          style={{ fontFamily: SCRIPT_FONT, fontSize: 'clamp(3.5rem, 12vw, 8rem)', lineHeight: 1.1, color: '#fff', textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}
-        >
-          {displayName}
-        </motion.h1>
+        {/* Large script nickname — dark pill backdrop + multi-layer shadow for legibility */}
+        <div className="relative inline-block">
+          {/* Blurred dark gradient behind text so it reads over any Polaroid */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -inset-x-6 -inset-y-2 rounded-2xl pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 72%)',
+              filter: 'blur(18px)',
+            }}
+          />
+          <motion.h1
+            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 120 }}
+            className="relative"
+            style={{
+              fontFamily: SCRIPT_FONT,
+              fontSize: 'clamp(3.5rem, 12vw, 8rem)',
+              lineHeight: 1.1,
+              color: '#fff',
+              /* Four-layer shadow: close sharp → medium → wide soft → ambient */
+              textShadow: [
+                '0 2px 4px rgba(0,0,0,0.95)',
+                '0 4px 12px rgba(0,0,0,0.85)',
+                '0 8px 28px rgba(0,0,0,0.70)',
+                '0 16px 48px rgba(0,0,0,0.50)',
+              ].join(', '),
+            }}
+          >
+            {displayName}
+          </motion.h1>
+        </div>
 
         {heroSubtitle && (
           <motion.p
@@ -96,26 +120,32 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
           </motion.p>
         )}
 
-        {/* Pulsating glassmorphic CTA */}
+        {/* Pulsating glassmorphic CTA — single animate prop (merged entry + pulse) */}
         <motion.button
           onClick={onScroll}
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.6 }}
-          whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{
+            opacity: 1,
+            y: 0,
             boxShadow: [
-              '0 0 0 0 rgba(251,191,36,0.5)',
-              '0 0 0 20px rgba(251,191,36,0)',
-              '0 0 0 0 rgba(251,191,36,0)',
+              '0 0 0 0px rgba(251,191,36,0.55)',
+              '0 0 0 18px rgba(251,191,36,0)',
+              '0 0 0 0px rgba(251,191,36,0)',
             ],
           }}
+          transition={{
+            opacity: { delay: 1.6, duration: 0.6 },
+            y:       { delay: 1.6, duration: 0.6 },
+            boxShadow: { delay: 2.4, duration: 2.2, repeat: Infinity, ease: 'easeOut' },
+          }}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
           style={{
             marginTop: '2rem',
             background: 'rgba(255,255,255,0.12)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255,255,255,0.25)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
             color: '#fff',
             fontWeight: 700,
             letterSpacing: '0.15em',

@@ -34,22 +34,24 @@ export default function LoveLetterEnvelope({ content }) {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start end', 'end start'],
+    // Trigger as soon as 85% of the envelope enters the viewport;
+    // complete before the section top reaches 25% from the top.
+    offset: ['start 85%', 'end 25%'],
   });
 
   /* ── Animation transforms ─────────────────────────────────────── */
-  // Letter slides from resting inside (18%) to fully extracted (-85%)
-  const letterY       = useTransform(scrollYProgress, [0.15, 0.55], ['18%', '-85%']);
-  const letterScale   = useTransform(scrollYProgress, [0.15, 0.55], [0.92, 1]);
-  const letterOpacity = useTransform(scrollYProgress, [0.10, 0.22], [0, 1]);
-  const letterRotate  = useTransform(scrollYProgress, [0.15, 0.55], [1, 0]);
+  // Compressed to [0 → 0.6] so everything plays in the first 60% of scroll
+  const letterY       = useTransform(scrollYProgress, [0.0, 0.60], ['20%', '-80%']);
+  const letterScale   = useTransform(scrollYProgress, [0.0, 0.60], [0.90, 1]);
+  const letterOpacity = useTransform(scrollYProgress, [0.0, 0.18], [0, 1]);
+  const letterRotate  = useTransform(scrollYProgress, [0.0, 0.60], [1.5, 0]);
 
-  // Flap opens as user scrolls
-  const flapRotateX   = useTransform(scrollYProgress, [0.12, 0.38], [0, -180]);
+  // Flap opens in the first 35% of scroll
+  const flapRotateX   = useTransform(scrollYProgress, [0.0, 0.35], [0, -180]);
 
-  // Heading fades in, then fades OUT as letter covers it
-  const headingOpacity = useTransform(scrollYProgress, [0.05, 0.18, 0.35, 0.48], [0, 1, 1, 0]);
-  const headingY       = useTransform(scrollYProgress, [0.05, 0.18], [30, 0]);
+  // Heading: fade in immediately, fade out before letter reaches it (< 30%)
+  const headingOpacity = useTransform(scrollYProgress, [0.0, 0.08, 0.22, 0.32], [0, 1, 1, 0]);
+  const headingY       = useTransform(scrollYProgress, [0.0, 0.12], [24, 0]);
 
   if (!content) return null;
 
@@ -57,14 +59,19 @@ export default function LoveLetterEnvelope({ content }) {
     <>
       <link href={FONT_LINK} rel="stylesheet" />
 
-      {/* ── Scroll container: 200vh gives scroll room for sticky ── */}
-      <div ref={sectionRef} style={{ height: '200vh' }}>
+      {/* ── Scroll container ──────────────────────────────────────
+           120vh gives just enough scroll room for the animation
+           without leaving a massive gap. The sticky inner div
+           pins to the viewport while the user scrolls through.    */}
+      <div ref={sectionRef} style={{ height: '130vh' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-visible px-4">
 
-          {/* ── Section heading — fades out when letter covers it ── */}
+          {/* ── Section heading ──────────────────────────────────────
+               Generous mb-14 ensures the rising letter never collides
+               with this heading. z-40 keeps it above the envelope.   */}
           <motion.div
-            style={{ opacity: headingOpacity, y: headingY }}
-            className="text-center mb-8 relative z-40 pointer-events-none"
+            className="text-center mb-14 relative pointer-events-none"
+            style={{ opacity: headingOpacity, y: headingY, zIndex: 40 }}
           >
             <span className="text-3xl block mb-2">💌</span>
             <h2
@@ -73,7 +80,7 @@ export default function LoveLetterEnvelope({ content }) {
             >
               A Letter For You
             </h2>
-            <p className="text-white/40 text-xs mt-2 uppercase tracking-[0.25em]">
+            <p className="text-white/40 text-xs mt-3 uppercase tracking-[0.25em]">
               Scroll to open ↓
             </p>
           </motion.div>
