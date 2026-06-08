@@ -1,302 +1,142 @@
 /**
- * LoveLetterEnvelope.jsx — Sticky Scroll Track Edition
+ * LoveLetterEnvelope.jsx — Clean Scroll-Reveal Letter Card
  *
- * Scroll architecture:
- *   ┌─ Outer div: h-[150vh], ref={containerRef}      ← scroll "track"
- *   │   useScroll target=containerRef
- *   │   offset=['start start', 'end end']
- *   │   → progress 0 when top of track hits top of viewport
- *   │   → progress 1 when bottom of track hits bottom of viewport
- *   └─ Inner div: sticky top-0, h-screen             ← pinned stage
- *       The envelope lives here, centred, while user scrolls the track.
+ * No envelope shapes, no clip-paths, no sticky scroll tricks.
+ * Just a premium paper card that reveals its text as the user scrolls.
  *
- * Z-index layers (inside the 280px envelope assembly):
- *   z-0:  Envelope back  — static linen gradient
- *   z-5:  Top flap       — rotateX open, BELOW the letter
- *   z-10: Letter card    — the ONLY moving element
- *   z-20: Front pocket   — clip-path polygon, masks letter bottom
- *   z-40: Heading        — fades out before letter reaches it
+ * Animation: each paragraph fades in + slides up (staggered via delay),
+ * triggered once when the card enters the viewport.
  */
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /* ── Google Fonts ──────────────────────────────────────────────────── */
 const FONT_LINK =
-  'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap';
+  'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;1,400&display=swap';
 
-/* ── Colour palette ────────────────────────────────────────────────── */
-const C = {
-  back:    '#E8DDD3',
-  front:   '#F5EDE4',
-  flapOut: '#DDD0C4',
-  flapIn:  '#C4B5A6',
-  paper:   '#FDFBF7',
-  lines:   '#E8E0D8',
-  ink:     '#3B2F25',
-  seal:    '#C17F59',
-};
+/* ── Shared animation preset ───────────────────────────────────────── */
+const REVEAL = (delay = 0) => ({
+  initial:    { opacity: 0, y: 28 },
+  whileInView:{ opacity: 1, y: 0  },
+  viewport:   { once: true, amount: 0.25 },
+  transition: { duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] },
+});
 
 export default function LoveLetterEnvelope({ content }) {
-  const containerRef = useRef(null);
-
-  /* ── Scroll progress: 0 → 1 over exactly 150vh ─────────────────── */
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  /* ── Animation transforms ──────────────────────────────────────── */
-  // Heading: slides in 0→0.10, stays until 0.25, fades out by 0.38
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.10, 0.25, 0.38], [0, 1, 1, 0]);
-  const headingY       = useTransform(scrollYProgress, [0, 0.10], [22, 0]);
-
-  // Flap: opens 0.08 → 0.42
-  const flapRotateX    = useTransform(scrollYProgress, [0.08, 0.42], [0, -180]);
-
-  // Letter: fades in 0.10→0.25, slides from inside (18%) to fully out (-78%)
-  // Completes at 0.82 so the last 18% of scroll is a nice "rest" on the full letter
-  const letterOpacity  = useTransform(scrollYProgress, [0.10, 0.25], [0, 1]);
-  const letterY        = useTransform(scrollYProgress, [0.12, 0.82], ['18%', '-78%']);
-  const letterScale    = useTransform(scrollYProgress, [0.12, 0.82], [0.91, 1]);
-  const letterRotate   = useTransform(scrollYProgress, [0.12, 0.82], [1.5, 0]);
-
   if (!content) return null;
+
+  /* Split on double-newline into paragraphs; fall back to single block */
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean);
 
   return (
     <>
       <link href={FONT_LINK} rel="stylesheet" />
 
-      {/*
-        ┌──────────────────────────────────────────────────────────────┐
-        │  OUTER: 150vh — the scroll "track" for the animation        │
-        │  The user scrolls through this height while the inner       │
-        │  sticky div stays pinned to the viewport centre.            │
-        └──────────────────────────────────────────────────────────────┘
-      */}
-      <div ref={containerRef} style={{ height: '150vh' }}>
+      {/* ── Section wrapper — flows naturally, no sticky tricks ── */}
+      <section className="py-20 px-6">
+        <div className="max-w-2xl mx-auto">
 
-        {/*
-          ┌────────────────────────────────────────────────────────────┐
-          │  INNER: pinned to top-0, fills the viewport               │
-          └────────────────────────────────────────────────────────────┘
-        */}
-        <div
-          className="sticky top-0 h-screen flex flex-col items-center justify-center px-4"
-          style={{ overflow: 'visible' }}
-        >
-
-          {/* ── Heading — fades out before letter overlaps it ──── */}
+          {/* ── Section heading ──────────────────────────────────── */}
           <motion.div
-            className="text-center pointer-events-none"
-            style={{
-              opacity: headingOpacity,
-              y: headingY,
-              zIndex: 40,
-              marginBottom: '2.5rem',
-            }}
+            {...REVEAL(0)}
+            className="text-center mb-10"
           >
-            <span className="text-3xl block mb-2">💌</span>
+            <span className="text-3xl block mb-3">💌</span>
             <h2
               className="text-4xl md:text-5xl font-light text-white tracking-wide"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               A Letter For You
             </h2>
-            <p className="text-white/40 text-xs mt-3 uppercase tracking-[0.25em]">
-              Scroll to open ↓
-            </p>
           </motion.div>
 
-          {/* ── Envelope assembly: 380px × 280px ─────────────── */}
-          <div
-            className="relative w-full max-w-[380px] flex-shrink-0"
-            style={{ height: '280px' }}
+          {/* ── Paper card ───────────────────────────────────────── */}
+          <motion.div
+            {...REVEAL(0.15)}
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              background: '#FDFBF7',
+              boxShadow: `
+                0 4px 6px rgba(0,0,0,0.04),
+                0 20px 60px rgba(0,0,0,0.18),
+                0 40px 80px rgba(0,0,0,0.10),
+                inset 0 1px 0 rgba(255,255,255,0.9)
+              `,
+              border: '1px solid rgba(200,190,175,0.30)',
+            }}
           >
+            {/* Top amber accent line — keeps the glassmorphic colour system */}
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-t-2xl" />
 
-            {/* ╔══════════════════════════════════════╗
-                ║  L1 — Envelope back (z-0)            ║
-                ╚══════════════════════════════════════╝ */}
+            {/* Red margin line — authentic notebook paper feel */}
             <div
-              className="absolute inset-0 rounded-[20px]"
-              style={{
-                zIndex: 0,
-                background: `linear-gradient(170deg, ${C.back} 0%, ${C.front} 100%)`,
-                boxShadow: `
-                  0 30px 60px rgba(0,0,0,0.28),
-                  0 12px 28px rgba(0,0,0,0.16),
-                  inset 0 1px 0 rgba(255,255,255,0.4)
-                `,
-                border: '1px solid rgba(255,255,255,0.25)',
-              }}
-            >
-              {/* Inner pocket depth shadow */}
-              <div
-                className="absolute inset-x-3 top-[45%] bottom-3 rounded-b-[16px]"
-                style={{
-                  background: `linear-gradient(180deg, ${C.back}00 0%, ${C.back}40 100%)`,
-                  boxShadow: 'inset 0 8px 20px rgba(0,0,0,0.08)',
-                }}
-              />
+              className="absolute top-0 bottom-0 w-px"
+              style={{ left: '52px', background: 'rgba(205,100,100,0.16)' }}
+            />
+
+            {/* Ruled lines */}
+            <div className="absolute inset-0 pointer-events-none" aria-hidden>
+              {Array.from({ length: 20 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute left-0 right-0"
+                  style={{
+                    top:        `${80 + i * 30}px`,
+                    height:     '1px',
+                    background: '#E8E0D8',
+                    opacity:    0.55,
+                  }}
+                />
+              ))}
             </div>
 
-            {/* ╔══════════════════════════════════════╗
-                ║  L2 — Top flap (z-5) — OPENS        ║
-                ║  z-5 < z-10: opened flap always     ║
-                ║  sits BEHIND the letter card.        ║
-                ╚══════════════════════════════════════╝ */}
-            <motion.div
-              className="absolute top-0 left-0 right-0 pointer-events-none"
-              style={{
-                zIndex: 5,
-                rotateX: flapRotateX,
-                transformOrigin: 'top center',
-                transformStyle: 'preserve-3d',
-                perspective: '800px',
-                height: '52%',
-              }}
+            {/* ── Letter content ─────────────────────────────────── */}
+            <div
+              className="relative z-10 px-8 py-10"
+              style={{ paddingLeft: '68px' }}
             >
-              {/* Outer face — visible when closed */}
-              <div
-                className="absolute inset-0 rounded-t-[20px]"
-                style={{
-                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                  background: `linear-gradient(180deg, ${C.flapOut} 0%, ${C.back} 80%)`,
-                  backfaceVisibility: 'hidden',
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.12), inset 0 -2px 8px rgba(0,0,0,0.06)',
-                }}
-              >
-                {/* Wax seal */}
-                <div
-                  className="absolute flex items-center justify-center"
+              {paragraphs.map((para, i) => (
+                <motion.p
+                  key={i}
+                  {...REVEAL(0.25 + i * 0.12)}
+                  className="mb-5 last:mb-0"
                   style={{
-                    left: '50%', top: '36%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '36px', height: '36px',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle at 40% 35%, ${C.seal}, #9A6040)`,
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.3)',
-                  }}
-                >
-                  <span style={{ fontSize: '14px', color: '#fff', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }}>♥</span>
-                </div>
-              </div>
-
-              {/* Inner face — visible when rotated past 90° */}
-              <div
-                className="absolute inset-0 rounded-t-[20px]"
-                style={{
-                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                  background: `linear-gradient(180deg, ${C.flapIn} 0%, ${C.back} 100%)`,
-                  transform: 'rotateX(180deg)',
-                  backfaceVisibility: 'hidden',
-                }}
-              />
-            </motion.div>
-
-            {/* ╔══════════════════════════════════════╗
-                ║  L3 — Letter card (z-10) — MOVES    ║
-                ║  Slides up from behind the pocket.  ║
-                ║  Always above the opened flap (z-5).║
-                ╚══════════════════════════════════════╝ */}
-            <motion.div
-              className="absolute left-3 right-3 rounded-xl overflow-hidden"
-              style={{
-                zIndex: 10,
-                y: letterY,
-                scale: letterScale,
-                opacity: letterOpacity,
-                rotate: letterRotate,
-                top: '16px',
-                minHeight: '320px',
-                maxHeight: '460px',
-                transformOrigin: 'bottom center',
-                background: `linear-gradient(175deg, ${C.paper} 0%, #FBF7F1 100%)`,
-                boxShadow: `
-                  0 -8px 30px rgba(0,0,0,0.12),
-                  0  4px 20px rgba(0,0,0,0.08),
-                  inset 0 1px 0 rgba(255,255,255,0.9)
-                `,
-                border: '1px solid rgba(200,190,175,0.35)',
-              }}
-            >
-              {/* Red margin line */}
-              <div
-                className="absolute top-0 bottom-0 w-px"
-                style={{ left: '42px', background: 'rgba(205,100,100,0.18)' }}
-              />
-
-              {/* Ruled horizontal lines */}
-              <div className="absolute inset-0">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute left-0 right-0"
-                    style={{
-                      top: `${50 + i * 26}px`,
-                      height: '1px',
-                      background: C.lines,
-                      opacity: 0.55,
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Letter text */}
-              <div className="relative z-10 py-7 pr-6" style={{ paddingLeft: '54px' }}>
-                <p
-                  className="whitespace-pre-line"
-                  style={{
-                    fontFamily: "'Dancing Script', cursive",
-                    fontSize: '1.12rem',
-                    lineHeight: '1.88',
-                    color: C.ink,
+                    fontFamily:    "'Dancing Script', cursive",
+                    fontSize:      '1.18rem',
+                    lineHeight:    '2',
+                    color:         '#3B2F25',
                     letterSpacing: '0.01em',
                   }}
                 >
-                  {content}
-                </p>
-              </div>
+                  {para}
+                </motion.p>
+              ))}
 
-              {/* Corner fold */}
-              <div
-                className="absolute top-0 right-0 w-8 h-8"
-                style={{
-                  background: `linear-gradient(225deg, ${C.back}80 0%, transparent 60%)`,
-                  borderRadius: '0 12px 0 0',
-                }}
-              />
-            </motion.div>
-
-            {/* ╔══════════════════════════════════════╗
-                ║  L4 — Front pocket (z-20) — STATIC  ║
-                ║  Letter emerges from BEHIND this.   ║
-                ╚══════════════════════════════════════╝ */}
-            <div
-              className="absolute inset-0 rounded-b-[20px] pointer-events-none"
-              style={{
-                zIndex: 20,
-                clipPath: 'polygon(0 42%, 50% 72%, 100% 42%, 100% 100%, 0 100%)',
-                background: `linear-gradient(180deg, ${C.front} 0%, ${C.back} 100%)`,
-                boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.5)',
-                border: '1px solid rgba(255,255,255,0.2)',
-              }}
-            >
-              {/* Subtle fold creases */}
-              <div
-                className="absolute bottom-0 left-0 right-0"
-                style={{
-                  height: '60%',
-                  background: `
-                    linear-gradient(135deg, transparent 48%, rgba(0,0,0,0.03) 49%, rgba(0,0,0,0.03) 51%, transparent 52%),
-                    linear-gradient(225deg, transparent 48%, rgba(0,0,0,0.02) 49%, rgba(0,0,0,0.02) 51%, transparent 52%)
-                  `,
-                }}
-              />
+              {/* Decorative closing flourish */}
+              <motion.div
+                {...REVEAL(0.30 + paragraphs.length * 0.12)}
+                className="mt-8 flex items-center gap-3"
+              >
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
+                <span className="text-amber-400 text-lg">♥</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
+              </motion.div>
             </div>
 
-          </div>{/* end envelope assembly */}
-        </div>{/* end sticky */}
-      </div>{/* end 150vh track */}
+            {/* Subtle corner fold */}
+            <div
+              className="absolute top-0 right-0 w-10 h-10 pointer-events-none"
+              style={{
+                background: 'linear-gradient(225deg, rgba(216,204,188,0.6) 0%, transparent 55%)',
+                borderRadius: '0 16px 0 0',
+              }}
+            />
+          </motion.div>
+
+        </div>
+      </section>
     </>
   );
 }
