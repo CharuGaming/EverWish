@@ -32,8 +32,11 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
   return (
     <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
 
-      {/* Floating Polaroids */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Floating Polaroids — explicitly z-0 so they NEVER overlap center content */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
         {photos.map((url, i) => {
           const cfg = POLAROID_CONFIG[i] || POLAROID_CONFIG[0];
           return (
@@ -69,8 +72,8 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
         })}
       </div>
 
-      {/* Center content */}
-      <div className="relative z-10 text-center px-8">
+      {/* Center content — z-20 guarantees it always sits above all Polaroids */}
+      <div className="relative text-center px-8" style={{ zIndex: 20 }}>
         <motion.p
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="text-amber-300 text-xs font-bold uppercase tracking-[0.4em] mb-3"
@@ -112,12 +115,33 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
         </div>
 
         {heroSubtitle && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-            className="text-white/60 text-base md:text-lg max-w-sm mx-auto font-light mt-4"
+            className="relative mt-4 max-w-sm mx-auto"
           >
-            {heroSubtitle}
-          </motion.p>
+            {/* Dark backdrop behind subtitle for legibility over any bg */}
+            <div
+              aria-hidden
+              className="absolute inset-0 -inset-x-4 -inset-y-2 rounded-xl pointer-events-none"
+              style={{
+                background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.50) 0%, transparent 80%)',
+                filter: 'blur(12px)',
+              }}
+            />
+            <p
+              className="relative font-light text-base md:text-lg"
+              style={{
+                color: 'rgba(255,255,255,0.90)',
+                textShadow: [
+                  '0 1px 3px rgba(0,0,0,0.99)',
+                  '0 3px 10px rgba(0,0,0,0.90)',
+                  '0 6px 22px rgba(0,0,0,0.70)',
+                ].join(', '),
+              }}
+            >
+              {heroSubtitle}
+            </p>
+          </motion.div>
         )}
 
         {/* Pulsating glassmorphic CTA — single animate prop (merged entry + pulse) */}
