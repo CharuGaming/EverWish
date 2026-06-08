@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 'lucide-react';
+import ScratchPhoto from './ScratchPhoto';
 
 // ── Google Fonts ───────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -355,11 +356,11 @@ export default function CinematicBirthday({ siteData = {} }) {
                   <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
                     {allGalleryImages.map((url, i) => (
                       <Reveal key={i} delay={i * 0.07} className="break-inside-avoid">
-                        <div className="relative group overflow-hidden rounded-2xl bg-white/5 border border-white/10">
-                          <img src={url} alt={`Memory ${i+1}`} loading="lazy"
-                            className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </div>
+                        <ScratchPhoto 
+                          src={url} 
+                          alt={`Memory ${i+1}`} 
+                          primary="#fbbf24" 
+                        />
                       </Reveal>
                     ))}
                   </div>
