@@ -1,121 +1,271 @@
 /**
  * LoveLetterEnvelope.jsx
- * Scroll-triggered envelope pull-out animation.
- * The letter card slides up out of the envelope as user scrolls.
+ * Premium scroll-triggered envelope with letter pull-out animation.
+ *
+ * Architecture — 3 z-layers inside a relative container:
+ *   Layer 1 (z-0):  Envelope back   — muted linen texture, side folds
+ *   Layer 2 (z-10): Letter card     — the ONLY moving element (slides up)
+ *   Layer 3 (z-20): Front pocket    — clip-path polygon, hides bottom of letter
+ *   Layer 4 (z-30): Top flap        — rotates open via scroll
  */
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-const FONT_LINK_LETTER = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap';
+/* ── Google Fonts ──────────────────────────────────────────────────── */
+const FONT_LINK =
+  'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap';
 
-const ENVELOPE_STYLE = {
-  background: 'linear-gradient(145deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)',
-  boxShadow: '0 25px 80px rgba(0,0,0,0.4), 0 8px 30px rgba(251,191,36,0.2)',
-};
-
-const LETTER_STYLE = {
-  background: 'linear-gradient(160deg, #fffdf5 0%, #fefce8 100%)',
-  boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
+/* ── Colour palette — soft, premium paper tones ────────────────────── */
+const COLORS = {
+  envelopeBack:   '#E8DDD3',   // warm linen
+  envelopeFront:  '#F5EDE4',   // lighter warm cream
+  flapOuter:      '#DDD0C4',   // slightly darker for flap contrast
+  flapInner:      '#C4B5A6',   // inner face when flap opens
+  letterPaper:    '#FDFBF7',   // soft paper white
+  letterLines:    '#E8E0D8',   // subtle ruled lines
+  ink:            '#3B2F25',   // warm dark brown ink
+  inkLight:       '#6B5D50',   // lighter brown for secondary text
+  seal:           '#C17F59',   // wax-seal copper
 };
 
 export default function LoveLetterEnvelope({ content }) {
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: sectionRef,
     offset: ['start end', 'end start'],
   });
 
-  // Letter pulls out as scroll increases
-  const letterY     = useTransform(scrollYProgress, [0.1, 0.55], ['55%', '-42%']);
-  const letterScale = useTransform(scrollYProgress, [0.1, 0.55], [0.88, 1]);
-  const letterOpacity = useTransform(scrollYProgress, [0.08, 0.2], [0, 1]);
-  // Envelope flap opens as letter comes out
-  const flapRotate  = useTransform(scrollYProgress, [0.1, 0.4], [0, -170]);
+  /* ── Animation transforms ─────────────────────────────────────── */
+  // Letter slides from resting inside (20%) to fully extracted (-90%)
+  const letterY       = useTransform(scrollYProgress, [0.15, 0.55], ['20%', '-90%']);
+  const letterScale   = useTransform(scrollYProgress, [0.15, 0.55], [0.92, 1]);
+  const letterOpacity = useTransform(scrollYProgress, [0.10, 0.22], [0, 1]);
+  const letterRotate  = useTransform(scrollYProgress, [0.15, 0.55], [1, 0]);
+
+  // Flap opens as user scrolls
+  const flapRotateX   = useTransform(scrollYProgress, [0.12, 0.38], [0, -180]);
+  const flapShadow    = useTransform(scrollYProgress, [0.12, 0.38], [
+    '0 8px 20px rgba(0,0,0,0.15)',
+    '0 -4px 12px rgba(0,0,0,0.08)',
+  ]);
+
+  // Heading fades in
+  const headingOpacity = useTransform(scrollYProgress, [0.05, 0.18], [0, 1]);
+  const headingY       = useTransform(scrollYProgress, [0.05, 0.18], [30, 0]);
 
   if (!content) return null;
 
   return (
     <>
-      <link href={FONT_LINK_LETTER} rel="stylesheet" />
-      {/* sticky scroll container — 200vh gives scroll room */}
-      <div ref={containerRef} style={{ height: '220vh' }}>
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
+      <link href={FONT_LINK} rel="stylesheet" />
 
-          {/* Section label */}
+      {/* ── Scroll container: 200vh gives scroll room for sticky ── */}
+      <div ref={sectionRef} style={{ height: '200vh' }}>
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-visible px-4">
+
+          {/* ── Section heading ─────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-10 z-10"
+            style={{ opacity: headingOpacity, y: headingY }}
+            className="text-center mb-8 relative z-40"
           >
-            <span className="text-3xl block mb-3">💌</span>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              className="text-4xl md:text-5xl font-light text-white">
+            <span className="text-3xl block mb-2">💌</span>
+            <h2
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              className="text-4xl md:text-5xl font-light text-white tracking-wide"
+            >
               A Letter For You
             </h2>
-            <p className="text-white/40 text-sm mt-2">Scroll to open ↓</p>
+            <p className="text-white/40 text-xs mt-2 uppercase tracking-[0.25em]">
+              Scroll to open ↓
+            </p>
           </motion.div>
 
-          {/* Envelope + Letter wrapper */}
-          <div className="relative w-full max-w-sm" style={{ height: '320px' }}>
+          {/* ── Envelope assembly ───────────────────────────────── */}
+          <div
+            className="relative w-full max-w-[380px]"
+            style={{ height: '280px' }}
+          >
 
-            {/* ── Envelope Back (bottom layer) ── */}
+            {/* ╔═══════════════════════════════════════════════════╗
+               ║  LAYER 1 — Envelope back (z-0)                   ║
+               ╚═══════════════════════════════════════════════════╝ */}
             <div
-              className="absolute inset-0 rounded-2xl z-0 overflow-hidden"
-              style={ENVELOPE_STYLE}
+              className="absolute inset-0 rounded-[20px] z-0"
+              style={{
+                background: `linear-gradient(170deg, ${COLORS.envelopeBack} 0%, ${COLORS.envelopeFront} 100%)`,
+                boxShadow: `
+                  0 30px 60px rgba(0,0,0,0.25),
+                  0 15px 30px rgba(0,0,0,0.15),
+                  inset 0 1px 0 rgba(255,255,255,0.4)
+                `,
+                border: '1px solid rgba(255,255,255,0.25)',
+              }}
             >
-              {/* Bottom triangle fold */}
-              <div className="absolute bottom-0 left-0 right-0 h-0 border-l-[180px] border-r-[180px] border-b-[120px] border-l-transparent border-r-transparent"
-                style={{ borderBottomColor: '#d97706' }} />
-              {/* Left fold */}
-              <div className="absolute top-0 left-0 w-0 h-0 border-t-[160px] border-r-[180px] border-t-transparent"
-                style={{ borderRightColor: '#f59e0b' }} />
-              {/* Right fold */}
-              <div className="absolute top-0 right-0 w-0 h-0 border-t-[160px] border-l-[180px] border-t-transparent"
-                style={{ borderLeftColor: '#f59e0b' }} />
+              {/* Inner shadow to simulate depth of envelope pocket */}
+              <div
+                className="absolute inset-x-3 top-[45%] bottom-3 rounded-b-[16px]"
+                style={{
+                  background: `linear-gradient(180deg, ${COLORS.envelopeBack}00 0%, ${COLORS.envelopeBack}40 100%)`,
+                  boxShadow: 'inset 0 8px 20px rgba(0,0,0,0.08)',
+                }}
+              />
             </div>
 
-            {/* ── Envelope Flap (top, rotates open) ── */}
+            {/* ╔═══════════════════════════════════════════════════╗
+               ║  LAYER 2 — Letter card (z-10) — MOVES            ║
+               ╚═══════════════════════════════════════════════════╝ */}
             <motion.div
-              className="absolute top-0 left-0 right-0 z-20 origin-top overflow-hidden"
-              style={{ rotate: flapRotate, height: '160px' }}
-            >
-              <div className="w-0 h-0 mx-auto"
-                style={{
-                  borderLeft: '180px solid transparent',
-                  borderRight: '180px solid transparent',
-                  borderTop: '160px solid #fbbf24',
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
-                }} />
-            </motion.div>
-
-            {/* ── The Letter Card (slides up) ── */}
-            <motion.div
-              className="absolute left-2 right-2 z-10 rounded-xl p-6 overflow-y-auto"
+              className="absolute left-3 right-3 z-10 rounded-xl"
               style={{
-                ...LETTER_STYLE,
                 y: letterY,
                 scale: letterScale,
                 opacity: letterOpacity,
-                top: '12px',
-                maxHeight: '420px',
+                rotate: letterRotate,
+                top: '16px',
+                minHeight: '320px',
+                maxHeight: '440px',
                 transformOrigin: 'bottom center',
+                background: `linear-gradient(175deg, ${COLORS.letterPaper} 0%, #FBF7F1 100%)`,
+                boxShadow: `
+                  0 -8px 30px rgba(0,0,0,0.12),
+                  0 4px 20px rgba(0,0,0,0.08),
+                  inset 0 1px 0 rgba(255,255,255,0.9)
+                `,
+                border: '1px solid rgba(200,190,175,0.35)',
               }}
             >
-              {/* Ruled lines decoration */}
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="absolute left-6 right-6 h-px bg-amber-100"
-                  style={{ top: `${60 + i * 28}px` }} />
-              ))}
-              {/* Letter content */}
-              <div className="relative z-10">
-                <p style={{ fontFamily: "'Dancing Script', cursive", fontSize: '1.2rem', lineHeight: '1.9', color: '#3b1a00' }}
-                  className="whitespace-pre-line">
+              {/* Red margin line */}
+              <div
+                className="absolute top-0 bottom-0 w-[1px]"
+                style={{ left: '42px', background: 'rgba(205,100,100,0.18)' }}
+              />
+
+              {/* Ruled horizontal lines */}
+              <div className="absolute inset-0 overflow-hidden rounded-xl">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute left-0 right-0"
+                    style={{
+                      top: `${52 + i * 26}px`,
+                      height: '1px',
+                      background: COLORS.letterLines,
+                      opacity: 0.6,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Letter text */}
+              <div className="relative z-10 px-8 py-7 pr-6" style={{ paddingLeft: '54px' }}>
+                <p
+                  className="whitespace-pre-line"
+                  style={{
+                    fontFamily: "'Dancing Script', cursive",
+                    fontSize: '1.15rem',
+                    lineHeight: '1.88',
+                    color: COLORS.ink,
+                    letterSpacing: '0.01em',
+                  }}
+                >
                   {content}
                 </p>
               </div>
+
+              {/* Subtle corner fold */}
+              <div
+                className="absolute top-0 right-0 w-8 h-8"
+                style={{
+                  background: `linear-gradient(225deg, ${COLORS.envelopeBack}80 0%, transparent 60%)`,
+                  borderRadius: '0 12px 0 0',
+                }}
+              />
+            </motion.div>
+
+            {/* ╔═══════════════════════════════════════════════════╗
+               ║  LAYER 3 — Front pocket (z-20) — STATIC          ║
+               ║  Letter slides up from BEHIND this layer          ║
+               ╚═══════════════════════════════════════════════════╝ */}
+            <div
+              className="absolute inset-0 z-20 rounded-b-[20px] pointer-events-none"
+              style={{
+                clipPath: 'polygon(0 42%, 50% 72%, 100% 42%, 100% 100%, 0 100%)',
+                background: `linear-gradient(180deg, ${COLORS.envelopeFront} 0%, ${COLORS.envelopeBack} 100%)`,
+                boxShadow: `
+                  0 -4px 16px rgba(0,0,0,0.06),
+                  inset 0 2px 8px rgba(255,255,255,0.5)
+                `,
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+            >
+              {/* Subtle crease lines on the front pocket */}
+              <div
+                className="absolute bottom-0 left-0 right-0"
+                style={{
+                  height: '60%',
+                  background: `
+                    linear-gradient(135deg, transparent 48%, rgba(0,0,0,0.03) 49%, rgba(0,0,0,0.03) 51%, transparent 52%),
+                    linear-gradient(225deg, transparent 48%, rgba(0,0,0,0.02) 49%, rgba(0,0,0,0.02) 51%, transparent 52%)
+                  `,
+                }}
+              />
+            </div>
+
+            {/* ╔═══════════════════════════════════════════════════╗
+               ║  LAYER 4 — Top flap (z-30) — ROTATES OPEN        ║
+               ╚═══════════════════════════════════════════════════╝ */}
+            <motion.div
+              className="absolute top-0 left-0 right-0 z-30 pointer-events-none"
+              style={{
+                rotateX: flapRotateX,
+                transformOrigin: 'top center',
+                transformStyle: 'preserve-3d',
+                height: '52%',
+                filter: flapShadow,
+              }}
+            >
+              {/* Outer face of flap (visible when closed) */}
+              <div
+                className="absolute inset-0 rounded-t-[20px]"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                  background: `linear-gradient(180deg, ${COLORS.flapOuter} 0%, ${COLORS.envelopeBack} 80%)`,
+                  backfaceVisibility: 'hidden',
+                  boxShadow: 'inset 0 -2px 8px rgba(0,0,0,0.06)',
+                }}
+              >
+                {/* Wax seal decoration */}
+                <div
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: '50%',
+                    top: '38%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle at 40% 35%, ${COLORS.seal}, #9A6040)`,
+                    boxShadow: `
+                      0 2px 6px rgba(0,0,0,0.2),
+                      inset 0 1px 2px rgba(255,255,255,0.3)
+                    `,
+                  }}
+                >
+                  <span style={{ fontSize: '14px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.2))' }}>♥</span>
+                </div>
+              </div>
+
+              {/* Inner face of flap (visible when open / rotated past 90deg) */}
+              <div
+                className="absolute inset-0 rounded-t-[20px]"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                  background: `linear-gradient(180deg, ${COLORS.flapInner} 0%, ${COLORS.envelopeBack} 100%)`,
+                  transform: 'rotateX(180deg)',
+                  backfaceVisibility: 'hidden',
+                }}
+              />
             </motion.div>
 
           </div>
