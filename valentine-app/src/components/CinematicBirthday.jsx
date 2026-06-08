@@ -138,6 +138,7 @@ function GiftBoxReveal({ giftImageUrl, giftRevealText }) {
             {giftImageUrl
               ? <motion.img src={giftImageUrl} alt="Gift" initial={{ scale:0, rotate:-10 }} animate={{ scale:1, rotate:0 }}
                   transition={{ delay:0.2, type:'spring', stiffness:250 }}
+                  loading="lazy"
                   className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-3xl mx-auto mb-6 shadow-2xl shadow-amber-500/30 border-2 border-amber-400/30"/>
               : <motion.div initial={{ scale:0 }} animate={{ scale:1 }} transition={{ delay:0.2, type:'spring' }}
                   className="text-8xl mb-6">🎁</motion.div>

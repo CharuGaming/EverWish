@@ -179,6 +179,7 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
               animate={{ scale: 1,   opacity: 1 }}
               transition={{ type: 'spring', stiffness: 280, damping: 16 }}
               draggable={false}
+              loading="lazy"
             />
           ) : (
             <img

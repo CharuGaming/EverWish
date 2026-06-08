@@ -40,13 +40,13 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
     <>
       <link href={FONT_LINK} rel="stylesheet" />
 
-      {/* ── Polaroid Masonry Grid ─────────────────────────────────── */}
+      {/* ── Polaroid Grid ─────────────────────────────────── */}
       <div className="w-full py-4 px-2">
-        <div className="columns-2 md:columns-3 gap-4 sm:gap-6 space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto items-start">
           {imgs.map((img, i) => (
             <div
               key={i}
-              className="break-inside-avoid relative"
+              className="relative"
             >
               <motion.div
                 ref={el => (itemRefs.current[i] = el)}
@@ -67,6 +67,7 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
                     className="w-full h-auto rounded-sm shadow-inner"
                     style={{ display: 'block' }}
                     draggable={false}
+                    loading="lazy"
                   />
                 ) : (
                   /* Placeholder when no photo */

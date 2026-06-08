@@ -65,6 +65,7 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
                   className="w-full object-cover rounded-sm"
                   style={{ height: '140px' }}
                   draggable={false}
+                  loading="lazy"
                 />
               </div>
             </motion.div>
