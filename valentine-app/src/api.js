@@ -463,6 +463,10 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       songAudioUrl:       '',
       songLyrics:         '',
       galleryImages:      [],
+      nickname:           '',
+      heroPhotos:         [],
+      useInteractiveHero: false,
+      loveLetterContent:  '',
     }
   };
 }

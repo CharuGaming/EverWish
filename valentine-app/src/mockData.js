@@ -224,7 +224,15 @@ export const MOCK_DATA = {
         UNSPLASH.bday3,
         UNSPLASH.couple1,
         UNSPLASH.couple2
-      ]
+      ],
+      nickname: 'Babe',
+      heroPhotos: [
+        UNSPLASH.bday1,
+        UNSPLASH.bday2,
+        UNSPLASH.bday3
+      ],
+      useInteractiveHero: true,
+      loveLetterContent: "Dear Babe,\n\nHappy Birthday to the most amazing person in my life! You make every single moment brighter, and I am so grateful for all the love and laughter we share.\n\nHere's to making many more beautiful memories together.\n\nWith all my love,\nAlways 💛"
     }
   },
 };
