@@ -309,22 +309,6 @@ export default function CinematicBirthday({ siteData = {} }) {
               </section>
             )}
 
-            {/* ── HEART MEMORY GALLERY ─────────────────────────── */}
-            {heroPhotos?.length > 0 && (
-              <section className="py-10 px-6">
-                <div className="max-w-2xl mx-auto">
-                  <Reveal className="text-center mb-6">
-                    <span className="text-3xl block mb-3">💝</span>
-                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Our Memories</h2>
-                    <p className="text-white/50 text-sm mt-2">Tap a photo to relive the moment</p>
-                  </Reveal>
-                  <Reveal delay={0.15}>
-                    <HeartMemoryGallery photos={heroPhotos} />
-                  </Reveal>
-                </div>
-              </section>
-            )}
-
             {/* ── GIFT BOX REVEAL ────────────────────────────────── */}
             <section className="py-10 px-6">
               <div className="max-w-2xl mx-auto">
@@ -412,28 +396,17 @@ export default function CinematicBirthday({ siteData = {} }) {
               </section>
             )}
 
-            {/* ── PHOTO GALLERY ───────────────────────────────────── */}
-            {allGalleryImages.length > 0 && (
+            {/* ── PHOTO GALLERY (POLAROID MASONRY) ───────────────── */}
+            {allGalleryImages?.length > 0 && (
               <section className="py-10 px-6">
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-4xl mx-auto">
                   <Reveal className="text-center mb-6">
-                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light mb-2">Memories</h2>
-                    <p className="text-white/50 text-sm">Moments captured in time 📸</p>
+                    <span className="text-3xl block mb-3">💝</span>
+                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Our Memories</h2>
+                    <p className="text-white/50 text-sm mt-2">Tap a photo to relive the moment</p>
                   </Reveal>
-                  <Reveal delay={0.1}>
-                    <div className="rounded-3xl p-6" style={GLASS}>
-                      <div className="flex flex-wrap justify-center gap-4">
-                        {allGalleryImages.map((url, i) => (
-                          <motion.div key={i}
-                            initial={{ opacity:0, scale:0.85 }}
-                            whileInView={{ opacity:1, scale:1 }}
-                            viewport={{ once:true, amount:0.1 }}
-                            transition={{ duration:0.5, delay: i * 0.06 }}>
-                            <ScratchPhoto src={url} alt={`Memory ${i+1}`} primary="#fbbf24"/>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
+                  <Reveal delay={0.15}>
+                    <HeartMemoryGallery photos={allGalleryImages} />
                   </Reveal>
                 </div>
               </section>
