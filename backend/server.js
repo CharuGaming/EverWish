@@ -44,12 +44,13 @@ app.get('/api/health', (_req, res) => {
     service:  'Celebration SaaS API',
     time:     new Date().toISOString(),
     mongo:    mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    mongoError: cached.error || null,
   });
 });
 // ── Serverless MongoDB Connection ─────────────────────────────────
 let cached = global.mongoose;
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null, fallback: false };
+  cached = global.mongoose = { conn: null, promise: null, fallback: false, error: null };
 }
 
 async function connectDB() {
@@ -69,12 +70,14 @@ async function connectDB() {
         .then((mongoose) => mongoose)
         .catch((err) => {
           console.warn('⚠️ MongoDB connection failed (async), enabling JSON fallback:', err.message);
+          cached.error = err.message;
           cached.fallback = true;
           try { enableJsonFallback(); } catch(e) { console.error('Fallback error:', e); }
           return null;
         });
     } catch (err) {
       console.warn('⚠️ MongoDB connection failed (sync), enabling JSON fallback:', err.message);
+      cached.error = err.message;
       cached.promise = Promise.resolve(null);
       cached.fallback = true;
       try { enableJsonFallback(); } catch(e) { console.error('Fallback error:', e); }
@@ -96,6 +99,7 @@ app.use(async (req, res, next) => {
     return next();
   } catch (err) {
     console.error('⚠️ Critical DB middleware error:', err.message);
+    cached.error = err.message;
     cached.fallback = true;
     try { enableJsonFallback(); } catch(e) {}
     return next();
