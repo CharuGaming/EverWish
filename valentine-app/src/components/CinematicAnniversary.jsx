@@ -340,7 +340,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 className="inline-flex items-center gap-3 bg-rose-500 hover:bg-rose-600 text-white font-bold px-10 py-4 rounded-full shadow-2xl shadow-rose-500/40 text-base tracking-wide"
               >
                 <Play size={18} fill="white" />
-                Tap to Open
+                {siteData.introButtonText || 'Tap to Open'}
               </motion.button>
             </motion.div>
           </motion.div>

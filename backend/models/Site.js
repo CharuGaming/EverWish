@@ -46,6 +46,10 @@ const SiteSchema = new mongoose.Schema(
       required: true,
       default: 'polaroid'
     },
+    introButtonText: {
+      type: String,
+      default: 'Tap to Open'
+    },
 
     // ── Site Lifecycle & Expiration ────────────────────────────
     isActive: {

@@ -247,7 +247,7 @@ export default function CinematicBirthday({ siteData = {} }) {
                 animate={{ boxShadow:['0 0 0 0 rgba(251,191,36,0.5)','0 0 0 24px rgba(251,191,36,0)','0 0 0 0 rgba(251,191,36,0)'] }}
                 transition={{ duration:2, repeat:Infinity }}
                 className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-900 font-bold px-10 py-4 rounded-full shadow-2xl shadow-amber-500/40 text-base tracking-wide">
-                Tap to Open
+                {siteData.introButtonText || 'Tap to Open'}
               </motion.button>
             </motion.div>
           </motion.div>

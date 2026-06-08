@@ -211,6 +211,7 @@ export function toComponentData(doc) {
   return {
     isActive:         doc.isActive !== false,
     expiresAt:        doc.expiresAt,
+    introButtonText:  doc.introButtonText || 'Tap to Open',
     category:         doc.category || 'valentine',
     templateType:     doc.templateType || 'polaroid',
     coupleName:       doc.general?.coupleName       || 'Your Names',
@@ -395,6 +396,7 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
     siteId,
     category,
     templateType,
+    introButtonText: 'Tap to Open',
     general: {
       coupleName: 'Name & Name',
       coupleEmoji: '💌',

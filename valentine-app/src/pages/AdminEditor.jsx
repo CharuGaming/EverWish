@@ -1709,6 +1709,14 @@ function CinGeneralTab({ doc, setDoc }) {
       </Card>
 
       <Card title="Cinematic Video Elements">
+        <div className="mb-5">
+          <Label>Custom Intro Button Text</Label>
+          <TextInput
+            value={doc.introButtonText || ''}
+            onChange={e => setDoc(d => ({ ...d, introButtonText: e.target.value }))}
+            placeholder="Tap to Open"
+          />
+        </div>
         <VideoField
           label="Intro Interaction Video"
           hint="Plays in full screen when 'Tap to Open' is clicked. Short reveal teaser clip."
@@ -1893,6 +1901,14 @@ function CinBdayGeneralTab({ doc, setDoc }) {
       </Card>
 
       <Card title="Cinematic Video Elements">
+        <div className="mb-5">
+          <Label>Custom Intro Button Text</Label>
+          <TextInput
+            value={doc.introButtonText || ''}
+            onChange={e => setDoc(d => ({ ...d, introButtonText: e.target.value }))}
+            placeholder="Tap to Open"
+          />
+        </div>
         <VideoField
           label="Intro Interaction Video"
           hint="Full-screen video played after 'Tap to Open' is clicked."
