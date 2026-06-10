@@ -191,26 +191,18 @@ function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
 }
 
 
-// ── Why I Love You section ─────────────────────────────────────────
+// ── Why I Love You section ─────────────────────────────────────────────────
 function WhyILoveYou({ reasons = [] }) {
   if (!reasons.length) return null;
   return (
-    <section className="py-20 px-6 relative overflow-hidden" style={{ background:'linear-gradient(180deg,#fff0f5 0%,#fce4ec 100%)' }}>
-      <div className="absolute inset-0 pointer-events-none">
-        {['💕','🌹','💝','✨','💖'].map((e,i) => (
-          <motion.span key={i}
-            className="absolute text-3xl opacity-10 select-none"
-            style={{ left:`${10+i*18}%`, top:`${20+i*12}%` }}
-            animate={{ y:[0,-15,0], rotate:[0,10,-10,0] }}
-            transition={{ duration:3+i, repeat:Infinity, delay:i*0.5 }}
-          >{e}</motion.span>
-        ))}
-      </div>
-      <div className="max-w-2xl mx-auto text-center relative z-10">
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
-          <span className="text-xs font-bold uppercase tracking-widest text-rose-500 font-mono">From the heart</span>
-          <h2 className="text-4xl font-serif text-rose-800 mt-2 mb-3">Why I Love You</h2>
-          <div className="w-16 h-0.5 bg-rose-300 mx-auto mb-12" />
+    <section className="py-20 px-6 relative overflow-hidden">
+      <div className="max-w-2xl mx-auto">
+        {/* Glass header card */}
+        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+          className="text-center mb-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-6">
+          <span className="text-xs font-bold uppercase tracking-widest text-pink-300 font-mono">From the heart</span>
+          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">Why I Love You</h2>
+          <div className="w-16 h-0.5 bg-pink-400/50 mx-auto mt-3" />
         </motion.div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {reasons.map((r, i) => (
@@ -220,11 +212,12 @@ function WhyILoveYou({ reasons = [] }) {
               viewport={{ once:true }}
               transition={{ delay:i*0.08, type:'spring', stiffness:120 }}
               whileHover={{ scale:1.03, rotate: i%2===0 ? -1 : 1 }}
-              className="relative bg-white rounded-2xl px-5 py-4 shadow-md border border-rose-100 text-left"
+              className="relative bg-white/10 backdrop-blur-md rounded-2xl px-5 py-4 shadow-xl border border-white/20 text-left"
             >
               <span className="absolute -top-3 -left-2 text-xl">💗</span>
-              <p className="text-rose-800 font-serif italic text-base leading-relaxed pl-2">{r}</p>
-              <span className="text-[10px] font-bold text-rose-300 uppercase tracking-widest mt-2 block">#{i+1}</span>
+              <p className="text-white/90 font-serif italic text-base leading-relaxed pl-2"
+                style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>{r}</p>
+              <span className="text-[10px] font-bold text-pink-300/70 uppercase tracking-widest mt-2 block">#{i+1}</span>
             </motion.div>
           ))}
         </div>
@@ -318,13 +311,14 @@ function ScratchCard({ imageUrl, caption }) {
 function ScratchMemories({ scratchMemories = [] }) {
   if (!scratchMemories.length) return null;
   return (
-    <section className="py-20 px-6" style={{ background:'#fff7f9' }}>
+    <section className="py-20 px-6">
       <div className="max-w-3xl mx-auto">
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} className="text-center mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-rose-500 font-mono">Reveal our moments</span>
-          <h2 className="text-4xl font-serif text-rose-800 mt-2 mb-3">Scratch Memories</h2>
-          <p className="text-sm text-rose-400">Scratch each card to reveal a hidden memory 💝</p>
-          <div className="w-16 h-0.5 bg-rose-300 mx-auto mt-4" />
+        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+          className="text-center mb-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-6">
+          <span className="text-xs font-bold uppercase tracking-widest text-pink-300 font-mono">Reveal our moments</span>
+          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">Scratch Memories</h2>
+          <p className="text-sm text-white/60">Scratch each card to reveal a hidden memory 💝</p>
+          <div className="w-16 h-0.5 bg-pink-400/50 mx-auto mt-4" />
         </motion.div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
           {scratchMemories.map((m, i) => (
@@ -343,33 +337,26 @@ function ScratchMemories({ scratchMemories = [] }) {
   );
 }
 
-// ── Love Letter section ───────────────────────────────────────────
+// ── Love Letter section ───────────────────────────────────────────────
 function LoveLetter({ text, coupleName }) {
   if (!text) return null;
   return (
-    <section className="py-20 px-6" style={{ background:'linear-gradient(180deg,#fdf2f8 0%,#fff0f5 100%)' }}>
+    <section className="py-20 px-6">
       <div className="max-w-xl mx-auto">
         <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-          className="relative bg-white rounded-3xl shadow-xl border border-rose-100 overflow-hidden"
+          className="relative bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 overflow-hidden p-8 sm:p-12"
         >
-          {/* Decorative corners */}
-          <div className="absolute top-0 left-0 w-20 h-20 bg-rose-50 rounded-br-full opacity-70" />
-          <div className="absolute bottom-0 right-0 w-20 h-20 bg-pink-50 rounded-tl-full opacity-70" />
-          <div className="relative z-10 p-8 sm:p-12">
-            <div className="text-center mb-8">
-              <span className="text-3xl">💌</span>
-              <h2 className="text-3xl font-serif text-rose-800 mt-3">A Love Letter</h2>
-              {coupleName && <p className="text-xs text-rose-400 uppercase tracking-widest mt-1 font-mono">for {coupleName}</p>}
-            </div>
-            {/* Lined paper effect */}
-            <div className="relative">
-              <div className="absolute left-8 top-0 bottom-0 w-px bg-rose-100" />
-              <p className="pl-10 text-base font-serif italic text-slate-700 leading-8 whitespace-pre-line">
-                {text}
-              </p>
-            </div>
-            <p className="text-right text-rose-400 font-serif italic text-sm mt-8">With all my love 💕</p>
+          <div className="text-center mb-8">
+            <span className="text-3xl">💌</span>
+            <h2 className="text-3xl font-serif text-white mt-3 drop-shadow">A Love Letter</h2>
+            {coupleName && <p className="text-xs text-pink-300/70 uppercase tracking-widest mt-1 font-mono">for {coupleName}</p>}
           </div>
+          <div className="relative">
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-white/15" />
+            <p className="pl-10 text-base font-serif italic text-white/85 leading-8 whitespace-pre-line"
+              style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{text}</p>
+          </div>
+          <p className="text-right text-pink-300/70 font-serif italic text-sm mt-8">With all my love 💕</p>
         </motion.div>
       </div>
     </section>
@@ -420,10 +407,13 @@ function VirtualGift({ gift }) {
   };
 
   return (
-    <section className="py-20 px-6 text-center relative overflow-hidden" style={{ background:'#fff0f5' }}>
-      <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
-        <h2 className="text-3xl font-serif text-rose-800 mb-2">Your Special Gift 🎁</h2>
-        <p className="text-sm text-rose-400 mb-12">Something wrapped just for you…</p>
+    <section className="py-20 px-6 text-center relative overflow-hidden">
+      <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-6 max-w-md mx-auto mb-12">
+        <h2 className="text-3xl font-serif text-white mb-1 drop-shadow">
+          Your Special Gift 🎁
+        </h2>
+        <p className="text-sm text-white/60">Something wrapped just for you…</p>
       </motion.div>
 
       <div className="relative min-h-[380px] flex flex-col items-center justify-center max-w-md mx-auto">
@@ -572,42 +562,101 @@ function VirtualGift({ gift }) {
 }
 
 // ── Hero banner ───────────────────────────────────────────────────
+const heroWords = ['Happy', "Valentine's", 'Day'];
 function ValentineHero({ siteData }) {
+  const bgUrl = siteData?.heroBackgroundMediaUrl || '';
+  const isVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
+
   return (
-    <section className="pt-16 pb-12 px-6 text-center relative overflow-hidden"
-      style={{ background:'linear-gradient(160deg,#fff0f5 0%,#fce4ec 60%,#fdf2f8 100%)' }}>
-      {/* Floating emojis */}
-      {['💕','🌹','💖','✨','💗','🌸'].map((e,i) => (
-        <motion.span key={i} className="absolute text-2xl opacity-20 select-none pointer-events-none"
-          style={{ left:`${8+i*15}%`, top:`${10+i*8}%` }}
-          animate={{ y:[0,-20,0], rotate:[0,15,-15,0] }}
-          transition={{ duration:3+i*0.5, repeat:Infinity, delay:i*0.4 }}
-        >{e}</motion.span>
-      ))}
-      <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8 }} className="relative z-10">
-        <motion.span className="text-6xl sm:text-8xl block mb-6"
-          animate={{ scale:[1,1.08,1] }} transition={{ duration:2, repeat:Infinity }}>
+    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden">
+      {/* ── Layer 0: Background media ── */}
+      {isVideo ? (
+        <video src={bgUrl} autoPlay loop muted playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" />
+      ) : bgUrl ? (
+        <img src={bgUrl} alt="" loading="eager"
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" />
+      ) : (
+        <div className="absolute inset-0 z-0"
+          style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
+      )}
+
+      {/* ── Layer 1: Dark romantic overlay ── */}
+      <div className="absolute inset-0 z-[1] pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.55) 0%, rgba(80,10,40,0.35) 50%, rgba(15,2,20,0.65) 100%)' }} />
+
+      {/* ── Layer 2: Floating decorative emojis ── */}
+      <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
+        {['💕','🌹','💖','✨','💗','🌸'].map((e,i) => (
+          <motion.span key={i} className="absolute text-2xl select-none"
+            style={{ left:`${8+i*15}%`, top:`${10+i*8}%`, opacity: 0.18 }}
+            animate={{ y:[0,-20,0], rotate:[0,15,-15,0] }}
+            transition={{ duration:3+i*0.5, repeat:Infinity, delay:i*0.4 }}
+          >{e}</motion.span>
+        ))}
+      </div>
+
+      {/* ── Layer 3: Content ── */}
+      <div className="relative z-[3] flex flex-col items-center">
+        <motion.span className="text-7xl sm:text-9xl block mb-6 drop-shadow-2xl"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale:[1,1.08,1], opacity: 1 }}
+          transition={{ scale: { duration:2, repeat:Infinity }, opacity: { duration: 0.6 } }}>
           {siteData.coupleEmoji || '💕'}
         </motion.span>
-        <h1 className="text-4xl sm:text-5xl font-serif text-rose-800 mb-3">
-          {siteData.coupleName || 'Our Love Story'}
+
+        {/* Staggered word-by-word title reveal */}
+        <h1 className="text-5xl sm:text-7xl font-serif font-bold mb-4 leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]">
+          {heroWords.map((word, i) => (
+            <motion.span key={i}
+              className="inline-block mr-3"
+              style={{ color: i === 1 ? '#fda4af' : '#ffffff', textShadow: '0 2px 20px rgba(0,0,0,0.7)' }}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 + i * 0.18, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {word}
+            </motion.span>
+          ))}
         </h1>
+
+        <motion.p
+          className="text-lg sm:text-xl font-serif italic text-white/80 mb-2 drop-shadow"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.9 }}>
+          {siteData.coupleName || 'Our Love Story'}
+        </motion.p>
+
         {siteData.heroDate && (
-          <p className="text-sm text-rose-500 font-mono uppercase tracking-widest mb-4">{siteData.heroDate}</p>
+          <motion.p className="text-xs text-pink-300/80 font-mono uppercase tracking-widest mb-6"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}>
+            {siteData.heroDate}
+          </motion.p>
         )}
         {siteData.heroSubtitle && (
-          <p className="text-base font-serif italic text-rose-600 max-w-md mx-auto leading-relaxed">
+          <motion.p className="text-base font-serif italic text-white/70 max-w-md mx-auto leading-relaxed mb-8"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
             "{siteData.heroSubtitle}"
-          </p>
+          </motion.p>
         )}
-        <div className="flex justify-center gap-2 mt-8 opacity-40">
+
+        <motion.div className="flex justify-center gap-3 mt-4"
+          initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} transition={{ delay: 1.4 }}>
           {Array.from({length:5}).map((_,i)=>(
             <motion.div key={i} animate={{ y:[0,-6,0] }} transition={{ duration:1.2, repeat:Infinity, delay:i*0.15 }}>
-              <Heart size={16} fill="#f43f5e" color="#f43f5e" />
+              <Heart size={18} fill="#f43f5e" color="#f43f5e" />
             </motion.div>
           ))}
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Scroll hint */}
+        <motion.div className="mt-14 flex flex-col items-center gap-1"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
+          <span className="text-white/40 text-[11px] font-bold uppercase tracking-[0.3em]">Scroll to explore</span>
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+            className="w-px h-8 rounded-full" style={{ background: 'linear-gradient(to bottom, #fda4af80, transparent)' }} />
+        </motion.div>
+      </div>
     </section>
   );
 }
@@ -644,57 +693,36 @@ export default function TemplateValentine({ siteData, onUnlock }) {
 
   return (
     <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }}
-      className="min-h-screen template-valentine-root" style={{ background: backgroundColor }}>
+      className="min-h-screen template-valentine-root relative" style={{ background: 'transparent' }}>
+
+      {/* ── Global Fixed Background Video (shows through all sections on scroll) ── */}
+      {(() => {
+        const bgUrl = siteData?.heroBackgroundMediaUrl || '';
+        const isVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
+        return (
+          <>
+            {isVideo
+              ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
+              : bgUrl
+              ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
+              : <div className="fixed inset-0 -z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
+            }
+            {/* Persistent dark romantic overlay */}
+            <div className="fixed inset-0 -z-[9] pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
+          </>
+        );
+      })()}
+
       <style>{`
         .template-valentine-root {
           --primary-val: ${primaryColor};
           --bg-val: ${backgroundColor};
           --card-val: ${cardColor};
         }
-        
-        .template-valentine-root .text-rose-500,
-        .template-valentine-root .text-rose-800,
-        .template-valentine-root .text-rose-400,
-        .template-valentine-root .text-rose-600,
-        .template-valentine-root .text-pink-500,
-        .template-valentine-root .text-rose-300,
-        .template-valentine-root h2.text-rose-800,
-        .template-valentine-root h1.cursive-title,
-        .template-valentine-root .text-rose-700 {
-          color: var(--primary-val) !important;
-        }
-
-        .template-valentine-root .bg-rose-500,
-        .template-valentine-root .bg-rose-600,
-        .template-valentine-root .bg-rose-400,
-        .template-valentine-root .bg-pink-500 {
-          background-color: var(--primary-val) !important;
-        }
-
-        .template-valentine-root .bg-rose-500 *,
-        .template-valentine-root .bg-rose-600 *,
-        .template-valentine-root .bg-pink-500 * {
-          color: ${onPrimaryColor} !important;
-        }
-
-        /* Ribbon colors on Gift Box */
         .template-valentine-root .bg-amber-400 {
-          background-color: #fbbf24 !important; /* Keep ribbon gold */
-        }
-
-        .template-valentine-root .border-rose-300,
-        .template-valentine-root .border-rose-100,
-        .template-valentine-root .border-pink-300 {
-          border-color: var(--primary-val) !important;
-        }
-        
-        .template-valentine-root section,
-        .template-valentine-root .min-h-screen {
-          background: linear-gradient(180deg, var(--bg-val) 0%, rgba(255, 255, 255, 0.4) 100%) !important;
-        }
-
-        .template-valentine-root .bg-\\[\\#ffccd5\\] {
-          background-color: var(--card-val) !important;
+          background-color: #fbbf24 !important;
         }
       `}</style>
       <ValentineHero siteData={siteData} />
