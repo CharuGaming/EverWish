@@ -624,6 +624,25 @@ function GeneralTab({ doc, setDoc }) {
         )}
       </Card>
 
+      {/* ── Hero Background Media ─────────────────────────── */}
+      <Card title="🎬 Hero Background (Video or Image)">
+        <p className="text-[11px] text-slate-500 mb-4">
+          Upload a looping background video (MP4/WebM — great for Veo AI-generated cinematic clips) or a background image. It will fill the entire background with the greeting text and glassmorphic content overlaid on top.
+        </p>
+        <VideoField
+          label="Hero Background Media"
+          hint="Upload an MP4/WebM video or JPG/PNG image. Videos loop silently. Keep under 20MB for fast load."
+          value={doc.heroBackgroundMediaUrl || ''}
+          onChange={v => setDoc(d => ({ ...d, heroBackgroundMediaUrl: v }))}
+        />
+        {doc.heroBackgroundMediaUrl && (
+          <button onClick={() => setDoc(d => ({ ...d, heroBackgroundMediaUrl: '' }))}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 block">
+            Remove hero background
+          </button>
+        )}
+      </Card>
+
       <ThemeColorsCard doc={doc} setDoc={setDoc} />
     </>
   );

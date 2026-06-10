@@ -657,8 +657,8 @@ export default function TemplateValentine({ siteData, onUnlock }) {
   const cardColor = colors.cardColor || '#ffccd5';
   const onPrimaryColor = getContrastYIQ(primaryColor);
 
-  // Compute background media once
-  const bgUrl = siteData?.heroBackgroundMediaUrl || '';
+  // Compute background media once — fallback to high-quality romantic video if none uploaded
+  const bgUrl = siteData?.heroBackgroundMediaUrl || 'https://res.cloudinary.com/demo/video/upload/q_auto,f_auto/v1689254848/video/couple-sunset.mp4';
   const isBgVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
 
   return (
