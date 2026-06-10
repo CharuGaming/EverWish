@@ -666,14 +666,14 @@ export default function TemplateValentine({ siteData, onUnlock }) {
 
       {/* ── Global Fixed Background (always mounted — shows through lockscreen too) ── */}
       {isBgVideo
-        ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
+        ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
         : bgUrl
-        ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
-        : <div className="fixed inset-0 -z-10 pointer-events-none"
+        ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
+        : <div className="fixed inset-0 z-0 pointer-events-none"
             style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
       }
       {/* Persistent dark romantic overlay */}
-      <div className="fixed inset-0 -z-[9] pointer-events-none"
+      <div className="fixed inset-0 z-[1] pointer-events-none"
         style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
 
       <AnimatePresence mode="wait">
@@ -688,7 +688,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
           </motion.div>
         ) : (
     <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }}
-      className="min-h-screen template-valentine-root relative" style={{ background: 'transparent' }}>
+      className="min-h-screen template-valentine-root relative z-10" style={{ background: 'transparent' }}>
 
 
       <style>{`
