@@ -135,21 +135,15 @@ function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
   return (
     <motion.div
       className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden select-none"
-      style={{ background: backgroundColor }}
+      style={{ background: 'transparent' }}
       animate={{ opacity: done ? 0 : 1 }}
       transition={{ duration: 1 }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;600&display=swap');
-        .cursive-title {
-          font-family: 'Dancing Script', cursive;
-        }
-        .quicksand-subtitle {
-          font-family: 'Quicksand', sans-serif;
-        }
-        .lock-primary-text {
-          color: ${primaryColor} !important;
-        }
+        .cursive-title { font-family: 'Dancing Script', cursive; }
+        .quicksand-subtitle { font-family: 'Quicksand', sans-serif; }
+        .lock-primary-text { color: ${primaryColor} !important; }
       `}</style>
       <Confetti active={confetti} />
       <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} className="text-center mb-10 px-4">
@@ -564,26 +558,11 @@ function VirtualGift({ gift }) {
 // ── Hero banner ───────────────────────────────────────────────────
 const heroWords = ['Happy', "Valentine's", 'Day'];
 function ValentineHero({ siteData }) {
-  const bgUrl = siteData?.heroBackgroundMediaUrl || '';
-  const isVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
-
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden">
-      {/* ── Layer 0: Background media ── */}
-      {isVideo ? (
-        <video src={bgUrl} autoPlay loop muted playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" />
-      ) : bgUrl ? (
-        <img src={bgUrl} alt="" loading="eager"
-          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" />
-      ) : (
-        <div className="absolute inset-0 z-0"
-          style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
-      )}
-
-      {/* ── Layer 1: Dark romantic overlay ── */}
+      {/* ── Romantic overlay on top of global fixed video ── */}
       <div className="absolute inset-0 z-[1] pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.55) 0%, rgba(80,10,40,0.35) 50%, rgba(15,2,20,0.65) 100%)' }} />
+        style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.4) 0%, rgba(80,10,40,0.2) 50%, rgba(15,2,20,0.5) 100%)' }} />
 
       {/* ── Layer 2: Floating decorative emojis ── */}
       <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
@@ -672,48 +651,45 @@ export default function TemplateValentine({ siteData, onUnlock }) {
   // Opening lock screen always plays; we use fallback emojis if no custom match images are configured
   const skipLock = false;
 
-  if (!unlocked && !skipLock) {
-    return (
-      <HeartMemoryMatch
-        matchImages={matchImages}
-        onComplete={() => {
-          setUnlocked(true);
-          if (onUnlock) onUnlock();
-        }}
-        themeColors={siteData?.themeColors}
-      />
-    );
-  }
-
   const colors = siteData?.themeColors?.valentine || {};
   const primaryColor = colors.primary || '#e11d48';
   const backgroundColor = colors.background || '#fff0f5';
   const cardColor = colors.cardColor || '#ffccd5';
   const onPrimaryColor = getContrastYIQ(primaryColor);
 
+  // Compute background media once
+  const bgUrl = siteData?.heroBackgroundMediaUrl || '';
+  const isBgVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
+
   return (
+    <div className="relative min-h-screen template-valentine-root">
+
+      {/* ── Global Fixed Background (always mounted — shows through lockscreen too) ── */}
+      {isBgVideo
+        ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
+        : bgUrl
+        ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
+        : <div className="fixed inset-0 -z-10 pointer-events-none"
+            style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
+      }
+      {/* Persistent dark romantic overlay */}
+      <div className="fixed inset-0 -z-[9] pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
+
+      <AnimatePresence mode="wait">
+        {!unlocked ? (
+          <motion.div key="lock" className="relative z-10"
+            exit={{ opacity: 0, scale: 1.04 }} transition={{ duration: 0.6 }}>
+            <HeartMemoryMatch
+              matchImages={matchImages}
+              onComplete={() => { setUnlocked(true); if (onUnlock) onUnlock(); }}
+              themeColors={siteData?.themeColors}
+            />
+          </motion.div>
+        ) : (
     <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }}
       className="min-h-screen template-valentine-root relative" style={{ background: 'transparent' }}>
 
-      {/* ── Global Fixed Background Video (shows through all sections on scroll) ── */}
-      {(() => {
-        const bgUrl = siteData?.heroBackgroundMediaUrl || '';
-        const isVideo = bgUrl && /\.(mp4|webm|ogg|mov)$/i.test(bgUrl.split('?')[0]);
-        return (
-          <>
-            {isVideo
-              ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
-              : bgUrl
-              ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none" />
-              : <div className="fixed inset-0 -z-10 pointer-events-none"
-                  style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
-            }
-            {/* Persistent dark romantic overlay */}
-            <div className="fixed inset-0 -z-[9] pointer-events-none"
-              style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
-          </>
-        );
-      })()}
 
       <style>{`
         .template-valentine-root {
@@ -744,9 +720,12 @@ export default function TemplateValentine({ siteData, onUnlock }) {
         message={siteData.timeCapsule?.message}
         mediaUrl={siteData.timeCapsule?.mediaUrl}
       />
-      <footer className="text-center py-8 text-[10px] uppercase tracking-widest text-rose-300 font-mono border-t border-rose-100">
+      <footer className="text-center py-8 text-[10px] uppercase tracking-widest text-white/30 font-mono border-t border-white/10">
         © {new Date().getFullYear()} · Made with 💕 by EverWish
       </footer>
     </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
