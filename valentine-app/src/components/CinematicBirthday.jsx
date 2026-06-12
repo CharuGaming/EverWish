@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 'lucide-react';
-import ScratchPhoto from './ScratchPhoto';
+
 import InteractiveHero from './InteractiveHero';
 import LoveLetterEnvelope from './LoveLetterEnvelope';
 import HeartMemoryGallery from './HeartMemoryGallery';

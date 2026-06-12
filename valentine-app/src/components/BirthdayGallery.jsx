@@ -2,7 +2,11 @@ import { useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { X } from 'lucide-react';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
-import ScratchPhoto from './ScratchPhoto';
+
+// Pre-defined random rotations for a playful polaroid look
+const ROTATIONS = [
+  "-rotate-2", "rotate-2", "-rotate-1", "rotate-3", "-rotate-3", "rotate-1"
+];
 
 export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
   const ref = useRef(null);
@@ -13,22 +17,22 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
 
   return (
     <section ref={ref} className="py-20 px-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: primary }}>
             📸 Memories
           </p>
-          <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2">
             Birthday Gallery
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 font-medium">
-            ✦ Scratch each photo to reveal the memory
+          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+            Tap a photo to relive the moment
           </p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <div className="h-px w-16 rounded-full" style={{ backgroundColor: primary, opacity: 0.4 }} />
@@ -37,39 +41,47 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
           </div>
         </motion.div>
 
-        {/* Masonry-style CSS Grid */}
-        <div
-          className="columns-2 md:columns-3 gap-4 space-y-4"
-          style={{ columnGap: '1rem' }}
+        {/* Polaroid Grid */}
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-10"
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           {images.map((img, i) => {
             const src     = typeof img === 'string' ? img : img?.url || img?.imageUrl || '';
             const caption = typeof img === 'object' ? img?.caption : '';
             if (!src) return null;
             const optimised = optimizeCloudinaryUrl(src, 600);
+            const rotationClass = ROTATIONS[i % ROTATIONS.length];
+
             return (
               <motion.div
                 key={i}
+                className={`polaroid cursor-pointer transform ${rotationClass} hover:rotate-0 hover:z-20 transition-all duration-300`}
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.1 + i * 0.07 }}
-                className="break-inside-avoid mb-4"
+                transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => setLightbox({ src, caption })}
               >
-                <ScratchPhoto
-                  src={optimised}
-                  alt={caption || `Memory ${i + 1}`}
-                  primary={primary}
-                  onClick={() => setLightbox({ src, caption })}
-                />
-                {caption && (
-                  <p className="text-center text-xs font-medium text-slate-400 mt-2 px-1 truncate">
-                    {caption}
+                <div className="w-full aspect-[4/3] overflow-hidden bg-slate-100">
+                  <img
+                    src={optimised}
+                    alt={caption || `Memory ${i + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="mt-4 text-center">
+                  <p className="serif text-lg font-medium text-slate-800 tracking-wide">
+                    {caption || "Beautiful Moment"}
                   </p>
-                )}
+                </div>
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
 
       {/* Lightbox */}
@@ -83,24 +95,21 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
             onClick={() => setLightbox(null)}
           >
             <button
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors z-50 cursor-pointer"
+              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors duration-200 z-50 cursor-pointer"
               onClick={() => setLightbox(null)}
               aria-label="Close"
             >
-              <X size={22} />
+              <X size={24} />
             </button>
             <motion.div
-              className="relative max-w-3xl max-h-[85vh] flex flex-col items-center cursor-default"
+              className="relative max-w-5xl w-full flex flex-col items-center justify-center pointer-events-auto cursor-default"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               onClick={e => e.stopPropagation()}
             >
-              <div
-                className="rounded-3xl overflow-hidden shadow-2xl"
-                style={{ border: `2px solid ${primary}40` }}
-              >
+              <div className="bg-white p-3 md:p-4 pb-12 md:pb-16 rounded-sm shadow-2xl max-w-full inline-block">
                 <img
                   src={optimizeCloudinaryUrl(lightbox.src, 1200)}
                   alt={lightbox.caption}
@@ -108,12 +117,10 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
                   loading="lazy"
                   decoding="async"
                 />
-              </div>
-              {lightbox.caption && (
-                <p className="mt-4 text-white/80 text-sm font-medium text-center">
-                  {lightbox.caption}
+                <p className="serif text-center text-slate-800 italic text-xl md:text-2xl mt-6 font-medium">
+                  {lightbox.caption || "Beautiful Moment"}
                 </p>
-              )}
+              </div>
             </motion.div>
           </motion.div>
         )}
