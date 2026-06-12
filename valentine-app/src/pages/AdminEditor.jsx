@@ -7,6 +7,7 @@ import {
   ExternalLink, AlertTriangle, ToggleLeft, ToggleRight, Layers, Sun, Moon, Heart,
   Share2, Sparkles
 } from 'lucide-react';
+import { generateRandomContent } from '../utils/aiContentBank';
 
 const toLocalDateTimeString = (dateOrStr) => {
   if (!dateOrStr) return '';
@@ -23,6 +24,48 @@ const toLocalDateTimeString = (dateOrStr) => {
 // ── Shared primitives ─────────────────────────────────────────────
 function Label({ children }) {
   return <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">{children}</label>;
+}
+
+// ── AI Generate Button ────────────────────────────────────────────
+function AIGeneratorButton({ fieldType, theme, onGenerate, className = '' }) {
+  const [spinning, setSpinning] = useState(false);
+
+  const handleClick = () => {
+    setSpinning(true);
+    const text = generateRandomContent(fieldType, theme);
+    onGenerate(text);
+    setTimeout(() => setSpinning(false), 600);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      title="AI Auto-fill"
+      className={`group flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/25 hover:to-fuchsia-500/25 border border-violet-400/20 hover:border-fuchsia-400/50 text-violet-400 hover:text-fuchsia-300 transition-all duration-200 hover:scale-105 hover:shadow-md hover:shadow-fuchsia-500/20 active:scale-95 ${className}`}
+    >
+      <Sparkles
+        size={12}
+        className={`flex-shrink-0 transition-transform duration-300 ${spinning ? 'animate-spin' : 'group-hover:rotate-12'}`}
+      />
+      <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">AI Fill</span>
+    </button>
+  );
+}
+
+// ── FieldRow: Label + AI Button row ──────────────────────────────
+function FieldRow({ label, fieldType, theme, onGenerate, children }) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-2">
+        <Label>{label}</Label>
+        {fieldType && onGenerate && (
+          <AIGeneratorButton fieldType={fieldType} theme={theme} onGenerate={onGenerate} />
+        )}
+      </div>
+      {children}
+    </div>
+  );
 }
 
 function TextInput({ value, onChange, placeholder, type = 'text' }) {
@@ -561,24 +604,22 @@ function GeneralTab({ doc, setDoc }) {
             value={imgs.heroImageUrl} 
             onChange={v => upImg('heroImageUrl', v)} 
           />
-          <div className="mb-5">
-            <Label>Romantic Quote</Label>
+          <FieldRow label="Romantic Quote" fieldType="subtitle" onGenerate={v => up('heroSubtitle', v)}>
             <TextArea 
               value={g.heroSubtitle} 
               onChange={e => up('heroSubtitle', e.target.value)} 
               placeholder="A beautiful romantic quote or caption…" 
               rows={4}
             />
-          </div>
-          <div className="mb-5">
-            <Label>Love Message / Letter</Label>
+          </FieldRow>
+          <FieldRow label="Love Message / Letter" fieldType="loveLetter" onGenerate={v => up('loveLetterText', v)}>
             <TextArea 
               value={g.loveLetterText} 
               onChange={e => up('loveLetterText', e.target.value)} 
               placeholder="Write a special love message or letter to show on the page…" 
               rows={6}
             />
-          </div>
+          </FieldRow>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Start Date / Year</Label>
@@ -601,21 +642,26 @@ function GeneralTab({ doc, setDoc }) {
       ) : (
         <Card title="Hero Section">
           <ImageField label="Hero Image" hint="Main polaroid photo shown in the hero section" value={imgs.heroImageUrl} onChange={v => upImg('heroImageUrl', v)} />
-          <div className="mb-5"><Label>Date Text</Label><TextInput value={g.heroDate} onChange={e => up('heroDate', e.target.value)} placeholder="February 14 · Forever" /></div>
-          <div className="mb-5"><Label>Subtitle</Label><TextInput value={g.heroSubtitle} onChange={e => up('heroSubtitle', e.target.value)} /></div>
-          <div className="mb-0"><Label>Love Letter</Label><TextArea value={g.loveLetterText} onChange={e => up('loveLetterText', e.target.value)} rows={5} /></div>
+          <FieldRow label="Date Text" fieldType="date" onGenerate={v => up('heroDate', v)}>
+            <TextInput value={g.heroDate} onChange={e => up('heroDate', e.target.value)} placeholder="February 14 · Forever" />
+          </FieldRow>
+          <FieldRow label="Subtitle" fieldType="subtitle" onGenerate={v => up('heroSubtitle', v)}>
+            <TextInput value={g.heroSubtitle} onChange={e => up('heroSubtitle', e.target.value)} />
+          </FieldRow>
+          <FieldRow label="Love Letter" fieldType="loveLetter" onGenerate={v => up('loveLetterText', v)}>
+            <TextArea value={g.loveLetterText} onChange={e => up('loveLetterText', e.target.value)} rows={5} />
+          </FieldRow>
         </Card>
       )}
 
       <Card title="Lock Screen">
-        <div className="mb-5">
-          <Label>Lock Screen Prompt</Label>
+        <FieldRow label="Lock Screen Prompt" fieldType="lockPrompt" onGenerate={v => up('lockScreenPrompt', v)}>
           <TextInput 
             value={g.lockScreenPrompt} 
             onChange={e => up('lockScreenPrompt', e.target.value)} 
             placeholder={isModern ? "Tap repeatedly to fill the meter" : "Tap until the screen is full red"}
           />
-        </div>
+        </FieldRow>
         {!isModern && (
           <div className="mb-0">
             <Label>Unlock Message</Label>
@@ -766,7 +812,9 @@ function GiftTab({ doc, setDoc }) {
     <>
       <Card title="Gift Message">
         <div className="mb-5"><Label>Recipient Name</Label><TextInput value={g.recipient} onChange={e => up('recipient', e.target.value)} placeholder="Maleesha" /></div>
-        <div className="mb-0"><Label>Hidden Message</Label><TextArea value={g.message} onChange={e => up('message', e.target.value)} rows={4} /></div>
+        <FieldRow label="Hidden Message" fieldType="loveLetter" onGenerate={v => up('message', v)}>
+          <TextArea value={g.message} onChange={e => up('message', e.target.value)} rows={4} />
+        </FieldRow>
       </Card>
       <Card title="Flower Bouquet Image">
         <ImageField label="Bouquet PNG" hint="Use a transparent PNG for best visual results" value={imgs.bouquetImageUrl} onChange={upImg} />
@@ -805,9 +853,13 @@ function MilestonesTab({ doc, setDoc }) {
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div><Label>Title</Label><TextInput value={m.title} onChange={e => upM(m.id, 'title', e.target.value)} /></div>
-              <div><Label>Date</Label><TextInput value={m.date} onChange={e => upM(m.id, 'date', e.target.value)} /></div>
+              <FieldRow label="Date" fieldType="date" onGenerate={v => upM(m.id, 'date', v)}>
+                <TextInput value={m.date} onChange={e => upM(m.id, 'date', e.target.value)} />
+              </FieldRow>
             </div>
-            <div className="mb-3"><Label>Description</Label><TextArea value={m.description} onChange={e => upM(m.id, 'description', e.target.value)} rows={2} /></div>
+            <FieldRow label="Description" fieldType="milestoneDesc" onGenerate={v => upM(m.id, 'description', v)}>
+              <TextArea value={m.description} onChange={e => upM(m.id, 'description', e.target.value)} rows={2} />
+            </FieldRow>
             <ImageField label="Photo" value={m.imageUrl} onChange={v => upM(m.id, 'imageUrl', v)} />
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -858,7 +910,9 @@ function GalleryTab({ doc, setDoc }) {
     <>
       <Card title="Center (Hero) Image">
         <ImageField label="Center Image" hint="Displayed with a ripped-paper mask in the gallery" value={g.centerImage} onChange={v => upG('centerImage', v)} />
-        <div><Label>Center Caption</Label><TextInput value={g.centerCaption} onChange={e => upG('centerCaption', e.target.value)} placeholder="Us, always ❤️" /></div>
+        <FieldRow label="Center Caption" fieldType="caption" onGenerate={v => upG('centerCaption', v)}>
+          <TextInput value={g.centerCaption} onChange={e => upG('centerCaption', e.target.value)} placeholder="Us, always ❤️" />
+        </FieldRow>
       </Card>
 
       <Card title="Supporting Photos">
@@ -876,7 +930,9 @@ function GalleryTab({ doc, setDoc }) {
                 <button onClick={() => delPhoto(s.id)} className="p-1 text-slate-500 hover:text-red-400 transition"><Trash2 size={13} /></button>
               </div>
               <ImageField label="Photo" value={s.url} onChange={v => upP(s.id, 'url', v)} />
-              <div><Label>Caption</Label><TextInput value={s.caption} onChange={e => upP(s.id, 'caption', e.target.value)} placeholder="A beautiful memory" /></div>
+              <FieldRow label="Caption" fieldType="caption" onGenerate={v => upP(s.id, 'caption', v)}>
+                <TextInput value={s.caption} onChange={e => upP(s.id, 'caption', e.target.value)} placeholder="A beautiful memory" />
+              </FieldRow>
             </div>
           ))}
           {!g.supporting?.length && (
@@ -1504,10 +1560,9 @@ function BirthdayGeneralTab({ doc, setDoc }) {
           />
         </div>
 
-        <div className="mb-0">
-          <Label>Birthday Message</Label>
+        <FieldRow label="Birthday Message" fieldType="birthdayWish" onGenerate={v => upBday('birthdayMessage', v)}>
           <TextArea value={b.birthdayMessage} onChange={e => upBday('birthdayMessage', e.target.value)} rows={4} placeholder="Wishing you the happiest of birthdays! 🥳" />
-        </div>
+        </FieldRow>
       </Card>
 
       {/* Virtual Gift */}
@@ -1519,15 +1574,14 @@ function BirthdayGeneralTab({ doc, setDoc }) {
           value={vg.imageUrl}
           onChange={v => upGift('imageUrl', v)}
         />
-        <div className="mt-1">
-          <Label>Gift Message</Label>
+        <FieldRow label="Gift Message" fieldType="birthdayWish" onGenerate={v => upGift('message', v)}>
           <TextArea
             value={vg.message}
             onChange={e => upGift('message', e.target.value)}
             rows={3}
             placeholder="A sweet note to accompany the gift…"
           />
-        </div>
+        </FieldRow>
       </Card>
 
       {/* Birthday Gallery */}
@@ -1798,14 +1852,15 @@ function CinMusicTab({ doc, setDoc }) {
       </Card>
 
       <Card title="Song Lyrics">
-        <Label>Favorite Song Lyrics</Label>
-        <p className="text-[11px] text-slate-500 mb-2">Display lyrics below the music player on the client page.</p>
-        <TextArea
-          value={cin.songLyrics || ''}
-          onChange={e => upCin('songLyrics', e.target.value)}
-          placeholder="Paste song lyrics here…"
-          rows={10}
-        />
+        <FieldRow label="Favorite Song Lyrics" fieldType="songLyrics" onGenerate={v => upCin('songLyrics', v)}>
+          <p className="text-[11px] text-slate-500 mb-2">Display lyrics below the music player on the client page.</p>
+          <TextArea
+            value={cin.songLyrics || ''}
+            onChange={e => upCin('songLyrics', e.target.value)}
+            placeholder="Paste song lyrics here…"
+            rows={10}
+          />
+        </FieldRow>
       </Card>
     </>
   );
@@ -1818,14 +1873,15 @@ function CinLoveLetterTab({ doc, setDoc }) {
 
   return (
     <Card title="Love Letter">
-      <Label>Love Letter Text</Label>
-      <p className="text-[11px] text-slate-500 mb-2">Write a special message to be shown in the premium glassmorphic section.</p>
-      <TextArea
-        value={g.loveLetterText || ''}
-        onChange={e => up('loveLetterText', e.target.value)}
-        placeholder="Dear..., Everyday with you is a gift..."
-        rows={12}
-      />
+      <FieldRow label="Love Letter Text" fieldType="loveLetter" onGenerate={v => up('loveLetterText', v)}>
+        <p className="text-[11px] text-slate-500 mb-2">Write a special message to be shown in the premium glassmorphic section.</p>
+        <TextArea
+          value={g.loveLetterText || ''}
+          onChange={e => up('loveLetterText', e.target.value)}
+          placeholder="Dear..., Everyday with you is a gift..."
+          rows={12}
+        />
+      </FieldRow>
     </Card>
   );
 }
