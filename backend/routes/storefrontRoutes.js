@@ -89,11 +89,25 @@ const INITIAL_STOREFRONT = {
       gradient: 'from-emerald-400 to-teal-500',
     },
     {
-      id: 'b4', name: 'The Surprise Party', price: 'Rs. 3,000',
+      id: 'b4', name: 'The Surprise Party', price: 'Rs. 750',
       emoji: '🎉', tag: 'Immersive',
       category: 'birthday',
       description: 'Full party experience with confetti, music & a wishes wall.',
       gradient: 'from-fuchsia-400 to-pink-500',
+    },
+    {
+      id: 'v5', name: 'The Cinematic Anniversary', price: 'Rs. 750',
+      emoji: '🎬', tag: 'Cinematic',
+      category: 'valentine',
+      description: 'Video intro, live relationship timer, timeline & custom audio player.',
+      gradient: 'from-slate-700 to-rose-800',
+    },
+    {
+      id: 'b5', name: 'The Cinematic Birthday', price: 'Rs. 750',
+      emoji: '🎬', tag: 'Cinematic',
+      category: 'birthday',
+      description: 'Video intro, gift box reveal, year recap & custom audio player.',
+      gradient: 'from-amber-500 to-orange-600',
     },
   ],
   testimonials: [
@@ -139,6 +153,15 @@ router.get('/', async (req, res) => {
       let storefront = await Storefront.findOne({ isGlobal: true });
       if (!storefront) {
         storefront = await Storefront.create(INITIAL_STOREFRONT);
+      } else {
+        // Auto-append any missing templates from INITIAL_STOREFRONT
+        const missingTemplates = INITIAL_STOREFRONT.templates.filter(
+          initTpl => !storefront.templates.some(t => t.id === initTpl.id)
+        );
+        if (missingTemplates.length > 0) {
+          storefront.templates.push(...missingTemplates);
+          await storefront.save();
+        }
       }
       return res.json({ success: true, data: storefront });
     } else {
@@ -147,6 +170,15 @@ router.get('/', async (req, res) => {
       if (!data.storefront) {
         data.storefront = INITIAL_STOREFRONT;
         writeDb(data);
+      } else {
+        // Auto-append missing templates for fallback
+        const missingTemplates = INITIAL_STOREFRONT.templates.filter(
+          initTpl => !data.storefront.templates.some(t => t.id === initTpl.id)
+        );
+        if (missingTemplates.length > 0) {
+          data.storefront.templates.push(...missingTemplates);
+          writeDb(data);
+        }
       }
       return res.json({ success: true, data: data.storefront });
     }
