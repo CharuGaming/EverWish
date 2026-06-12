@@ -37,7 +37,10 @@ export async function resetPassword(email, otp, newPassword) {
 
 // ── Sites ─────────────────────────────────────────────────────────
 export async function listSites() {
-  const r = await fetch(`${BASE}/api/sites`, { headers: getAuthHeaders() });
+  const r = await fetch(`${BASE}/api/sites`, { 
+    headers: getAuthHeaders(),
+    cache: 'no-store'
+  });
   if (!r.ok) {
     let msg = 'API error';
     try {
@@ -57,7 +60,7 @@ export async function listSites() {
 }
 
 export async function getSite(siteId) {
-  const r = await fetch(`${BASE}/api/sites/${siteId}`);
+  const r = await fetch(`${BASE}/api/sites/${siteId}`, { cache: 'no-store' });
   return r.json();
 }
 
@@ -102,7 +105,7 @@ export async function getDemoSite(templateId) {
 
 // ── Storefront Configuration ──────────────────────────────────────
 export async function getStorefront() {
-  const r = await fetch(`${BASE}/api/storefront`);
+  const r = await fetch(`${BASE}/api/storefront`, { cache: 'no-store' });
   if (!r.ok) {
     let msg = 'API error';
     try {
