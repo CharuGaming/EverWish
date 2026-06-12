@@ -63,6 +63,19 @@ const BIRTHDAY_WISHES = [
   `To the most wonderful person I know — Happy Birthday! May today be just the beginning of an incredible year filled with adventure, laughter, and magic. 🎈`,
 ];
 
+const MILESTONE_TITLES = [
+  'The Day We Met',
+  'Our First Date',
+  'The Moment I Knew',
+  'Our First Trip Together',
+  "A Night We'll Never Forget",
+  'When Everything Changed',
+  'The Day You Said Yes',
+  'Our Anniversary',
+  'A Spontaneous Adventure',
+  'The Quiet Days in Between',
+];
+
 const MILESTONE_DESCRIPTIONS = [
   'The day everything changed — in the best way possible.',
   'A memory I will treasure for the rest of my life.',
@@ -71,6 +84,40 @@ const MILESTONE_DESCRIPTIONS = [
   'A perfect day, with the most perfect person.',
   'Laughing until we couldn\'t breathe. Just us.',
   'The adventure that reminded us of what matters most.',
+  'I didn\'t plan it — it just happened, and it was perfect.',
+  'Small moment. Huge meaning.',
+  'The kind of day you wish you could live twice.',
+];
+
+const BUCKET_LIST_TITLES = [
+  'Go on a hot air balloon ride 🎈',
+  'Watch the sunset from a rooftop 🌅',
+  'Cook a full meal together from scratch 🍝',
+  'Take a spontaneous road trip 🚗',
+  'Slow dance in the living room 💃',
+  'Write letters to each other and seal them 💌',
+  'Watch every movie in a trilogy in one day 🎬',
+  'Stargaze from a hilltop at midnight 🌟',
+  'Visit a place neither of us has been before ✈️',
+  'Get matching something — just for fun 💫',
+  'Have a picnic in the park 🧺',
+  'Learn a new skill together 🎨',
+  'Plan a surprise date — no hints allowed 🎭',
+  'Read the same book and discuss it together 📖',
+  'Go hiking and find the perfect view 🏔️',
+];
+
+const BUCKET_LIST_DESCRIPTIONS = [
+  'Somewhere we\'ve never been — just us and the open road.',
+  'One of those things we always talk about but never actually do.',
+  'Because life is too short for ordinary weekends.',
+  'Make it a proper date — plan it, dress up, show up.',
+  'No phones. Just us, fully present.',
+  'The kind of memory that becomes a story we tell forever.',
+  'Simple, but secretly the thing I\'m most looking forward to.',
+  'Put it in the calendar — no more postponing this one!',
+  'Even if it goes wrong, it\'ll be funny later.',
+  'Just to say we did it. Together.',
 ];
 
 const CAPTION_TEXTS = [
@@ -119,20 +166,23 @@ const SONG_LYRICS = [
 /**
  * generateRandomContent(fieldType, theme?)
  * Returns a randomly selected string for the given admin field type.
- * @param {'date'|'subtitle'|'loveLetter'|'birthdayWish'|'milestoneDesc'|'caption'|'lockPrompt'|'reason'|'songLyrics'} fieldType
+ * @param {'date'|'subtitle'|'loveLetter'|'birthdayWish'|'milestoneDesc'|'milestoneTitle'|'bucketTitle'|'bucketDesc'|'caption'|'lockPrompt'|'reason'|'songLyrics'} fieldType
  * @param {'valentine'|'birthday'|string} [theme]
  */
 export function generateRandomContent(fieldType, theme = 'valentine') {
   switch (fieldType) {
-    case 'date':          return pick(DATES);
-    case 'subtitle':      return pick(SUBTITLES);
-    case 'loveLetter':    return pick(theme === 'birthday' ? BIRTHDAY_WISHES : LOVE_LETTERS);
-    case 'birthdayWish':  return pick(BIRTHDAY_WISHES);
-    case 'milestoneDesc': return pick(MILESTONE_DESCRIPTIONS);
-    case 'caption':       return pick(CAPTION_TEXTS);
-    case 'lockPrompt':    return pick(LOCK_PROMPTS);
-    case 'reason':        return pick(REASONS);
-    case 'songLyrics':    return pick(SONG_LYRICS);
-    default:              return pick(SUBTITLES);
+    case 'date':           return pick(DATES);
+    case 'subtitle':       return pick(SUBTITLES);
+    case 'loveLetter':     return pick(theme === 'birthday' ? BIRTHDAY_WISHES : LOVE_LETTERS);
+    case 'birthdayWish':   return pick(BIRTHDAY_WISHES);
+    case 'milestoneTitle': return pick(MILESTONE_TITLES);
+    case 'milestoneDesc':  return pick(MILESTONE_DESCRIPTIONS);
+    case 'bucketTitle':    return pick(BUCKET_LIST_TITLES);
+    case 'bucketDesc':     return pick(BUCKET_LIST_DESCRIPTIONS);
+    case 'caption':        return pick(CAPTION_TEXTS);
+    case 'lockPrompt':     return pick(LOCK_PROMPTS);
+    case 'reason':         return pick(REASONS);
+    case 'songLyrics':     return pick(SONG_LYRICS);
+    default:               return pick(SUBTITLES);
   }
 }

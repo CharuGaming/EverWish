@@ -852,7 +852,9 @@ function MilestonesTab({ doc, setDoc }) {
               <button onClick={() => del(m.id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-700 transition"><Trash2 size={14} /></button>
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
-              <div><Label>Title</Label><TextInput value={m.title} onChange={e => upM(m.id, 'title', e.target.value)} /></div>
+              <FieldRow label="Title" fieldType="milestoneTitle" onGenerate={v => upM(m.id, 'title', v)}>
+                <TextInput value={m.title} onChange={e => upM(m.id, 'title', e.target.value)} />
+              </FieldRow>
               <FieldRow label="Date" fieldType="date" onGenerate={v => upM(m.id, 'date', v)}>
                 <TextInput value={m.date} onChange={e => upM(m.id, 'date', e.target.value)} />
               </FieldRow>
@@ -1218,14 +1220,12 @@ function ThingsToDoTab({ doc, setDoc }) {
                 <Trash2 size={14}/>
               </button>
             </div>
-            <div className="mb-4">
-              <Label>Title</Label>
+            <FieldRow label="Title" fieldType="bucketTitle" onGenerate={v => upT(s.id, 'title', v)}>
               <TextInput value={s.title} onChange={e => upT(s.id, 'title', e.target.value)} placeholder="e.g. Go on a hot air balloon ride 🎈" />
-            </div>
-            <div className="mb-4">
-              <Label>Short Description / Note</Label>
+            </FieldRow>
+            <FieldRow label="Short Description / Note" fieldType="bucketDesc" onGenerate={v => upT(s.id, 'description', v)}>
               <TextInput value={s.description} onChange={e => upT(s.id, 'description', e.target.value)} placeholder="e.g. In Ella or Kandalama..." />
-            </div>
+            </FieldRow>
             <ImageField label="Image / Illustration" value={s.imageUrl} onChange={v => upT(s.id, 'imageUrl', v)} />
           </Card>
         ))}
