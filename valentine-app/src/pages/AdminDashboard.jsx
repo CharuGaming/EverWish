@@ -75,6 +75,8 @@ export default function AdminDashboard() {
 
   // Storefront Tab State
   const [activeTab, setActiveTab] = useState('sites'); // 'sites' | 'storefront' | 'orders'
+  const [wipingDemos, setWipingDemos] = useState(false);
+  const [wipingClients, setWipingClients] = useState(false);
   const [storefront, setStorefront] = useState({ templates: [], testimonials: [] });
   const [savingStorefront, setSavingStorefront] = useState(false);
 
@@ -318,6 +320,34 @@ export default function AdminDashboard() {
     setStorefront({ ...storefront, testimonials: newTests });
   };
 
+  const handleWipeDemos = async () => {
+    if (!window.confirm('Are you sure you want to permanently delete ALL Demo sites?')) return;
+    setWipingDemos(true);
+    const demoSites = sites.filter(s => s.isDemoPreview);
+    try {
+      await Promise.all(demoSites.map(s => deleteSite(s.siteId)));
+      showToast(`${demoSites.length} demo sites deleted!`, true);
+      load();
+    } catch (e) {
+      showToast('Error wiping demo sites', false);
+    }
+    setWipingDemos(false);
+  };
+
+  const handleWipeClients = async () => {
+    if (!window.confirm('Are you sure you want to permanently delete ALL Client sites (non-demo)?')) return;
+    setWipingClients(true);
+    const regularSites = sites.filter(s => !s.isDemoPreview);
+    try {
+      await Promise.all(regularSites.map(s => deleteSite(s.siteId)));
+      showToast(`${regularSites.length} client sites deleted!`, true);
+      load();
+    } catch (e) {
+      showToast('Error wiping client sites', false);
+    }
+    setWipingClients(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden relative">
       
@@ -399,7 +429,13 @@ export default function AdminDashboard() {
             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Client Sites</h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm">Manage all active celebration websites</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <button onClick={handleWipeDemos} disabled={wipingDemos} className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
+              {wipingDemos ? 'Wiping...' : 'Wipe Demos'}
+            </button>
+            <button onClick={handleWipeClients} disabled={wipingClients} className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
+              {wipingClients ? 'Wiping...' : 'Wipe Users'}
+            </button>
             <div className="flex bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 p-1 rounded-2xl shadow-sm">
               <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
                 <List size={18} />
@@ -509,9 +545,12 @@ export default function AdminDashboard() {
                               <p className="font-bold text-white text-base truncate">
                                 {site.general?.coupleName || site.siteId}
                               </p>
-                              <p className="text-xs text-amber-300/70 mt-1 mb-2 font-mono tracking-tight truncate">
-                                /{site.siteId}
-                                <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-400 border border-amber-400/30 text-[10px] font-bold uppercase tracking-wider">
+                              <p className="text-xs text-amber-300/70 mt-1 mb-2 font-mono tracking-tight flex flex-wrap items-center gap-2 truncate">
+                                <span>/{site.siteId}</span>
+                                <span className="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/20 text-[9px] uppercase tracking-wider text-amber-300 font-bold">
+                                  Template: {site.templateType || 'polaroid'}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-400 border border-amber-400/30 text-[10px] font-bold uppercase tracking-wider">
                                   <Star size={9} className="fill-amber-400" /> Active Demo
                                 </span>
                               </p>
@@ -604,8 +643,11 @@ export default function AdminDashboard() {
                               <p className="font-bold text-slate-900 dark:text-white text-base truncate">
                                 {site.general?.coupleName || site.siteId}
                               </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight truncate">
-                                /{site.siteId}
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-2 font-mono tracking-tight flex items-center gap-2 truncate">
+                                <span>/{site.siteId}</span>
+                                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
+                                  Template: {site.templateType || 'polaroid'}
+                                </span>
                               </p>
                               <div className={`flex gap-3 text-[11px] text-slate-500 dark:text-slate-400 ${viewMode === 'list' ? 'items-center' : 'flex-col'}`}>
                                 <span><strong className="font-semibold text-slate-600 dark:text-slate-300">Created On:</strong> {formatDate(site.createdAt)}</span>
@@ -771,7 +813,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-8">
           
           {/* Templates Editor */}
           <div className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6">
