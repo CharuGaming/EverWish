@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Storefront = require('../models/Storefront');
 const fs = require('fs');
 const path = require('path');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Fallback logic for db.json if mongo fails
 const dbPath = (process.env.NODE_ENV === 'production' || process.env.VERCEL)
@@ -190,6 +191,59 @@ router.post('/', async (req, res) => {
     }
   } catch (error) {
     console.error('Storefront POST error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PATCH /api/storefront/templates/:id/toggle
+router.patch('/templates/:id/toggle', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (mongoose.connection.readyState === 1) {
+      const storefront = await Storefront.findOne({ isGlobal: true });
+      if (!storefront) {
+        return res.status(404).json({ success: false, message: 'Storefront not found' });
+      }
+      
+      const template = storefront.templates.find(t => t.id === id);
+      if (!template) {
+        return res.status(404).json({ success: false, message: 'Template not found' });
+      }
+      
+      // Toggle isActive, treating undefined as true (default state)
+      template.isActive = template.isActive === undefined ? false : !template.isActive;
+      
+      await storefront.save();
+      
+      if (req.app.get('io')) {
+        req.app.get('io').emit('storefrontUpdated', storefront);
+      }
+      
+      return res.json({ success: true, data: template });
+    } else {
+      // Use fallback
+      const data = readDb();
+      if (!data.storefront) {
+        return res.status(404).json({ success: false, message: 'Storefront not found' });
+      }
+      
+      const template = data.storefront.templates.find(t => t.id === id);
+      if (!template) {
+        return res.status(404).json({ success: false, message: 'Template not found' });
+      }
+      
+      template.isActive = template.isActive === undefined ? false : !template.isActive;
+      writeDb(data);
+      
+      if (req.app.get('io')) {
+        req.app.get('io').emit('storefrontUpdated', data.storefront);
+      }
+      
+      return res.json({ success: true, data: template });
+    }
+  } catch (error) {
+    console.error('Template toggle error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

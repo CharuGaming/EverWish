@@ -1,6 +1,6 @@
 // ── Centralised API client ────────────────────────────────────────
 // Set VITE_API_URL in .env.local to override for production
-const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
+const BASE = import.meta.env.VITE_API_URL || '';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('adminToken');
@@ -136,6 +136,22 @@ export async function updateStorefront(payload) {
   if (!data.success) throw new Error(data.message || 'API returned failure');
   return data;
 }
+
+export async function toggleTemplateStatus(templateId) {
+  const r = await fetch(`${BASE}/api/storefront/templates/${templateId}/toggle`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }
+  });
+  if (!r.ok) {
+    let msg = 'API error';
+    try { const data = await r.json(); msg = data.message; } catch(e) {}
+    throw new Error(msg);
+  }
+  const data = await r.json();
+  if (!data.success) throw new Error(data.message || 'API returned failure');
+  return data;
+}
+
 export async function uploadImage(file) {
   try {
     // 1. Fetch upload signature from backend

@@ -10,7 +10,8 @@ const templateSchema = new mongoose.Schema({
   badge: String,
   // For backward compatibility with existing storefront
   emoji: String,
-  gradient: String
+  gradient: String,
+  isActive: { type: Boolean, default: true }
 });
 
 const testimonialSchema = new mongoose.Schema({

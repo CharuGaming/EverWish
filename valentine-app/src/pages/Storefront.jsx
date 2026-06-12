@@ -476,9 +476,21 @@ export default function Storefront() {
             animate="visible"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {TEMPLATES[activeTab].map((tpl, i) => (
-              <TemplateCard key={tpl.id} tpl={tpl} index={i} onPreview={openPreview} />
-            ))}
+            {(() => {
+              const dbTemplates = storefrontData.templates || [];
+              const categoryTemplates = dbTemplates.filter(t => t.category === activeTab && t.isActive !== false);
+              
+              const allTemplates = [...categoryTemplates, CUSTOM_CARD];
+              
+              return allTemplates.map((tpl, i) => (
+                <TemplateCard 
+                  key={tpl.id} 
+                  tpl={{...tpl, desc: tpl.desc || tpl.description}} 
+                  index={i} 
+                  onPreview={openPreview} 
+                />
+              ));
+            })()}
           </motion.div>
         )}
 

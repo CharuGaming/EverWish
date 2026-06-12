@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, setSiteDemo, getStorefront, updateStorefront, uploadImage, listOrders, updateOrderStatus } from '../api';
+import { listSites, saveSite, deleteSite, emptyTemplate, toggleSiteStatus, setSiteDemo, getStorefront, updateStorefront, uploadImage, listOrders, updateOrderStatus, toggleTemplateStatus } from '../api';
 import {
   Heart, Plus, ExternalLink, Trash2, Edit3,
   Search, AlertCircle, Loader2, CheckCircle2,
@@ -280,6 +280,20 @@ export default function AdminDashboard() {
     const newTpls = [...storefront.templates];
     newTpls.splice(idx, 1);
     setStorefront({ ...storefront, templates: newTpls });
+  };
+
+  const handleToggleTemplateStatus = async (idx) => {
+    try {
+      const template = storefront.templates[idx];
+      const res = await toggleTemplateStatus(template.id);
+      
+      const newTpls = [...storefront.templates];
+      newTpls[idx].isActive = res.data.isActive;
+      setStorefront({ ...storefront, templates: newTpls });
+      showToast(`Template ${res.data.isActive ? 'activated' : 'deactivated'} successfully!`, true);
+    } catch (err) {
+      showToast(`Failed to toggle template status: ${err.message}`, false);
+    }
   };
 
   const removeTestimonial = (idx) => {
@@ -793,6 +807,22 @@ export default function AdminDashboard() {
                   <div>
                     <label className="text-[10px] uppercase font-bold text-slate-500">Description</label>
                     <textarea value={tpl.description} onChange={e => handleTemplateChange(i, 'description', e.target.value)} rows={2} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" />
+                  </div>
+                  
+                  {/* Template Activation Toggle */}
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-white/10 mt-2">
+                    <span className="text-[10px] uppercase font-bold text-slate-500">Active on Storefront</span>
+                    <button
+                      onClick={() => handleToggleTemplateStatus(i)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${tpl.isActive !== false ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    >
+                      <motion.span
+                        layout
+                        animate={{ x: tpl.isActive !== false ? 22 : 2 }}
+                        transition={{ type: "spring", stiffness: 700, damping: 30 }}
+                        className="inline-block h-5 w-5 transform rounded-full bg-white shadow-md"
+                      />
+                    </button>
                   </div>
                 </div>
               ))}
