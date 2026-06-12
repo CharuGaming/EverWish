@@ -256,6 +256,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTemplateImageUpload = async (idx, file) => {
+    if (!file) return;
+    try {
+      showToast("Uploading template thumbnail...", true);
+      const res = await uploadImage(file);
+      if (res.success) {
+        handleTemplateChange(idx, 'imageUrl', res.url);
+        showToast("Template thumbnail uploaded successfully!", true);
+      } else {
+        showToast(res.message || "Upload failed", false);
+      }
+    } catch (err) {
+      showToast("Upload failed", false);
+    }
+  };
+
   const addTemplate = () => {
     setStorefront({
       ...storefront,
@@ -801,6 +817,37 @@ export default function AdminDashboard() {
                       <div className="flex gap-2">
                         <input value={tpl.emoji || '✨'} onChange={e => handleTemplateChange(i, 'emoji', e.target.value)} className="w-12 text-center bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-2 py-2 text-sm" title="Emoji" />
                         <input value={tpl.gradient || 'from-gray-400 to-gray-500'} onChange={e => handleTemplateChange(i, 'gradient', e.target.value)} className="flex-1 bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm" title="Tailwind Gradient Classes" />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Live Animated Thumbnail (Overrides Emoji)</label>
+                    <div className="flex items-center gap-3">
+                      {tpl.imageUrl ? (
+                        <div className="relative w-24 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-black/5 flex-shrink-0 group/img">
+                          <img loading="lazy" src={tpl.imageUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => handleTemplateChange(i, 'imageUrl', '')}
+                            className="absolute inset-0 bg-black/70 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-24 h-16 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-rose-500 transition-colors cursor-pointer bg-white/30 dark:bg-black/10 flex-shrink-0">
+                          <Upload size={16} className="text-slate-400" />
+                          <span className="text-[9px] font-bold text-slate-500 mt-0.5">Upload</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={e => handleTemplateImageUpload(i, e.target.files[0])} 
+                            className="hidden" 
+                          />
+                        </label>
+                      )}
+                      <div className="flex-1 text-xs text-slate-500">
+                        Upload a screenshot of the first page to create a live animated preview card.
                       </div>
                     </div>
                   </div>

@@ -173,13 +173,19 @@ function TemplateCard({ tpl, index, onPreview }) {
     >
       {/* Thumbnail */}
       <div className={`relative h-44 bg-gradient-to-br ${tpl.gradient} flex items-center justify-center overflow-hidden shrink-0`}>
-        {isCustom ? (
-          <div className="flex flex-col items-center gap-2">
+        {tpl.imageUrl ? (
+          <img 
+            src={tpl.imageUrl} 
+            alt={tpl.name} 
+            className="absolute inset-0 w-full h-full object-cover animate-live-pan"
+          />
+        ) : isCustom ? (
+          <div className="flex flex-col items-center gap-2 relative z-10">
             <span className="text-5xl font-black text-white/90 drop-shadow-lg" style={{ fontFamily: 'Georgia, serif' }}>✦</span>
             <span className="text-white/80 text-xs font-bold uppercase tracking-[0.2em]">Bespoke</span>
           </div>
         ) : (
-          <span className="text-7xl select-none drop-shadow-lg group-hover:scale-110 transition-transform duration-500">{tpl.emoji}</span>
+          <span className="text-7xl select-none drop-shadow-lg group-hover:scale-110 transition-transform duration-500 relative z-10">{tpl.emoji}</span>
         )}
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
         {/* Tag badge */}
