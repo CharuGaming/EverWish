@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+const mongoose = require('mongoose');
 const Site    = require('../models/Site');
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -25,6 +26,69 @@ router.get('/demo/:templateId', async (req, res) => {
   } catch (err) {
     console.error('[GET /api/sites/demo/:templateId]', err.message);
     res.status(500).json({ success: false, message: 'Server error fetching demo site.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+//  GET /api/sites/public-demos
+//  Fetch all storefront demo sites.
+// ─────────────────────────────────────────────────────────────────
+router.get('/public-demos', async (req, res) => {
+  try {
+    const isMongoose = mongoose.connection.readyState === 1;
+    let rawSites = [];
+
+    if (isMongoose) {
+      rawSites = await Site.find({
+        $or: [
+          { isDemoPreview: true },
+          { isDemo: true },
+          { storefrontStatus: 'ACTIVE_DEMO' }
+        ]
+      });
+    } else {
+      // JSON database fallback mode
+      const fs = require('fs');
+      const path = require('path');
+      const dbPath = (process.env.NODE_ENV === 'production' || process.env.VERCEL)
+        ? path.join('/tmp', 'db.json')
+        : path.join(__dirname, '..', 'db.json');
+      if (fs.existsSync(dbPath)) {
+        const content = fs.readFileSync(dbPath, 'utf8');
+        const db = JSON.parse(content);
+        const sites = db.sites || [];
+        rawSites = sites.filter(s => s.isDemoPreview === true || s.isDemo === true || s.storefrontStatus === 'ACTIVE_DEMO');
+      }
+    }
+
+    const formatted = rawSites.map(s => {
+      // Extract a valid previewImage
+      let previewImage = '';
+      if (s.images?.heroImageUrl) {
+        previewImage = s.images.heroImageUrl;
+      } else if (s.cinematicBirthday?.heroPhotos && s.cinematicBirthday.heroPhotos.length > 0) {
+        previewImage = s.cinematicBirthday.heroPhotos[0];
+      } else if (s.gallery?.centerImage) {
+        previewImage = s.gallery.centerImage;
+      } else if (s.gallery?.supporting && s.gallery.supporting.length > 0) {
+        previewImage = s.gallery.supporting[0].url;
+      } else if (s.coverImage) {
+        previewImage = s.coverImage;
+      }
+
+      return {
+        siteUrl: `/${s.siteId}`, // URL path corresponding to :siteId
+        slug: s.siteId,
+        templateName: s.templateType || 'polaroid',
+        clientNames: s.general?.coupleName || s.gift?.recipient || 'Loved One',
+        previewImage: previewImage || ''
+      };
+    });
+
+    res.status(200).json({ success: true, data: formatted });
+  } catch (err) {
+    console.error('[GET /api/sites/public-demos]', err.message);
+    res.status(500).json({ success: false, message: 'Server error fetching public storefront demos.' });
   }
 });
 

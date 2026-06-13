@@ -103,6 +103,14 @@ export async function getDemoSite(templateId) {
   return r.json();
 }
 
+export async function getPublicDemos() {
+  const r = await fetch(`${BASE}/api/sites/public-demos`, { cache: 'no-store' });
+  if (!r.ok) {
+    throw new Error('Failed to fetch public storefront demos');
+  }
+  return r.json();
+}
+
 // ── Storefront Configuration ──────────────────────────────────────
 export async function getStorefront() {
   const r = await fetch(`${BASE}/api/storefront`, { cache: 'no-store' });
