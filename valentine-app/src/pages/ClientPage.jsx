@@ -231,26 +231,34 @@ export default function ClientPage() {
       {/* ── GLOBAL BACKGROUND VIDEO (FOR POLAROID ONLY) ── */}
       {isPolaroid && (
         <>
-          {isBgVideo ? (
-            <video
-              src={bgUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none"
-            />
-          ) : bgUrl ? (
-            <img
-              src={bgUrl}
-              alt=""
-              className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none"
-            />
-          ) : (
-            <div className="fixed inset-0 z-0 pointer-events-none bg-gradient-to-br from-rose-950 to-black" />
+          {/* Always-present dark background */}
+          <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, background: 'linear-gradient(135deg, #0a0005 0%, #1a0010 50%, #0a0005 100%)' }} />
+          {/* Video or image overlay when uploaded */}
+          {bgUrl && (
+            isBgVideo ? (
+              <video
+                src={bgUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="fixed inset-0 w-full h-full object-cover pointer-events-none"
+                style={{ zIndex: 1 }}
+              />
+            ) : (
+              <img
+                src={bgUrl}
+                alt=""
+                className="fixed inset-0 w-full h-full object-cover pointer-events-none"
+                style={{ zIndex: 1 }}
+              />
+            )
           )}
           {/* Dark Cinematic Overlay */}
-          <div className="fixed inset-0 z-[1] pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
+          <div
+            className="fixed inset-0 pointer-events-none"
+            style={{ zIndex: 2, background: 'linear-gradient(to bottom, rgba(5,0,10,0.55) 0%, rgba(15,2,10,0.3) 50%, rgba(5,0,10,0.6) 100%)' }}
+          />
         </>
       )}
 
@@ -284,7 +292,7 @@ export default function ClientPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="relative z-10"
+            style={{ position: 'relative', zIndex: 3 }}
           >
             {siteData.templateType === 'modern' ? (
               <TemplateModern siteData={siteData} />
