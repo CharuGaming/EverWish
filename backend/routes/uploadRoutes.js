@@ -79,12 +79,16 @@ router.post('/', upload.single('image'), async (req, res) => {
     const isAudio = req.file.mimetype.startsWith('audio/') || 
                     ['.mp3', '.wav', '.ogg', '.m4a'].includes(path.extname(req.file.originalname).toLowerCase());
 
+    const isVideo = req.file.mimetype.startsWith('video/') ||
+                    ['.mp4', '.webm', '.mov', '.avi', '.mkv'].includes(path.extname(req.file.originalname).toLowerCase());
+
     const uploadOptions = {
       folder:        'everwish-celebrations',
       resource_type: 'auto',
     };
 
-    if (!isAudio) {
+    // Only apply image transformations for actual images (not audio or video)
+    if (!isAudio && !isVideo) {
       uploadOptions.transformation = [
         { quality: 'auto', fetch_format: 'auto' },
         { width: 1200, crop: 'limit' },
@@ -106,14 +110,15 @@ router.post('/', upload.single('image'), async (req, res) => {
     });
 
     // Respond with the permanent Cloudinary URL
+    // Only inject f_auto,q_auto for images (not audio or video)
     let optimizedUrl = uploadResult.secure_url;
-    if (!isAudio && optimizedUrl.includes('/upload/')) {
+    if (!isAudio && !isVideo && optimizedUrl.includes('/upload/')) {
       optimizedUrl = optimizedUrl.replace('/upload/', '/upload/f_auto,q_auto/');
     }
 
     res.status(200).json({
       success:  true,
-      message:  'Image uploaded successfully.',
+      message:  'File uploaded successfully.',
       publicId: uploadResult.public_id,
       url:      optimizedUrl,   // HTTPS CDN URL — optimized with f_auto,q_auto
       width:    uploadResult.width,
@@ -131,7 +136,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       });
     }
 
-    res.status(500).json({ success: false, message: 'Image upload failed.', error: err.message });
+    res.status(500).json({ success: false, message: 'File upload failed.', error: err.message });
   }
 });
 

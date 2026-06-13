@@ -206,8 +206,42 @@ export default function ClientPage() {
     );
   }
 
+  const isPolaroid = !siteData.templateType || siteData.templateType === 'polaroid';
+  const bgUrl = siteData?.heroBackgroundMediaUrl || '';
+  // Detect video by extension OR Cloudinary /video/upload/ resource path
+  const isBgVideo = bgUrl && (
+    /\.(mp4|webm|ogg|mov)(\?|$)/i.test(bgUrl) ||
+    /\/video\/upload\//i.test(bgUrl)
+  );
+
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-[#050505]">
+      {/* ── GLOBAL BACKGROUND VIDEO (FOR POLAROID ONLY) ── */}
+      {isPolaroid && (
+        <>
+          {isBgVideo ? (
+            <video
+              src={bgUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none"
+            />
+          ) : bgUrl ? (
+            <img
+              src={bgUrl}
+              alt=""
+              className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none"
+            />
+          ) : (
+            <div className="fixed inset-0 z-0 pointer-events-none bg-gradient-to-br from-rose-950 to-black" />
+          )}
+          {/* Dark Cinematic Overlay */}
+          <div className="fixed inset-0 z-[1] pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(15,2,20,0.6) 0%, rgba(60,5,30,0.4) 50%, rgba(15,2,20,0.65) 100%)' }} />
+        </>
+      )}
+
       <GlobalMusicPlayer musicData={siteData.music} />
       <HeartBurst show={showBurst} />
       <CursorTrail />
@@ -238,57 +272,14 @@ export default function ClientPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="relative z-10"
           >
             {siteData.templateType === 'modern' ? (
               <TemplateModern siteData={siteData} />
             ) : siteData.templateType === 'valentine' ? (
               <TemplateValentine siteData={siteData} />
-            ) : (!siteData.templateType || siteData.templateType === 'polaroid') ? (
-              <div className="template-polaroid-root" style={{ background: siteData.themeColors?.polaroid?.background || '#fff0f5' }}>
-                <style>{`
-                  .template-polaroid-root {
-                    --primary-pol: ${siteData.themeColors?.polaroid?.primary || '#e11d48'};
-                    --bg-pol: ${siteData.themeColors?.polaroid?.background || '#fff0f5'};
-                  }
-                  
-                  .template-polaroid-root .text-rose-500,
-                  .template-polaroid-root .text-rose-800,
-                  .template-polaroid-root .text-rose-600,
-                  .template-polaroid-root .text-pink-500,
-                  .template-polaroid-root .text-rose-700 {
-                    color: var(--primary-pol) !important;
-                  }
-
-                  .template-polaroid-root .bg-rose-500,
-                  .template-polaroid-root .bg-rose-600,
-                  .template-polaroid-root .bg-pink-500,
-                  .template-polaroid-root .bg-rose-400 {
-                    background-color: var(--primary-pol) !important;
-                  }
-
-                  .template-polaroid-root .bg-rose-500 *,
-                  .template-polaroid-root .bg-rose-600 *,
-                  .template-polaroid-root .bg-pink-500 * {
-                    color: #ffffff !important;
-                  }
-
-                  .template-polaroid-root .bg-amber-400 {
-                    background-color: #fbbf24 !important; /* Keep ribbon gold */
-                  }
-
-                  .template-polaroid-root .border-rose-300,
-                  .template-polaroid-root .border-rose-100,
-                  .template-polaroid-root .border-pink-300 {
-                    border-color: var(--primary-pol) !important;
-                  }
-                  
-                  .template-polaroid-root section,
-                  .template-polaroid-root .min-h-screen,
-                  .template-polaroid-root .bg-pink-50,
-                  .template-polaroid-root .bg-rose-50 {
-                    background: linear-gradient(180deg, var(--bg-pol) 0%, rgba(255, 255, 255, 0.4) 100%) !important;
-                  }
-                `}</style>
+            ) : isPolaroid ? (
+              <div className="template-polaroid-root text-white">
                 <FloatingDecor />
                 <Hero siteDataOverride={siteData} />
                 <GiftBox
