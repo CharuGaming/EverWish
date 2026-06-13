@@ -2,6 +2,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { Heart, X } from "lucide-react";
 import { siteData } from "../siteData";
+import { optimizeCloudinaryUrl } from "../utils/imageHelpers";
 
 // Pre-defined random rotations for a playful polaroid look
 const ROTATIONS = [
@@ -78,7 +79,7 @@ export default function Gallery({ siteDataOverride }) {
               >
                 <div className="w-full aspect-[4/3] overflow-hidden bg-slate-100">
                   <img 
-                    src={photo.url} 
+                    src={optimizeCloudinaryUrl(photo.url, 600)} 
                     alt={photo.caption} 
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
@@ -123,7 +124,7 @@ export default function Gallery({ siteDataOverride }) {
             >
               <div className="bg-white p-3 md:p-4 pb-12 md:pb-16 rounded-sm shadow-2xl max-w-full inline-block">
                 <img
-                  src={selectedImg.url}
+                  src={optimizeCloudinaryUrl(selectedImg.url, 1200)}
                   alt={selectedImg.caption}
                   loading="lazy"
                   className="max-w-full max-h-[75vh] object-contain"

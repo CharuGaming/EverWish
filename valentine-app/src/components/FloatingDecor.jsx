@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const decorItems = [
   { emoji: "🌸", size: "text-4xl", top: "8%",  left: "4%",  delay: 0,   duration: 5 },
@@ -10,6 +10,12 @@ const decorItems = [
 ];
 
 export default function FloatingDecor() {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return null; // Gracefully disable complex background loops if reduced motion is requested
+  }
+
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {decorItems.map((item, i) => (
@@ -20,6 +26,7 @@ export default function FloatingDecor() {
             top: item.top,
             left: item.left ?? undefined,
             right: item.right ?? undefined,
+            willChange: "transform",
           }}
           animate={{ y: [0, -22, 0] }}
           transition={{

@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 export default function ThingsToDoSection({ items, themeColors }) {
   const [completedMap, setCompletedMap] = useState({});
+  const shouldReduceMotion = useReducedMotion();
 
   if (!items || items.length === 0) return null;
 
@@ -35,19 +37,20 @@ export default function ThingsToDoSection({ items, themeColors }) {
           return (
             <motion.div
               key={item.id || idx}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
-              whileHover={{ y: -8 }}
+              whileHover={shouldReduceMotion ? {} : { y: -8 }}
               onClick={() => toggleItem(item.id)}
               className="bg-white/10 backdrop-blur-md rounded-3xl overflow-hidden border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.25)] cursor-pointer relative group flex flex-col h-full text-left transition-all duration-300"
+              style={{ willChange: 'transform, opacity' }}
             >
               {/* Image Header */}
               {item.imageUrl ? (
                 <div className="h-44 w-full overflow-hidden relative">
                   <img
-                    src={item.imageUrl}
+                    src={optimizeCloudinaryUrl(item.imageUrl, 500)}
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

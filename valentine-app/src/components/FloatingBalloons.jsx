@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const BALLOON_COLORS = [
   // Premium Pink
@@ -15,8 +15,15 @@ const BALLOON_COLORS = [
 ];
 
 export default function FloatingBalloons() {
+  const shouldReduceMotion = useReducedMotion();
+
   const balloons = useMemo(() => {
-    return Array.from({ length: 18 }).map((_, i) => {
+    if (shouldReduceMotion) return [];
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const count = isMobile ? 6 : 18; // Dynamically degrade complexity for mobile
+
+    return Array.from({ length: count }).map((_, i) => {
       const color = BALLOON_COLORS[i % BALLOON_COLORS.length];
       const startX = 5 + Math.random() * 90; // 5% to 95%
       const scale = 0.5 + Math.random() * 0.7; // 0.5 to 1.2
@@ -36,7 +43,11 @@ export default function FloatingBalloons() {
         swayOffset,
       };
     });
-  }, []);
+  }, [shouldReduceMotion]);
+
+  if (shouldReduceMotion) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
@@ -50,6 +61,7 @@ export default function FloatingBalloons() {
             height: 145,
             originX: 0.5,
             originY: 0.5,
+            willChange: "transform",
           }}
           initial={{ y: "120vh", scale: b.scale }}
           animate={{
@@ -65,7 +77,7 @@ export default function FloatingBalloons() {
           }}
         >
           <motion.div
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "100%", willChange: "transform" }}
             animate={{
               x: [-b.swayOffset, b.swayOffset, -b.swayOffset],
               rotate: [-6, 6, -6]

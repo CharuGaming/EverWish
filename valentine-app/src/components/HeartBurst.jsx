@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const COLORS = ['#ef4444', '#f43f5e', '#fb7185', '#fda4af', '#f472b6'];
 
@@ -27,7 +27,7 @@ function HeartParticle({ id, x, y, scale, rotation, color, duration, delay }) {
         times: [0, 0.2, 0.7, 1]
       }}
       className="absolute top-1/2 left-1/2 -ml-3 -mt-3 pointer-events-none"
-      style={{ color: color }}
+      style={{ color: color, willChange: 'transform' }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -43,14 +43,15 @@ function HeartParticle({ id, x, y, scale, rotation, color, duration, delay }) {
 
 export default function HeartBurst({ show }) {
   const [particles, setParticles] = useState([]);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (show) {
-      // Generate 40 particles with random trajectories
-      const newParticles = Array.from({ length: 40 }).map((_, i) => {
-        // Random angle from 0 to 360 degrees
+    if (show && !shouldReduceMotion) {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const count = isMobile ? 12 : 40; // Dynamic degradation for mobile
+
+      const newParticles = Array.from({ length: count }).map((_, i) => {
         const angle = Math.random() * Math.PI * 2;
-        // Random distance from center (between 100px and 600px, depending on viewport)
         const distance = 150 + Math.random() * Math.min(window.innerWidth, window.innerHeight) * 0.8;
         
         return {
@@ -68,7 +69,9 @@ export default function HeartBurst({ show }) {
     } else {
       setParticles([]);
     }
-  }, [show]);
+  }, [show, shouldReduceMotion]);
+
+  if (shouldReduceMotion) return null;
 
   return (
     <AnimatePresence>

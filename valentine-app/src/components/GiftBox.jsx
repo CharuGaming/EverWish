@@ -1,6 +1,7 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useMemo } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Heart } from "lucide-react";
+import { optimizeCloudinaryUrl } from "../utils/imageHelpers";
 
 // ── Explosion particle data generator ────────────────────────────────
 function generateExplosionParticles(count = 40) {
@@ -44,8 +45,19 @@ export default function GiftBox({
   bouquetUrl   = 'https://pngimg.com/uploads/bouquet/bouquet_PNG48.png',
 }) {
   const [phase, setPhase] = useState('closed'); // 'closed' | 'exploding' | 'revealed'
-  const [particles] = useState(() => generateExplosionParticles(40));
-  const [fragments] = useState(() => generateBoxFragments(14));
+  const shouldReduceMotion = useReducedMotion();
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  const activeParticles = useMemo(() => {
+    if (shouldReduceMotion) return [];
+    return generateExplosionParticles(isMobile ? 12 : 40);
+  }, [shouldReduceMotion, isMobile]);
+
+  const activeFragments = useMemo(() => {
+    if (shouldReduceMotion) return [];
+    return generateBoxFragments(isMobile ? 5 : 14);
+  }, [shouldReduceMotion, isMobile]);
+
   const containerRef = useRef(null);
 
   const handleOpen = () => {
@@ -81,11 +93,11 @@ export default function GiftBox({
           {/* ── EXPLOSION PARTICLES ── */}
           <AnimatePresence>
             {phase === 'exploding' &&
-              particles.map((p) => (
+              activeParticles.map((p) => (
                 <motion.div
                   key={`particle-${p.id}`}
                   className="absolute pointer-events-none z-40"
-                  style={{ fontSize: p.size }}
+                  style={{ fontSize: p.size, willChange: 'transform, opacity' }}
                   initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
                   animate={{
                     opacity: [0, 1, 1, 0],
@@ -108,7 +120,7 @@ export default function GiftBox({
           {/* ── BOX FRAGMENTS (flying away pieces of the box) ── */}
           <AnimatePresence>
             {phase === 'exploding' &&
-              fragments.map((f) => (
+              activeFragments.map((f) => (
                 <motion.div
                   key={`frag-${f.id}`}
                   className="absolute z-30 rounded-sm pointer-events-none"
@@ -116,6 +128,7 @@ export default function GiftBox({
                     width: f.width,
                     height: f.height,
                     backgroundColor: f.color,
+                    willChange: 'transform, opacity',
                   }}
                   initial={{ opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 }}
                   animate={{
@@ -214,12 +227,13 @@ export default function GiftBox({
 
                 {/* Gift Image */}
                 <motion.img
-                  src={bouquetUrl || 'https://pngimg.com/uploads/bouquet/bouquet_PNG48.png'}
+                  src={optimizeCloudinaryUrl(bouquetUrl || 'https://pngimg.com/uploads/bouquet/bouquet_PNG48.png', 800)}
                   alt="Gift"
                   className="w-60 h-60 object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.5)] rounded-2xl"
                   initial={{ scale: 0.6 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 250, damping: 15, delay: 0.2 }}
+                  style={{ willChange: "transform" }}
                 />
 
                 {/* Celebratory sparkle emojis floating around */}

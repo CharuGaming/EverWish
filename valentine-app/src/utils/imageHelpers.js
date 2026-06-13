@@ -15,9 +15,9 @@ export function optimizeCloudinaryUrl(url, width = 800) {
   if (parts.length < 2) return url;
 
   // Guard: avoid double-transforming if already optimized
-  if (parts[1].startsWith('c_scale,') || parts[1].startsWith('f_webp')) {
+  if (parts[1].includes('f_auto') || parts[1].includes('q_auto')) {
     return url;
   }
 
-  return `${parts[0]}/upload/c_scale,w_${width},f_webp,q_auto/${parts[1]}`;
+  return `${parts[0]}/upload/f_auto,q_auto,c_scale,w_${width}/${parts[1]}`;
 }

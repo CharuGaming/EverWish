@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getSite, toComponentData } from '../api';
@@ -6,10 +6,6 @@ import { getSite, toComponentData } from '../api';
 // Existing components (now accept siteDataOverride / gift props)
 import LockScreen    from '../components/LockScreen';
 import Hero          from '../components/Hero';
-import LoveMap       from '../components/LoveMap';
-import Gallery       from '../components/Gallery';
-import GiftBox       from '../components/GiftBox';
-import Footer        from '../components/Footer';
 import FloatingDecor from '../components/FloatingDecor';
 import CursorTrail   from '../components/CursorTrail';
 import GlobalMusicPlayer from '../components/GlobalMusicPlayer';
@@ -21,11 +17,55 @@ import BirthdayTemplate1 from '../components/BirthdayTemplate1';
 import BirthdayTemplate2 from '../components/BirthdayTemplate2';
 import BirthdayTemplate3 from '../components/BirthdayTemplate3';
 import BirthdayTemplate4 from '../components/BirthdayTemplate4';
-import ThingsToDoSection from '../components/ThingsToDoSection';
 import HeartBurst        from '../components/HeartBurst';
 import FloatingBalloons  from '../components/FloatingBalloons';
 import CinematicAnniversary from '../components/CinematicAnniversary';
 import CinematicBirthday   from '../components/CinematicBirthday';
+
+// Lazy load components that are below the fold to optimize memory & bundles
+const LoveMap = lazy(() => import('../components/LoveMap'));
+const Gallery = lazy(() => import('../components/Gallery'));
+const GiftBox = lazy(() => import('../components/GiftBox'));
+const Footer = lazy(() => import('../components/Footer'));
+const ThingsToDoSection = lazy(() => import('../components/ThingsToDoSection'));
+
+// Intersection Observer Wrapper to load components only when scrolled close to viewport
+function LazySection({ children, height = '200px' }) {
+  const [inView, setInView] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (inView) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      { rootMargin: '200px' } // Pre-load 200px before scrolling in
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [inView]);
+
+  return (
+    <div ref={ref} style={{ minHeight: inView ? 'auto' : height }}>
+      {inView ? (
+        <Suspense fallback={<div className="h-24 flex items-center justify-center text-white/40 text-xs">Loading section…</div>}>
+          {children}
+        </Suspense>
+      ) : null}
+    </div>
+  );
+}
 
 // ── Romantic loading spinner ──────────────────────────────────────
 function LoadingScreen() {
@@ -302,15 +342,25 @@ export default function ClientPage() {
               <div className="template-polaroid-root text-white">
                 <FloatingDecor />
                 <Hero siteDataOverride={siteData} />
-                <GiftBox
-                  recipient={siteData.gift?.recipient}
-                  message={siteData.gift?.message}
-                  bouquetUrl={siteData.gift?.bouquetUrl}
-                />
-                <LoveMap siteDataOverride={siteData} />
-                <Gallery siteDataOverride={siteData} />
-                <ThingsToDoSection items={siteData.thingsToDo} themeColors={siteData.themeColors?.polaroid} />
-                <Footer siteDataOverride={siteData} />
+                <LazySection height="380px">
+                  <GiftBox
+                    recipient={siteData.gift?.recipient}
+                    message={siteData.gift?.message}
+                    bouquetUrl={siteData.gift?.bouquetUrl}
+                  />
+                </LazySection>
+                <LazySection height="400px">
+                  <LoveMap siteDataOverride={siteData} />
+                </LazySection>
+                <LazySection height="500px">
+                  <Gallery siteDataOverride={siteData} />
+                </LazySection>
+                <LazySection height="400px">
+                  <ThingsToDoSection items={siteData.thingsToDo} themeColors={siteData.themeColors?.polaroid} />
+                </LazySection>
+                <LazySection height="200px">
+                  <Footer siteDataOverride={siteData} />
+                </LazySection>
               </div>
             ) : (
               <div className="min-h-screen flex items-center justify-center">
