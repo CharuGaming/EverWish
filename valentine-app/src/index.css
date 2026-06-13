@@ -23,6 +23,11 @@ body {
   overflow-x: hidden;
 }
 
+/* Override body background for dark cinematic templates */
+body.polaroid-page {
+  background-color: #050505;
+}
+
 h1, h2, h3, .serif {
   font-family: var(--font-serif);
 }

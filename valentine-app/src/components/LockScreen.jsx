@@ -10,7 +10,8 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
 
   const colors = themeColors?.polaroid || {};
   const primaryColor = colors.primary || '#e11d48';
-  const backgroundColor = colors.background || '#fff0f5';
+  // Removed opaque background to allow video to show through
+  const backgroundColor = 'transparent';
 
   const handleTap = useCallback(() => {
     if (tapCount >= MAX_TAPS) return;
@@ -32,17 +33,21 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
   return (
     <motion.div
       key="lockscreen"
-      className="fixed inset-0 flex flex-col items-center justify-center cursor-pointer select-none overflow-hidden"
+      className="fixed inset-0 flex flex-col items-center justify-center cursor-pointer select-none overflow-hidden z-50"
       style={{ backgroundColor }}
       onClick={handleTap}
       exit={{ opacity: 0, scale: 1.04, transition: { duration: 0.7 } }}
     >
-      {/* Dynamic overlay that fills as you tap */}
+      {/* Dynamic overlay that fills as you tap (glassmorphic tint instead of solid color) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
-        animate={{ opacity: overlayOpacity }}
+        animate={{ opacity: overlayOpacity * 0.85 }}
         transition={{ duration: 0.25 }}
-        style={{ backgroundColor: primaryColor }}
+        style={{
+          backgroundColor: primaryColor,
+          backdropFilter: `blur(${overlayOpacity * 8}px)`,
+          WebkitBackdropFilter: `blur(${overlayOpacity * 8}px)`,
+        }}
       />
 
       <AnimatePresence mode="wait">
@@ -75,8 +80,8 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
 
             {/* Prompt text */}
             <motion.p
-              className="serif text-2xl md:text-3xl font-semibold"
-              style={{ color: overlayOpacity > 0.55 ? "white" : primaryColor }}
+              className="serif text-2xl md:text-3xl font-semibold drop-shadow-md"
+              style={{ color: overlayOpacity > 0.55 ? "white" : "white" }}
             >
               {lockScreenPrompt || 'Tap until the screen is full red'}
             </motion.p>
@@ -88,13 +93,9 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
                   key={i}
                   className="w-2.5 h-2.5 rounded-full border-2"
                   style={{
-                    borderColor: overlayOpacity > 0.55 ? "white" : primaryColor,
-                    backgroundColor:
-                      i < tapCount
-                        ? overlayOpacity > 0.55
-                          ? "white"
-                          : primaryColor
-                        : "transparent",
+                    borderColor: "white",
+                    backgroundColor: i < tapCount ? "white" : "transparent",
+                    boxShadow: i < tapCount ? "0 0 10px rgba(255,255,255,0.8)" : "none"
                   }}
                   animate={i < tapCount ? { scale: [1.4, 1] } : {}}
                   transition={{ duration: 0.25 }}
@@ -103,8 +104,8 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
             </div>
 
             <p
-              className="text-sm font-medium tracking-wider uppercase"
-              style={{ color: overlayOpacity > 0.55 ? "rgba(255,255,255,0.7)" : primaryColor }}
+              className="text-sm font-medium tracking-wider uppercase drop-shadow-md"
+              style={{ color: "rgba(255,255,255,0.9)" }}
             >
               {MAX_TAPS - tapCount > 0
                 ? `${MAX_TAPS - tapCount} more tap${MAX_TAPS - tapCount !== 1 ? "s" : ""} to go…`
@@ -123,12 +124,12 @@ export default function LockScreen({ onUnlock, onUnlockImmediate, lockScreenProm
               animate={{ rotate: [0, -10, 10, -6, 6, 0] }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <Heart size={80} fill="white" color="white" />
+              <Heart size={80} fill="white" color="white" className="drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
             </motion.div>
-            <h1 className="serif text-4xl md:text-6xl font-bold text-white leading-tight">
-              {valentineMessage ? valentineMessage.replace('! 💕','').replace('!','') : 'Happy'}<br />Valentine's Day!
+            <h1 className="serif text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+              {valentineMessage || "Happy Valentine's Day!"}
             </h1>
-            <p className="text-white/70 text-lg font-light tracking-wide">
+            <p className="text-white/90 text-lg font-light tracking-wide drop-shadow-md">
               💕 Just for you…
             </p>
           </motion.div>

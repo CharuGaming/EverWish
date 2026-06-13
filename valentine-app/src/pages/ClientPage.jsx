@@ -122,6 +122,18 @@ export default function ClientPage() {
   
   const handleUnlockImmediate = useCallback(() => setPlayTrigger(true), []);
 
+  // Apply dark body background for polaroid/cinematic templates
+  useEffect(() => {
+    if (!siteData) return;
+    const isPol = !siteData.templateType || siteData.templateType === 'polaroid' || siteData.templateType === 'cinematic' || siteData.templateType === 'bday5';
+    if (isPol) {
+      document.body.classList.add('polaroid-page');
+    } else {
+      document.body.classList.remove('polaroid-page');
+    }
+    return () => document.body.classList.remove('polaroid-page');
+  }, [siteData]);
+
   if (loading)  return <LoadingScreen />;
   if (notFound) return <NotFoundScreen siteId={siteId} />;
   if (siteData && siteData.isActive === false) return <ExpiredScreen />;
