@@ -61,18 +61,17 @@ export default function GiftBox({
   return (
     <section
       id="gift-box"
-      className="py-24 px-6 text-center overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #fff0f5 0%, #fce7f3 100%)" }}
+      className="py-24 px-6 text-center overflow-hidden relative z-10"
     >
       <div className="max-w-md mx-auto" ref={containerRef}>
         {/* Section Title */}
-        <span className="text-rose-400 text-xs tracking-widest uppercase font-semibold">
+        <span className="text-white/80 text-xs tracking-widest uppercase font-semibold drop-shadow-md">
           A Special Surprise
         </span>
-        <h2 className="serif text-4xl md:text-5xl font-bold text-rose-700 mt-2 mb-3">
+        <h2 className="serif text-4xl md:text-5xl font-bold text-white mt-2 mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
           Your Virtual Gift
         </h2>
-        <p className="text-rose-600/70 text-sm max-w-xs mx-auto mb-16 leading-relaxed">
+        <p className="text-white/80 text-sm max-w-xs mx-auto mb-16 leading-relaxed drop-shadow">
           I couldn't send these to your doorstep, but I wrapped them with all my love. Tap the box to open! 🎁
         </p>
 
@@ -155,7 +154,7 @@ export default function GiftBox({
                     transition: { duration: 0.5, repeat: Infinity },
                   }}
                   whileTap={{ scale: 0.92 }}
-                  className="relative"
+                  className="relative drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)]"
                 >
                   {/* Box Lid */}
                   <div className="relative z-20 w-[170px] h-11 bg-rose-500 rounded-t-xl shadow-md border-b-2 border-rose-600 flex items-center justify-center">
@@ -184,7 +183,7 @@ export default function GiftBox({
                 <motion.span
                   animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="mt-8 text-xs font-semibold tracking-wider text-rose-400 uppercase"
+                  className="mt-8 text-xs font-semibold tracking-wider text-white/90 uppercase drop-shadow-md"
                 >
                   Tap to open ✨
                 </motion.span>
@@ -209,7 +208,7 @@ export default function GiftBox({
               >
                 {/* Glow behind gift */}
                 <div
-                  className="absolute rounded-full bg-rose-400/20 blur-3xl -z-10"
+                  className="absolute rounded-full bg-white/10 blur-3xl -z-10"
                   style={{ width: "240px", height: "240px" }}
                 />
 
@@ -217,7 +216,7 @@ export default function GiftBox({
                 <motion.img
                   src={bouquetUrl || 'https://pngimg.com/uploads/bouquet/bouquet_PNG48.png'}
                   alt="Gift"
-                  className="w-60 h-60 object-contain drop-shadow-[0_15px_35px_rgba(225,29,72,0.35)] rounded-2xl"
+                  className="w-60 h-60 object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.5)] rounded-2xl"
                   initial={{ scale: 0.6 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 250, damping: 15, delay: 0.2 }}
@@ -227,7 +226,7 @@ export default function GiftBox({
                 {["✨", "💖", "✨", "💕", "✨"].map((emoji, i) => (
                   <motion.span
                     key={i}
-                    className="absolute text-xl pointer-events-none"
+                    className="absolute text-xl pointer-events-none drop-shadow-md"
                     style={{
                       left: `${20 + i * 15}%`,
                       top: `${10 + (i % 3) * 25}%`,
@@ -247,16 +246,16 @@ export default function GiftBox({
         <AnimatePresence>
           {phase === 'revealed' && (
             <motion.div
-              className="mt-8 p-6 bg-white/80 backdrop-blur border border-rose-100 rounded-3xl shadow-xl shadow-rose-100/60 max-w-sm mx-auto"
+              className="mt-8 p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.25)] max-w-sm mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <Heart size={16} fill="#e11d48" color="#e11d48" className="mx-auto mb-3" />
-              <h4 className="serif text-rose-700 font-bold text-lg mb-1">
+              <Heart size={16} fill="white" color="white" className="mx-auto mb-3 opacity-90" />
+              <h4 className="serif text-white font-bold text-lg mb-1 drop-shadow-sm">
                 For {recipient} 💐
               </h4>
-              <p className="text-gray-600 leading-relaxed text-sm italic">
+              <p className="text-white/90 leading-relaxed text-sm italic drop-shadow-sm">
                 "{message}"
               </p>
             </motion.div>

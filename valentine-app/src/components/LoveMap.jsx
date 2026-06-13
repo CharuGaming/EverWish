@@ -15,7 +15,7 @@ function MilestoneCard({ milestone, index }) {
         isLeft ? "md:flex-row" : "md:flex-row-reverse"
       } flex-col`}
     >
-      {/* Content side */}
+      {/* Content side - Glassmorphic */}
       <motion.div
         className={`md:w-5/12 w-full pl-12 md:pl-0 ${
           isLeft ? "md:pr-10 md:text-right" : "md:pl-10 md:text-left"
@@ -24,33 +24,35 @@ function MilestoneCard({ milestone, index }) {
         animate={inView ? { opacity: 1, x: 0 } : {}}
         transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
       >
-        <span className="inline-block text-xs font-semibold tracking-widest uppercase text-rose-400 mb-1">
-          {milestone.date}
-        </span>
-        <h3 className="serif text-2xl md:text-3xl font-bold text-rose-700 mb-2">
-          {milestone.title}
-        </h3>
-        <p className="text-gray-500 leading-relaxed text-sm md:text-base max-w-xs">
-          {milestone.description}
-        </p>
+        <div className={`bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.25)] ${isLeft ? 'ml-auto' : 'mr-auto'} max-w-sm`}>
+          <span className="inline-block text-xs font-semibold tracking-widest uppercase text-white/80 mb-1 drop-shadow-md">
+            {milestone.date}
+          </span>
+          <h3 className="serif text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">
+            {milestone.title}
+          </h3>
+          <p className="text-white/90 leading-relaxed text-sm md:text-base drop-shadow-sm">
+            {milestone.description}
+          </p>
+        </div>
       </motion.div>
 
       {/* Center dot */}
       <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10">
         <motion.div
-          className="w-10 h-10 rounded-full bg-white border-4 border-rose-300 flex items-center justify-center shadow-lg"
+          className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border-4 border-white/40 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.4)]"
           initial={{ scale: 0 }}
           animate={inView ? { scale: 1 } : {}}
           transition={{ type: "spring", stiffness: 280, damping: 15, delay: 0.2 }}
         >
-          <Heart size={14} fill="#e11d48" color="#e11d48" />
+          <Heart size={14} fill="white" color="white" />
         </motion.div>
       </div>
 
       {/* Mobile dot */}
       <div className="absolute left-4 top-2 flex md:hidden z-10">
-        <div className="w-8 h-8 rounded-full bg-white border-4 border-rose-300 flex items-center justify-center shadow">
-          <Heart size={10} fill="#e11d48" color="#e11d48" />
+        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border-4 border-white/40 flex items-center justify-center shadow-md">
+          <Heart size={10} fill="white" color="white" />
         </div>
       </div>
 
@@ -64,9 +66,9 @@ function MilestoneCard({ milestone, index }) {
         transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
       >
         <motion.div
-          className={`polaroid ${milestone.rotate} hover:rotate-0 transition-transform duration-300`}
+          className={`polaroid bg-white p-2 pb-6 ${milestone.rotate} hover:rotate-0 transition-transform duration-300 drop-shadow-[0_15px_25px_rgba(0,0,0,0.5)]`}
           whileHover={{ scale: 1.04, zIndex: 10 }}
-          style={{ maxWidth: "220px" }}
+          style={{ maxWidth: "220px", borderRadius: "4px" }}
         >
           <img
             src={milestone.imageUrl}
@@ -74,7 +76,7 @@ function MilestoneCard({ milestone, index }) {
             loading="lazy"
             className="w-44 h-44 object-cover block"
           />
-          <p className="serif text-center text-xs text-gray-400 italic mt-2">
+          <p className="serif text-center text-xs text-gray-800 font-medium italic mt-2">
             {milestone.title}
           </p>
         </motion.div>
@@ -91,8 +93,7 @@ export default function LoveMap({ siteDataOverride }) {
   return (
     <section
       id="timeline"
-      className="relative py-24 px-4"
-      style={{ background: "linear-gradient(180deg, #fce7f3 0%, #fff0f5 100%)" }}
+      className="relative py-24 px-4 overflow-hidden z-10"
     >
       {/* Section header */}
       <motion.div
@@ -102,23 +103,23 @@ export default function LoveMap({ siteDataOverride }) {
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6 }}
       >
-        <span className="text-rose-400 text-xs tracking-widest uppercase font-semibold">
+        <span className="text-white/80 text-xs tracking-widest uppercase font-semibold drop-shadow-md">
           Our Journey
         </span>
-        <h2 className="serif text-4xl md:text-5xl font-bold text-rose-700 mt-2">
+        <h2 className="serif text-4xl md:text-5xl font-bold text-white mt-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
           Milestones of Us
         </h2>
         <div className="mt-4 flex items-center justify-center gap-2">
-          <div className="h-px w-16 bg-rose-200" />
-          <Heart size={14} fill="#fda4af" color="#fda4af" />
-          <div className="h-px w-16 bg-rose-200" />
+          <div className="h-px w-16 bg-white/40" />
+          <Heart size={14} fill="white" color="white" className="opacity-80" />
+          <div className="h-px w-16 bg-white/40" />
         </div>
       </motion.div>
 
       {/* Timeline container */}
       <div className="relative max-w-4xl mx-auto">
-        {/* Dashed center line */}
-        <div className="timeline-line" />
+        {/* Dashed center line - updated to white */}
+        <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px border-l-2 border-dashed border-white/30 -translate-x-1/2" />
 
         {milestones.map((milestone, i) => (
           <MilestoneCard key={milestone.id} milestone={milestone} index={i} />
