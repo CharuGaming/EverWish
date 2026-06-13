@@ -8,6 +8,7 @@ import {
 
 import { getStorefront } from '../api';
 import StorefrontDemos from '../components/StorefrontDemos';
+import PreviewModal from '../components/PreviewModal';
 
 // ── Data ─────────────────────────────────────────────────────────────
 // ── Contact Details ──────────────────────────────────────────────────
@@ -208,11 +209,11 @@ function TemplateCard({ tpl, index, onPreview }) {
         {/* Preview overlay on hover (only for standard templates) */}
         {!isCustom && (
           <button
-            onClick={() => onPreview(tpl.id)}
+            onClick={() => onPreview(tpl)}
             className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
           >
             <Eye size={28} className="text-white drop-shadow" />
-            <span className="text-white text-xs font-bold uppercase tracking-widest">Live Preview</span>
+            <span className="text-white text-xs font-bold uppercase tracking-widest">Preview</span>
           </button>
         )}
       </div>
@@ -232,9 +233,9 @@ function TemplateCard({ tpl, index, onPreview }) {
             {/* Preview button (standard only) */}
             {!isCustom && (
               <button
-                onClick={() => onPreview(tpl.id)}
+                onClick={() => onPreview(tpl)}
                 className="flex items-center justify-center gap-1 bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50/20 text-slate-700 hover:text-rose-600 text-xs font-bold py-2.5 rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                title="Live Preview"
+                title="Preview Screenshot"
               >
                 <Eye size={13} />
                 Preview
@@ -273,7 +274,7 @@ function Stars({ count = 5 }) {
 // ── Main Component ────────────────────────────────────────────────────
 export default function Storefront() {
   const [activeTab, setActiveTab]     = useState('valentine');
-  const [preview, setPreview]         = useState({ isOpen: false, templateId: null });
+  const [previewData, setPreviewData] = useState({ isOpen: false, tpl: null });
   const [storefrontData, setStorefrontData] = useState({ templates: [], testimonials: [] });
   const [loading, setLoading] = useState(true);
   const [selectedProof, setSelectedProof] = useState(null);
@@ -289,8 +290,9 @@ export default function Storefront() {
     });
   }, []);
 
-  const openPreview  = (id) => window.open(`/demo/${id}?demo=1`, '_blank');
-  const closePreview = ()   => setPreview({ isOpen: false, templateId: null });
+  // openPreview now accepts full template object so we can pass screenshot + name + price
+  const openPreview  = (tpl) => setPreviewData({ isOpen: true, tpl });
+  const closePreview = ()    => setPreviewData({ isOpen: false, tpl: null });
 
   const scrollToShop = () => shopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -730,6 +732,16 @@ export default function Storefront() {
         )}
       </AnimatePresence>
 
+      {/* ══ Template Screenshot Preview Modal ════════════════════════ */}
+      <PreviewModal
+        isOpen={previewData.isOpen}
+        onClose={closePreview}
+        screenshotUrl={previewData.tpl?.longScreenshotUrl || ''}
+        templateName={previewData.tpl?.name}
+        templateId={previewData.tpl?.id}
+        whatsappNumber={WHATSAPP_NUMBER}
+        price={previewData.tpl?.price}
+      />
 
     </div>
   );

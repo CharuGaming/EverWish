@@ -12,7 +12,8 @@ const templateSchema = new mongoose.Schema({
   emoji: String,
   gradient: String,
   isActive: { type: Boolean, default: true },
-  imageUrl: String
+  imageUrl: String,
+  longScreenshotUrl: { type: String, default: '' }  // Full-page scrollable preview screenshot
 });
 
 const testimonialSchema = new mongoose.Schema({

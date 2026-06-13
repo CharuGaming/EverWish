@@ -8,7 +8,7 @@ const ROTATIONS = [
   "-rotate-2", "rotate-2", "-rotate-1", "rotate-3", "-rotate-3", "rotate-1"
 ];
 
-export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
+export default function BirthdayGallery({ images = [], primary = '#f59e0b', customTitles }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [lightbox, setLightbox] = useState(null);
@@ -29,7 +29,7 @@ export default function BirthdayGallery({ images = [], primary = '#f59e0b' }) {
             📸 Memories
           </p>
           <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2">
-            Birthday Gallery
+            {customTitles?.gallerySectionTitle || "Birthday Gallery"}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
             Tap a photo to relive the moment

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { differenceInSeconds, intervalToDuration } from 'date-fns';
 import { Play, Pause, Volume2, VolumeX, Heart, Music2, Clock, ChevronDown } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // ── Scroll reveal wrapper ──────────────────────────────────────────────────
 function Reveal({ children, className = '', delay = 0, y = 50 }) {
@@ -195,7 +196,7 @@ function TimelineItem({ item, index }) {
         <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-5 hover:bg-white/10 transition-colors">
           {item.imageUrl && (
             <img
-              src={item.imageUrl}
+              src={optimizeCloudinaryUrl(item.imageUrl, 600)}
               alt={item.title}
               loading="lazy"
               decoding="async"
@@ -362,7 +363,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
           >
             <video
               ref={introVideoRef}
-              src={introVideoUrl}
+              src={optimizeCloudinaryUrl(introVideoUrl, 1080)}
               className="w-full h-full object-cover"
               playsInline
               onEnded={handleVideoEnd}
@@ -395,7 +396,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 <video
                   autoPlay loop muted playsInline
                   className="absolute inset-0 w-full h-full object-cover"
-                  src={bgVideoUrl}
+                  src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
                 />
               ) : (
                 <div className="absolute inset-0" style={{ background: heroBg, backgroundSize: 'cover', backgroundPosition: 'center' }} />
@@ -420,7 +421,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                   transition={{ delay: 0.7, duration: 1 }}
                   className="font-serif-cin text-5xl md:text-8xl font-light text-white leading-tight mb-4"
                 >
-                  {coupleName}
+                  {siteData?.customTitles?.heroMainTitle || coupleName}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -428,7 +429,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                   transition={{ delay: 1.2, duration: 0.8 }}
                   className="text-white/60 text-base md:text-lg max-w-md mx-auto font-light"
                 >
-                  {heroSubtitle}
+                  {siteData?.customTitles?.heroSubtitle || heroSubtitle}
                 </motion.p>
               </div>
 
@@ -497,7 +498,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 <div className="max-w-4xl mx-auto">
                   <Reveal className="text-center mb-14">
                     <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-3">
-                      Our Story
+                      {siteData?.customTitles?.gameSectionTitle || "Our Story"}
                     </h2>
                     <p className="text-white/40 text-sm">Milestones written in time</p>
                   </Reveal>
@@ -571,7 +572,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 <div className="max-w-5xl mx-auto">
                   <Reveal className="text-center mb-12">
                     <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-3">
-                      Caught on Camera
+                      {siteData?.customTitles?.gallerySectionTitle || "Caught on Camera"}
                     </h2>
                     <p className="text-white/40 text-sm">Moments we'll never forget</p>
                   </Reveal>
@@ -580,7 +581,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                       <Reveal key={photo.id || i} delay={i * 0.1} className="break-inside-avoid">
                         <div className="relative group overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
                           <img 
-                            src={photo.url} 
+                            src={optimizeCloudinaryUrl(photo.url, 600)} 
                             alt={photo.caption || 'Memory'} 
                             className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
                             loading="lazy"

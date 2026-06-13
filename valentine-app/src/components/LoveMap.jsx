@@ -86,7 +86,8 @@ function MilestoneCard({ milestone, index }) {
 }
 
 export default function LoveMap({ siteDataOverride }) {
-  const { milestones } = siteDataOverride || siteData;
+  const data = siteDataOverride || siteData;
+  const { milestones, customTitles } = data;
   const headerRef = useRef(null);
   const inView = useInView(headerRef, { once: true });
 
@@ -107,7 +108,7 @@ export default function LoveMap({ siteDataOverride }) {
           Our Journey
         </span>
         <h2 className="serif text-4xl md:text-5xl font-bold text-white mt-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          Milestones of Us
+          {customTitles?.gameSectionTitle || "Milestones of Us"}
         </h2>
         <div className="mt-4 flex items-center justify-center gap-2">
           <div className="h-px w-16 bg-white/40" />

@@ -23,6 +23,7 @@ const valentineBase = {
   coupleName: 'Sofia & Liam',
   coupleEmoji: '💌',
   heroSubtitle: 'A little corner of the internet, made just for you 💕',
+  heroTitle: "Happy Valentine's Day",
   heroDate: 'February 14 · Forever',
   loveLetterText:
     'Every day with you feels like the beginning of something beautiful. You are my favourite adventure, my safe harbour, and the reason I smile for no reason at all.',

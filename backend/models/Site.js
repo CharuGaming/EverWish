@@ -280,6 +280,13 @@ const SiteSchema = new mongoose.Schema(
       instagram: { type: String, default: '' },
       tiktok:    { type: String, default: '' },
       youtube:   { type: String, default: '' }
+    },
+    // ── Custom Titles / Typography Configuration ──────────────────
+    customTitles: {
+      heroMainTitle:       { type: String, default: '' },
+      heroSubtitle:        { type: String, default: '' },
+      gameSectionTitle:    { type: String, default: '' },
+      gallerySectionTitle: { type: String, default: '' }
     }
   },
   {

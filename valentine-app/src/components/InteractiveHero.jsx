@@ -5,6 +5,7 @@
  */
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 const SCRIPT_FONT = "'Dancing Script', cursive";
 
@@ -25,8 +26,9 @@ const FLOAT_VARIANTS = {
   }),
 };
 
-export default function InteractiveHero({ nickname, heroPhotos = [], coupleName, heroSubtitle, onScroll }) {
-  const displayName = nickname || coupleName || 'Happy Birthday!';
+export default function InteractiveHero({ nickname, heroPhotos = [], coupleName, heroSubtitle, onScroll, customTitles }) {
+  const displayName = customTitles?.heroMainTitle || nickname || coupleName || 'Happy Birthday!';
+  const displaySub = customTitles?.heroSubtitle || heroSubtitle;
   const photos = heroPhotos.slice(0, 5);
 
   return (
@@ -61,7 +63,7 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
                 borderRadius: '4px',
                 width: '150px',
               }}>
-                <img src={url} alt={`Memory ${i+1}`}
+                <img src={optimizeCloudinaryUrl(url, 400)} alt={`Memory ${i+1}`}
                   className="w-full object-cover rounded-sm"
                   style={{ height: '140px' }}
                   draggable={false}
@@ -115,7 +117,7 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
           </motion.h1>
         </div>
 
-        {heroSubtitle && (
+        {displaySub && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
             className="relative mt-4 max-w-sm mx-auto"
@@ -140,7 +142,7 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
                 ].join(', '),
               }}
             >
-              {heroSubtitle}
+              {displaySub}
             </p>
           </motion.div>
         )}

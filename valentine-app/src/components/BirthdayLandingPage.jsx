@@ -7,6 +7,8 @@ import BirthdayGift     from './BirthdayGift';
 import VoiceMessage     from './VoiceMessage';
 import YearInReview     from './YearInReview';
 import ScratchCoupon    from './ScratchCoupon';
+import PremiumBalloons  from './PremiumBalloons';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // Scroll-triggered fade-in-up wrapper
 function FadeUp({ children, delay = 0 }) {
@@ -63,7 +65,7 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                 {/* ── Layer 0: Background media (video or image) ── */}
                 {hasBg && isVideo && (
                   <video
-                    src={bgUrl}
+                    src={optimizeCloudinaryUrl(bgUrl, 1080)}
                     autoPlay
                     loop
                     muted
@@ -74,7 +76,7 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                 )}
                 {hasBg && !isVideo && (
                   <img
-                    src={bgUrl}
+                    src={optimizeCloudinaryUrl(bgUrl, 1080)}
                     alt="Hero background"
                     className="absolute inset-0 w-full h-full object-cover z-0"
                     style={{ pointerEvents: 'none' }}
@@ -99,7 +101,10 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                   />
                 )}
 
-                {/* ── Layer 2: Content ── */}
+                {/* ── Layer 2: Premium Floating Balloons (z-10 pointer-events-none) ── */}
+                <PremiumBalloons />
+
+                {/* ── Layer 3: Content (z-20) ── */}
                 <div className="relative z-20 flex flex-col items-center">
                   <motion.div
                     initial={{ scale: 0, rotate: -15 }}
@@ -120,16 +125,22 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
                       textShadow: hasBg ? '0 2px 20px rgba(0,0,0,0.7), 0 0 60px rgba(0,0,0,0.4)' : 'none',
                     }}
                   >
-                    Happy Birthday
-                    <br />
-                    <span
-                      style={{
-                        color: hasBg ? primary : undefined,
-                        textShadow: hasBg ? `0 0 40px ${primary}aa, 0 2px 20px rgba(0,0,0,0.8)` : 'none',
-                      }}
-                    >
-                      {siteData?.coupleName || 'You'}!
-                    </span>
+                    {siteData?.customTitles?.heroMainTitle ? (
+                      siteData.customTitles.heroMainTitle
+                    ) : (
+                      <>
+                        Happy Birthday
+                        <br />
+                        <span
+                          style={{
+                            color: hasBg ? primary : undefined,
+                            textShadow: hasBg ? `0 0 40px ${primary}aa, 0 2px 20px rgba(0,0,0,0.8)` : 'none',
+                          }}
+                        >
+                          {siteData?.coupleName || 'You'}!
+                        </span>
+                      </>
+                    )}
                   </motion.h1>
 
                   {b.recipientAge && (
@@ -221,7 +232,7 @@ export default function BirthdayLandingPage({ siteData, themeColors }) {
           case 'gallery':
             return galleryImages.length > 0 ? (
               <FadeUp key="gallery" delay={0.05}>
-                <BirthdayGallery images={galleryImages} primary={primary} />
+                <BirthdayGallery images={galleryImages} primary={primary} customTitles={siteData?.customTitles} />
               </FadeUp>
             ) : null;
           case 'voiceNote':

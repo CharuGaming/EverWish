@@ -10,7 +10,8 @@ const ROTATIONS = [
 ];
 
 export default function Gallery({ siteDataOverride }) {
-  const { gallery } = siteDataOverride || siteData;
+  const data = siteDataOverride || siteData;
+  const { gallery, customTitles } = data;
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [selectedImg, setSelectedImg] = useState(null);
@@ -45,7 +46,7 @@ export default function Gallery({ siteDataOverride }) {
           Memories
         </span>
         <h2 className="serif text-4xl md:text-5xl font-bold text-white mt-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          Our Memories
+          {customTitles?.gallerySectionTitle || "Our Memories"}
         </h2>
         <p className="text-sm text-white/80 mt-2 font-medium drop-shadow-md">
           Tap a photo to relive the moment

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, Gift, Calendar } from 'lucide-react';
 import ThingsToDoSection from './ThingsToDoSection';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // ── Confetti ──────────────────────────────────────────────────────
 function Confetti({ active }) {
@@ -179,7 +180,7 @@ function ProposalScratchCard({ imageUrl, caption, cardColor }) {
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-lg border border-pink-100 bg-white">
       {imageUrl
-        ? <img src={imageUrl} alt={caption||'memory'} className="w-full aspect-square object-cover" />
+        ? <img src={optimizeCloudinaryUrl(imageUrl, 600)} alt={caption||'memory'} className="w-full aspect-square object-cover" />
         : <div className="w-full aspect-square bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center text-5xl">💕</div>
       }
       <canvas ref={canvasRef} width={300} height={300}
@@ -214,7 +215,7 @@ function ScratchGallery({ items, cardColor, themeColors }) {
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity:0,y:20 }} whileInView={{ opacity:1,y:0 }} viewport={{ once:true }} className="text-center mb-12">
           <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: themeColors.primary }}>Our Memories</span>
-          <h2 className="text-4xl font-serif mt-2 mb-3" style={{ color: themeColors.primary }}>Scratch to Reveal 💝</h2>
+          <h2 className="text-4xl font-serif mt-2 mb-3" style={{ color: themeColors.primary }}>{siteData?.customTitles?.gallerySectionTitle || "Scratch to Reveal 💝"}</h2>
           <div className="w-16 h-0.5 mx-auto" style={{ backgroundColor: themeColors.primary }} />
         </motion.div>
         <div className="columns-2 sm:columns-3 gap-4 space-y-4">
@@ -433,7 +434,7 @@ function VirtualGiftBox({ giftImageUrl, giftMessage, themeColors }) {
                     transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.3 }}
                     className="w-full aspect-square rounded-2xl overflow-hidden mb-5 bg-rose-50"
                   >
-                    <img src={giftImageUrl} alt="gift" className="w-full h-full object-cover" />
+                    <img src={optimizeCloudinaryUrl(giftImageUrl, 600)} alt="gift" className="w-full h-full object-cover" />
                   </motion.div>
                 )}
                 <p className="text-slate-700 font-serif italic text-lg leading-relaxed">
@@ -476,7 +477,7 @@ function DatePlanner({ activities, foods, themeColors }) {
         <motion.div initial={{ opacity:0,y:20 }} whileInView={{ opacity:1,y:0 }} viewport={{ once:true }} className="mb-12">
           <Calendar className="mx-auto mb-3" size={32} style={{ color: themeColors.primary }} />
           <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: themeColors.primary }}>Plan Together</span>
-          <h2 className="text-4xl font-serif mt-2" style={{ color: themeColors.primary }}>Let's Plan Our Date 💚</h2>
+          <h2 className="text-4xl font-serif mt-2" style={{ color: themeColors.primary }}>{siteData?.customTitles?.gameSectionTitle || "Let's Plan Our Date 💚"}</h2>
           <div className="w-16 h-0.5 mx-auto mt-4" style={{ backgroundColor: themeColors.primary }} />
         </motion.div>
 
@@ -572,7 +573,7 @@ export default function TemplateProposal({ siteData, onUnlock }) {
   if (!unlocked) {
     return (
       <ProposalLockscreen
-        proposalText={p.proposalText || 'Will you be my Valentine? 💕'}
+        proposalText={siteData?.customTitles?.heroMainTitle || p.proposalText || 'Will you be my Valentine? 💕'}
         themeColors={themeColors}
         onAccept={() => {
           setUnlocked(true);

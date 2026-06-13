@@ -7,6 +7,7 @@
  */
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 const FONT_LINK =
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,400&family=Dancing+Script:wght@500;700&display=swap';
@@ -62,7 +63,7 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
                 {/* Photo: Uncropped (h-auto) */}
                 {img ? (
                   <img
-                    src={img}
+                    src={optimizeCloudinaryUrl(img, 600)}
                     alt={memLabels[i]}
                     className="w-full h-auto rounded-sm shadow-inner"
                     style={{ display: 'block' }}
@@ -142,7 +143,7 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
             >
               {/* Full image — contain so it never crops */}
               <img
-                src={imgs[selected]}
+                src={optimizeCloudinaryUrl(imgs[selected], 1200)}
                 alt={memLabels[selected]}
                 className="w-full h-full"
                 style={{ objectFit: 'contain' }}

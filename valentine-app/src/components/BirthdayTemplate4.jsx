@@ -48,7 +48,7 @@ export default function BirthdayTemplate4({ siteData, onUnlock }) {
               <div className="flex-1 bg-neutral-700 rounded-md shadow-sm border-b-2 border-neutral-600 transition-transform hover:translate-y-1" />
               <div className="flex-1" />
             </motion.div>
-            <p className="text-neutral-600 font-bold mt-8 uppercase tracking-[0.3em] text-sm">Turn on the lights</p>
+            <p className="text-neutral-600 font-bold mt-8 uppercase tracking-[0.3em] text-sm">{siteData?.customTitles?.gameSectionTitle || "Turn on the lights"}</p>
           </motion.div>
         ) : (
           <motion.div key="content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1 }}>

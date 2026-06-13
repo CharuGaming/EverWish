@@ -82,7 +82,7 @@ const HEART_POSITIONS = [
 ];
 const FALLBACK_EMOJIS = ['💖', '🌹', '🧸', '🍫', '💍'];
 
-function MemoryLockscreen({ matchImages, onUnlock, primary, cardColor }) {
+function MemoryLockscreen({ matchImages, onUnlock, primary, cardColor, siteData }) {
   const imgs = (matchImages && matchImages.filter(Boolean).length >= 5)
     ? matchImages.slice(0, 5) : Array.from({ length: 5 }, () => '');
 
@@ -112,7 +112,7 @@ function MemoryLockscreen({ matchImages, onUnlock, primary, cardColor }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: '#fff0f5' }}>
-      <h1 className="text-3xl font-bold text-rose-600 mb-2">For My Valentine ❤️</h1>
+      <h1 className="text-3xl font-bold text-rose-600 mb-2">{siteData?.customTitles?.gameSectionTitle || "For My Valentine ❤️"}</h1>
       <p className="text-sm text-slate-600 mb-10">Match the pairs to unlock a surprise...</p>
       <div className="relative scale-[0.85] sm:scale-100" style={{ width: 4 * 64 + 56, height: 3 * 64 + 56 }}>
         {HEART_POSITIONS.map((pos, i) => {
@@ -140,7 +140,7 @@ function MemoryLockscreen({ matchImages, onUnlock, primary, cardColor }) {
 }
 
 // ── Lockscreen 4: Dodging Button ────────────────────────────────────
-function DodgingLockscreen({ proposalText, onUnlock, primary }) {
+function DodgingLockscreen({ proposalText, onUnlock, primary, siteData }) {
   const [yesScale, setYesScale] = useState(1);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
   const [accepted, setAccepted] = useState(false);
@@ -161,7 +161,7 @@ function DodgingLockscreen({ proposalText, onUnlock, primary }) {
     <motion.div className="min-h-screen flex flex-col items-center justify-center select-none" style={{ background: '#fdf2f8' }} animate={{ opacity: accepted ? 0 : 1 }} transition={{ delay: 1.4, duration: 0.4 }}>
       <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-6xl mb-8">{accepted ? '🎉' : '💕'}</motion.div>
       <h1 className="text-3xl font-bold mb-12 text-center px-8" style={{ color: primary || '#e11d48', fontFamily: 'Dancing Script, cursive' }}>
-        {proposalText || 'Will you be my Valentine? 💕'}
+        {siteData?.customTitles?.heroMainTitle || proposalText || 'Will you be my Valentine? 💕'}
       </h1>
       <div className="flex gap-8 items-center relative min-h-[80px]">
         <motion.button onClick={handleYes} className="px-8 py-4 rounded-2xl text-white font-bold text-lg shadow-xl" style={{ backgroundColor: primary || '#e11d48', scale: yesScale }}>Yes! 💖</motion.button>
@@ -227,12 +227,12 @@ function ScratchCard({ imageUrl, caption }) {
   );
 }
 
-function ScratchGalleryModule({ items, primary }) {
+function ScratchGalleryModule({ items, primary, siteData }) {
   if (!items?.length) return null;
   return (
     <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="py-20 px-6 text-center">
       <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: primary }}>Memories</span>
-      <h2 className="text-4xl font-serif mt-2 mb-12" style={{ color: primary }}>Scratch to Reveal 💝</h2>
+      <h2 className="text-4xl font-serif mt-2 mb-12" style={{ color: primary }}>{siteData?.customTitles?.gallerySectionTitle || "Scratch to Reveal 💝"}</h2>
       <div className="flex flex-wrap justify-center gap-6">
         {items.map((item, i) => <ScratchCard key={i} imageUrl={item.imageUrl} caption={item.caption} />)}
       </div>
@@ -291,7 +291,7 @@ function WhyILoveYouModule({ reasons, primary }) {
 }
 
 // ── Module: Date Planner ────────────────────────────────────────────
-function DatePlannerModule({ activities, foods, primary }) {
+function DatePlannerModule({ activities, foods, primary, siteData }) {
   const [selActivity, setSelActivity] = useState(null);
   const [selFood, setSelFood] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -304,7 +304,7 @@ function DatePlannerModule({ activities, foods, primary }) {
   return (
     <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="py-20 px-6">
       <div className="max-w-2xl mx-auto text-center">
-        <h2 className="text-4xl font-serif mb-12" style={{ color: primary }}>Let's Plan Our Date 💚</h2>
+        <h2 className="text-4xl font-serif mb-12" style={{ color: primary }}>{siteData?.customTitles?.gameSectionTitle || "Let's Plan Our Date 💚"}</h2>
         <AnimatePresence mode="wait">
           {!confirmed ? (
             <motion.div key="plan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -523,13 +523,13 @@ export default function TemplateCustom({ siteData, onUnlock }) {
   if (!unlocked) {
     const lockType = cm.lockscreenType || 'tap';
     if (lockType === 'memory') {
-      return <MemoryLockscreen matchImages={siteData?.valentine?.matchImages} onUnlock={handleUnlock} primary={primary} cardColor={cardColor} />;
+      return <MemoryLockscreen matchImages={siteData?.valentine?.matchImages} onUnlock={handleUnlock} primary={primary} cardColor={cardColor} siteData={siteData} />;
     }
     if (lockType === 'meter') {
       return <MeterLockscreen prompt={siteData?.lockScreenPrompt} onUnlock={handleUnlock} primary={primary} />;
     }
     if (lockType === 'dodging') {
-      return <DodgingLockscreen proposalText={siteData?.proposal?.proposalText} onUnlock={handleUnlock} primary={primary} />;
+      return <DodgingLockscreen proposalText={siteData?.proposal?.proposalText} onUnlock={handleUnlock} primary={primary} siteData={siteData} />;
     }
     // Default: tap
     return <TapLockscreen prompt={siteData?.lockScreenPrompt} onUnlock={handleUnlock} primary={primary} />;
@@ -543,9 +543,9 @@ export default function TemplateCustom({ siteData, onUnlock }) {
       <section className="py-20 px-6 text-center">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <span className="text-5xl">{siteData?.coupleEmoji || '💌'}</span>
-          <h1 className="text-5xl font-serif mt-4 mb-2" style={{ color: primary }}>{siteData?.coupleName || 'Our Love Story'}</h1>
+          <h1 className="text-5xl font-serif mt-4 mb-2" style={{ color: primary }}>{siteData?.customTitles?.heroMainTitle || siteData?.coupleName || 'Our Love Story'}</h1>
           {siteData?.heroDate && <p className="text-sm font-mono uppercase tracking-widest mt-2" style={{ color: primary }}>{siteData.heroDate}</p>}
-          {siteData?.heroSubtitle && <p className="text-base font-serif italic mt-4 max-w-md mx-auto text-slate-600">"{siteData.heroSubtitle}"</p>}
+          {(siteData?.customTitles?.heroSubtitle || siteData?.heroSubtitle) && <p className="text-base font-serif italic mt-4 max-w-md mx-auto text-slate-600">"{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle}"</p>}
           {siteData?.loveLetterText && (
             <div className="max-w-lg mx-auto mt-8 bg-white/80 rounded-3xl p-6 shadow-md border border-rose-100 text-left">
               <p className="font-serif italic text-slate-700 leading-relaxed whitespace-pre-wrap">{siteData.loveLetterText}</p>
@@ -556,9 +556,9 @@ export default function TemplateCustom({ siteData, onUnlock }) {
 
       {/* Conditional Modules */}
       {cm.showMilestones     && <MilestonesModule milestones={siteData?.milestones} primary={primary} />}
-      {cm.showScratchGallery && <ScratchGalleryModule items={siteData?.valentine?.scratchMemories} primary={primary} />}
+      {cm.showScratchGallery && <ScratchGalleryModule items={siteData?.valentine?.scratchMemories} primary={primary} siteData={siteData} />}
       {cm.showWhyILoveYou    && <WhyILoveYouModule reasons={siteData?.valentine?.reasons} primary={primary} />}
-      {cm.showDatePlanner    && <DatePlannerModule activities={siteData?.proposal?.activities} foods={siteData?.proposal?.foods} primary={primary} />}
+      {cm.showDatePlanner    && <DatePlannerModule activities={siteData?.proposal?.activities} foods={siteData?.proposal?.foods} primary={primary} siteData={siteData} />}
       {cm.showVirtualGift    && <VirtualGiftModule giftImageUrl={siteData?.gift?.bouquetUrl || siteData?.proposal?.giftImageUrl} giftMessage={siteData?.gift?.message || siteData?.proposal?.giftMessage} primary={primary} />}
 
       {/* Things To Do */}

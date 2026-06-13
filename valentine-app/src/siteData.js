@@ -15,6 +15,7 @@ export const siteData = {
   // ── Hero ──────────────────────────────────────────────────
   heroImageUrl:
     "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+  heroTitle: "Happy Valentine's Day",
   heroDate: "February 14 · Forever",
 
   // ── Timeline milestones ───────────────────────────────────

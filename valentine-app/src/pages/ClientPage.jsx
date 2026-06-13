@@ -21,6 +21,7 @@ import HeartBurst        from '../components/HeartBurst';
 import FloatingBalloons  from '../components/FloatingBalloons';
 import CinematicAnniversary from '../components/CinematicAnniversary';
 import CinematicBirthday   from '../components/CinematicBirthday';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // Lazy load components that are below the fold to optimize memory & bundles
 const LoveMap = lazy(() => import('../components/LoveMap'));
@@ -277,7 +278,7 @@ export default function ClientPage() {
           {bgUrl && (
             isBgVideo ? (
               <video
-                src={bgUrl}
+                src={optimizeCloudinaryUrl(bgUrl, 1080)}
                 autoPlay
                 loop
                 muted
@@ -287,7 +288,7 @@ export default function ClientPage() {
               />
             ) : (
               <img
-                src={bgUrl}
+                src={optimizeCloudinaryUrl(bgUrl, 1080)}
                 alt=""
                 className="fixed inset-0 w-full h-full object-cover pointer-events-none"
                 style={{ zIndex: 1 }}

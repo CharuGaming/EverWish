@@ -6,6 +6,7 @@ import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 
 import InteractiveHero from './InteractiveHero';
 import LoveLetterEnvelope from './LoveLetterEnvelope';
 import HeartMemoryGallery from './HeartMemoryGallery';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // ── Google Fonts ────────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -136,7 +137,7 @@ function GiftBoxReveal({ giftImageUrl, giftRevealText }) {
           <motion.div key="opened" initial={{ scale:0.6, opacity:0, y:40 }} animate={{ scale:1, opacity:1, y:0 }}
             transition={{ type:'spring', stiffness:200, damping:18 }} className="text-center max-w-sm">
             {giftImageUrl
-              ? <motion.img src={giftImageUrl} alt="Gift" initial={{ scale:0, rotate:-10 }} animate={{ scale:1, rotate:0 }}
+              ? <motion.img src={optimizeCloudinaryUrl(giftImageUrl, 600)} alt="Gift" initial={{ scale:0, rotate:-10 }} animate={{ scale:1, rotate:0 }}
                   transition={{ delay:0.2, type:'spring', stiffness:250 }}
                   loading="lazy"
                   className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-3xl mx-auto mb-6 shadow-2xl shadow-amber-500/30 border-2 border-amber-400/30"/>
@@ -215,7 +216,7 @@ export default function CinematicBirthday({ siteData = {} }) {
         {bgVideoUrl ? (
           <video autoPlay loop muted playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            src={bgVideoUrl}/>
+            src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}/>
         ) : (
           <div className="absolute inset-0"
             style={{ background: 'radial-gradient(ellipse at 40% 40%, #3d1a00 0%, #1a0800 50%, #0a0806 100%)' }}/>
@@ -260,7 +261,7 @@ export default function CinematicBirthday({ siteData = {} }) {
         {phase === 'playing' && (
           <motion.div key="video" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
             className="fixed inset-0 z-[190] bg-black flex items-center justify-center">
-            <video ref={introVideoRef} src={introVideoUrl} className="w-full h-full object-cover"
+            <video ref={introVideoRef} src={optimizeCloudinaryUrl(introVideoUrl, 1080)} className="w-full h-full object-cover"
               playsInline onEnded={() => setPhase('hero')}/>
             <button onClick={() => setPhase('hero')}
               className="absolute top-6 right-6 text-white/60 hover:text-white text-xs uppercase tracking-widest font-bold bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm transition">
@@ -283,6 +284,7 @@ export default function CinematicBirthday({ siteData = {} }) {
                 coupleName={coupleName}
                 heroSubtitle={heroSubtitle}
                 onScroll={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                customTitles={siteData?.customTitles}
               />
             ) : (
               <section className="relative h-screen flex flex-col items-center justify-center">
@@ -293,11 +295,11 @@ export default function CinematicBirthday({ siteData = {} }) {
                   </motion.p>
                   <motion.h1 initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.7, duration:1 }}
                     className="font-serif-bday text-5xl md:text-8xl font-light text-white leading-tight mb-4">
-                    {coupleName}
+                    {siteData?.customTitles?.heroMainTitle || coupleName}
                   </motion.h1>
                   <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}
                     className="text-white/60 text-base md:text-lg max-w-md mx-auto font-light">
-                    {heroSubtitle}
+                    {siteData?.customTitles?.heroSubtitle || heroSubtitle}
                   </motion.p>
                 </div>
                 <motion.button onClick={() => window.scrollTo({ top: window.innerHeight, behavior:'smooth' })}
@@ -403,7 +405,7 @@ export default function CinematicBirthday({ siteData = {} }) {
                 <div className="max-w-4xl mx-auto">
                   <Reveal className="text-center mb-6">
                     <span className="text-3xl block mb-3">💝</span>
-                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Our Memories</h2>
+                    <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">{siteData?.customTitles?.gallerySectionTitle || "Our Memories"}</h2>
                     <p className="text-white/50 text-sm mt-2">Tap a photo to relive the moment</p>
                   </Reveal>
                   <Reveal delay={0.15}>

@@ -1439,6 +1439,28 @@
         "category": "birthday",
         "description": "Full party experience with confetti, music & a wishes wall.",
         "gradient": "from-fuchsia-400 to-pink-500"
+      },
+      {
+        "id": "v5",
+        "name": "The Cinematic Anniversary",
+        "price": "Rs. 750",
+        "emoji": "🎬",
+        "tag": "Cinematic",
+        "category": "valentine",
+        "description": "Video intro, live relationship timer, timeline & custom audio player.",
+        "gradient": "from-slate-700 to-rose-800",
+        "isActive": true
+      },
+      {
+        "id": "b5",
+        "name": "The Cinematic Birthday",
+        "price": "Rs. 750",
+        "emoji": "🎬",
+        "tag": "Cinematic",
+        "category": "birthday",
+        "description": "Video intro, gift box reveal, year recap & custom audio player.",
+        "gradient": "from-amber-500 to-orange-600",
+        "isActive": true
       }
     ],
     "testimonials": [

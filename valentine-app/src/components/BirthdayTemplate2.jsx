@@ -36,7 +36,7 @@ export default function BirthdayTemplate2({ siteData, onUnlock }) {
             exit={{ opacity: 0 }}
           >
             <div className="absolute top-20 text-center px-4 w-full">
-              <h1 className="text-3xl font-black mb-2 text-slate-800">Keep tapping to inflate!</h1>
+              <h1 className="text-3xl font-black mb-2 text-slate-800">{siteData?.customTitles?.gameSectionTitle || "Keep tapping to inflate!"}</h1>
               <p className="text-slate-500 font-bold">Taps: {taps} / {MAX_TAPS}</p>
             </div>
 

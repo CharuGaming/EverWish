@@ -244,6 +244,7 @@ export function toComponentData(doc) {
     coupleName:       doc.general?.coupleName       || 'Your Names',
     coupleEmoji:      doc.general?.coupleEmoji       || '💌',
     heroSubtitle:     doc.general?.heroSubtitle      || '',
+    heroTitle:        doc.general?.heroTitle         || '',
     heroDate:         doc.general?.heroDate          || '',
     loveLetterText:   doc.general?.loveLetterText    || '',
     lockScreenPrompt: doc.general?.lockScreenPrompt  || 'Tap until the screen is full red',
@@ -414,6 +415,12 @@ export function toComponentData(doc) {
       useInteractiveHero: doc.cinematicBirthday.useInteractiveHero ?? false,
       loveLetterContent:  doc.cinematicBirthday.loveLetterContent  || '',
     } : null,
+    customTitles: {
+      heroMainTitle:       doc.customTitles?.heroMainTitle       || '',
+      heroSubtitle:        doc.customTitles?.heroSubtitle        || '',
+      gameSectionTitle:    doc.customTitles?.gameSectionTitle    || '',
+      gallerySectionTitle: doc.customTitles?.gallerySectionTitle || '',
+    },
   };
 }
 
@@ -428,6 +435,7 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       coupleName: 'Name & Name',
       coupleEmoji: '💌',
       heroSubtitle: 'A little corner of the internet, made just for you 💕',
+      heroTitle: "Happy Valentine's Day",
       heroDate: 'February 14 · Forever',
       loveLetterText: 'Write your love letter here…',
       lockScreenPrompt: 'Tap until the screen is full red',
@@ -496,6 +504,12 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       heroPhotos:         [],
       useInteractiveHero: false,
       loveLetterContent:  '',
+    },
+    customTitles: {
+      heroMainTitle: '',
+      heroSubtitle: '',
+      gameSectionTitle: '',
+      gallerySectionTitle: '',
     }
   };
 }

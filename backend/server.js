@@ -44,13 +44,18 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) return cached.conn;
+  // If we have a cached connection AND it is actually connected, return it.
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
+  
   if (cached.fallback) return null; // Already entered fallback mode
 
-  if (!cached.promise) {
+  // If there's no promise or the connection dropped, we must reconnect
+  if (!cached.promise || mongoose.connection.readyState !== 1) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 2000,
+      serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
       minPoolSize: 1

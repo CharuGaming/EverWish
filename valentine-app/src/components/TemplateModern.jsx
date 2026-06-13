@@ -212,7 +212,7 @@ export default function TemplateModern({ siteData }) {
           className="mb-12"
         >
           <span className="text-rose-500 text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse">
-            Happy Valentine's Day {siteData.coupleEmoji || '🥰'}
+            {siteData.customTitles?.heroMainTitle || "Happy Valentine's Day"} {siteData.coupleEmoji || '🥰'}
           </span>
           <h1 className="text-xl md:text-2xl font-semibold tracking-[0.25em] text-slate-500 uppercase font-sans">
             {siteData.coupleName || 'Our Story'}
@@ -247,7 +247,7 @@ export default function TemplateModern({ siteData }) {
           transition={{ delay: 0.4, duration: 1 }}
           className="text-lg font-serif italic text-slate-700 leading-relaxed max-w-md mx-auto mb-8 px-4"
         >
-          "{siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
+          "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
         </motion.p>
 
         {/* Timeline Dates */}
@@ -473,7 +473,7 @@ export default function TemplateModern({ siteData }) {
 
       {/* SECTION 4: Lightbox Gallery */}
       <section className="max-w-4xl mx-auto px-6">
-        <h2 className="text-center font-serif text-2xl text-slate-800 mb-10">Our Memory Grid</h2>
+        <h2 className="text-center font-serif text-2xl text-slate-800 mb-10">{siteData.customTitles?.gallerySectionTitle || "Our Memory Grid"}</h2>
         
         {allImages.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

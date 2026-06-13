@@ -41,15 +41,15 @@ export default function BirthdayTemplate3({ siteData, onUnlock }) {
               >
                 <div className="absolute inset-0 flex flex-col items-center justify-center backface-hidden" style={{ color: onPrimary }}>
                   <span className="text-6xl mb-4">🎂</span>
-                  <h2 className="text-2xl font-bold font-serif text-center px-4">Open Me!</h2>
+                  <h2 className="text-2xl font-bold font-serif text-center px-4">{siteData?.customTitles?.gameSectionTitle || "Open Me!"}</h2>
                 </div>
                 <div className="absolute inset-0 bg-white transform rotate-y-180 backface-hidden flex items-center justify-center p-6 border-2 border-slate-100 rounded-xl">
                 </div>
               </motion.div>
               <div className="w-full h-full absolute top-0 left-0 bg-white shadow-xl rounded-xl z-10 flex flex-col items-center justify-center p-8 border border-slate-100 text-center">
-                <h3 className="text-xl font-bold text-slate-800 mb-4" style={{ fontFamily: 'Dancing Script, cursive' }}>Happy Birthday!</h3>
+                <h3 className="text-xl font-bold text-slate-800 mb-4" style={{ fontFamily: 'Dancing Script, cursive' }}>{siteData?.customTitles?.heroMainTitle || "Happy Birthday!"}</h3>
                 <p className="text-sm text-slate-500 font-serif leading-relaxed">
-                  Wishing you a day filled with joy and wonderful surprises.
+                  {siteData?.customTitles?.heroSubtitle || "Wishing you a day filled with joy and wonderful surprises."}
                 </p>
               </div>
             </div>

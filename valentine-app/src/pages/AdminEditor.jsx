@@ -5,9 +5,10 @@ import {
   Save, ArrowLeft, Upload, Loader2, CheckCircle2,
   Plus, Trash2, Settings, Music, Gift, MapPin, Image,
   ExternalLink, AlertTriangle, ToggleLeft, ToggleRight, Layers, Sun, Moon, Heart,
-  Share2, Sparkles
+  Share2, Sparkles, Download, UploadCloud, Type
 } from 'lucide-react';
 import { generateRandomContent } from '../utils/aiContentBank';
+import { exportConfig, importConfig } from '../utils/configSync';
 
 const toLocalDateTimeString = (dateOrStr) => {
   if (!dateOrStr) return '';
@@ -104,10 +105,41 @@ function Toggle({ checked, onChange, label }) {
   );
 }
 
-function Card({ title, children }) {
+function Card({ title, onExport, onImport, children }) {
+  const hasHeader = title || onExport || onImport;
   return (
     <div className="bg-white/50 dark:bg-black/20 backdrop-blur-xl border border-white/60 dark:border-white/10 rounded-[2rem] p-6 md:p-8 mb-6 shadow-xl shadow-black/5">
-      {title && <h3 className="text-xs font-black text-rose-500 uppercase tracking-[0.2em] mb-6">{title}</h3>}
+      {hasHeader && (
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xs font-black text-rose-500 uppercase tracking-[0.2em]">{title || ''}</h3>
+          {(onExport || onImport) && (
+            <div className="flex gap-2">
+              {onImport && (
+                <button
+                  type="button"
+                  onClick={onImport}
+                  title="Import Config"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/20 dark:bg-black/20 hover:bg-white/40 dark:hover:bg-white/10 border border-white/40 dark:border-white/10 text-[10px] font-bold text-slate-600 dark:text-slate-300 transition-colors shadow-sm cursor-pointer hover:scale-105 active:scale-95"
+                >
+                  <Download size={12} />
+                  📥 Import
+                </button>
+              )}
+              {onExport && (
+                <button
+                  type="button"
+                  onClick={onExport}
+                  title="Export Config"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/20 dark:bg-black/20 hover:bg-white/40 dark:hover:bg-white/10 border border-white/40 dark:border-white/10 text-[10px] font-bold text-slate-600 dark:text-slate-300 transition-colors shadow-sm cursor-pointer hover:scale-105 active:scale-95"
+                >
+                  <UploadCloud size={12} />
+                  📤 Export
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );
@@ -396,6 +428,7 @@ const TABS = [
   { id: 'thingsToDo', label: 'Things To Do', Icon: CheckCircle2 },
   { id: 'milestones', label: 'Milestones',   Icon: MapPin   },
   { id: 'gallery',    label: 'Gallery',      Icon: Image    },
+  { id: 'customTitles',label: 'Typography',  Icon: Type     },
   { id: 'socialLinks',label: 'Social Links', Icon: Share2   },
 ];
 
@@ -406,6 +439,7 @@ const CINEMATIC_TABS = [
   { id: 'milestones', label: 'Milestones',        Icon: MapPin   },
   { id: 'gallery',    label: 'Photo Gallery',     Icon: Image    },
   { id: 'reasons',    label: 'Why I Love You',    Icon: Heart    },
+  { id: 'customTitles',label: 'Typography',  Icon: Type     },
   { id: 'socialLinks',label: 'Social Links',      Icon: Share2   },
 ];
 
@@ -418,6 +452,7 @@ const VALENTINE_TABS = [
   { id: 'reasons',     label: 'Why I Love You',    Icon: MapPin   },
   { id: 'scratch',     label: 'Scratch Cards',     Icon: Image    },
   { id: 'valFeatures', label: 'Valentine Features', Icon: Heart   },
+  { id: 'customTitles',label: 'Typography',        Icon: Type     },
   { id: 'socialLinks', label: 'Social Links',      Icon: Share2   },
 ];
 
@@ -427,6 +462,7 @@ const PROPOSAL_TABS = [
   { id: 'thingsToDo', label: 'Things To Do',   Icon: CheckCircle2 },
   { id: 'scratch',    label: 'Scratch Gallery', Icon: Image   },
   { id: 'activities', label: 'Date Planner',   Icon: MapPin   },
+  { id: 'customTitles',label: 'Typography',    Icon: Type     },
   { id: 'socialLinks',label: 'Social Links',   Icon: Share2   },
 ];
 
@@ -435,6 +471,7 @@ const CUSTOM_TABS = [
   { id: 'general',   label: 'General',         Icon: Settings },
   { id: 'music',     label: 'Music',           Icon: Music    },
   { id: 'thingsToDo',label: 'Things To Do',    Icon: CheckCircle2 },
+  { id: 'customTitles',label: 'Typography',    Icon: Type     },
   { id: 'socialLinks',label: 'Social Links',   Icon: Share2   },
 ];
 
@@ -443,6 +480,7 @@ const BIRTHDAY_TABS = [
   { id: 'gallery',      label: 'Gallery',           Icon: Image    },
   { id: 'music',        label: 'Music',             Icon: Music    },
   { id: 'sectionOrder', label: 'Section Order',     Icon: Layers   },
+  { id: 'customTitles', label: 'Typography',        Icon: Type     },
   { id: 'socialLinks',  label: 'Social Links',      Icon: Share2   },
 ];
 
@@ -453,6 +491,7 @@ const CINEMATIC_BDAY_TABS = [
   { id: 'cinbday_recap',       label: 'Year Recap',              Icon: CheckCircle2 },
   { id: 'cinbday_music',       label: 'Music & Lyrics',          Icon: Music    },
   { id: 'cinbday_gallery',     label: 'Photo Gallery',           Icon: Image    },
+  { id: 'customTitles',        label: 'Typography',              Icon: Type     },
   { id: 'socialLinks',         label: 'Social Links',            Icon: Share2   },
 ];
 
@@ -569,11 +608,36 @@ function ValentineFeaturesTab({ doc, setDoc }) {
   );
 }
 
-function GeneralTab({ doc, setDoc }) {
+function GeneralTab({ doc, setDoc, showToast }) {
   const g = doc.general || {};
   const imgs = doc.images || {};
   const up = (field, val) => setDoc(d => ({ ...d, general: { ...d.general, [field]: val } }));
   const upImg = (field, val) => setDoc(d => ({ ...d, images: { ...d.images, [field]: val } }));
+
+  const handleExportSection = async (sectionKey, data) => {
+    try {
+      const configStr = JSON.stringify({ section: sectionKey, data }, null, 2);
+      await navigator.clipboard.writeText(configStr);
+      if (showToast) showToast(`Section config copied to clipboard!`, true);
+    } catch (err) {
+      if (showToast) showToast("Failed to copy configuration.", false);
+    }
+  };
+
+  const handleImportSection = async (sectionKey, updateFn) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const parsed = JSON.parse(text);
+      if (parsed && parsed.section === sectionKey && parsed.data) {
+        updateFn(parsed.data);
+        if (showToast) showToast("Config imported successfully!", true);
+      } else {
+        if (showToast) showToast("Invalid configuration data.", false);
+      }
+    } catch (err) {
+      if (showToast) showToast("Failed to read or parse clipboard data.", false);
+    }
+  };
 
   // Helper for timelineDates
   const upTimeline = (field, val) => setDoc(d => ({
@@ -640,7 +704,26 @@ function GeneralTab({ doc, setDoc }) {
           </div>
         </Card>
       ) : (
-        <Card title="Hero Section">
+        <Card 
+          title="Hero Section"
+          onExport={() => handleExportSection('hero', { images: { heroImageUrl: imgs.heroImageUrl }, general: { heroTitle: g.heroTitle, heroDate: g.heroDate, heroSubtitle: g.heroSubtitle, loveLetterText: g.loveLetterText } })}
+          onImport={() => handleImportSection('hero', (data) => {
+            setDoc(d => ({
+              ...d,
+              images: { ...d.images, heroImageUrl: data.images?.heroImageUrl ?? d.images?.heroImageUrl },
+              general: {
+                ...d.general,
+                heroTitle: data.general?.heroTitle ?? d.general?.heroTitle,
+                heroDate: data.general?.heroDate ?? d.general?.heroDate,
+                heroSubtitle: data.general?.heroSubtitle ?? d.general?.heroSubtitle,
+                loveLetterText: data.general?.loveLetterText ?? d.general?.loveLetterText
+              }
+            }));
+          })}
+        >
+          <FieldRow label="Hero Title" fieldType="subtitle" onGenerate={v => up('heroTitle', v)}>
+            <TextInput value={g.heroTitle} onChange={e => up('heroTitle', e.target.value)} placeholder="Happy Valentine's Day" />
+          </FieldRow>
           <ImageField label="Hero Image" hint="Main polaroid photo shown in the hero section" value={imgs.heroImageUrl} onChange={v => upImg('heroImageUrl', v)} />
           <FieldRow label="Date Text" fieldType="date" onGenerate={v => up('heroDate', v)}>
             <TextInput value={g.heroDate} onChange={e => up('heroDate', e.target.value)} placeholder="February 14 · Forever" />
@@ -810,13 +893,26 @@ function GiftTab({ doc, setDoc }) {
   const upImg = v => setDoc(d => ({ ...d, images: { ...d.images, bouquetImageUrl: v } }));
   return (
     <>
-      <Card title="Gift Message">
+      <Card 
+        title="Gift Message"
+        onExport={() => exportConfig('giftMessage', { recipient: g.recipient, message: g.message })}
+        onImport={() => importConfig('giftMessage', data => {
+          up('recipient', data.recipient || '');
+          up('message', data.message || '');
+        })}
+      >
         <div className="mb-5"><Label>Recipient Name</Label><TextInput value={g.recipient} onChange={e => up('recipient', e.target.value)} placeholder="Maleesha" /></div>
         <FieldRow label="Hidden Message" fieldType="loveLetter" onGenerate={v => up('message', v)}>
           <TextArea value={g.message} onChange={e => up('message', e.target.value)} rows={4} />
         </FieldRow>
       </Card>
-      <Card title="Flower Bouquet Image">
+      <Card 
+        title="Flower Bouquet Image"
+        onExport={() => exportConfig('giftBouquet', { bouquetImageUrl: imgs.bouquetImageUrl })}
+        onImport={() => importConfig('giftBouquet', data => {
+          if (data.bouquetImageUrl !== undefined) upImg(data.bouquetImageUrl);
+        })}
+      >
         <ImageField label="Bouquet PNG" hint="Use a transparent PNG for best visual results" value={imgs.bouquetImageUrl} onChange={upImg} />
       </Card>
     </>
@@ -846,7 +942,13 @@ function MilestonesTab({ doc, setDoc }) {
 
       <div className="space-y-4">
         {milestones.map((m, i) => (
-          <Card key={m.id}>
+          <Card 
+            key={m.id}
+            onExport={() => exportConfig('milestoneItem', m)}
+            onImport={() => importConfig('milestoneItem', data => {
+              setDoc(d => ({ ...d, milestones: d.milestones.map(x => x.id === m.id ? { ...data, id: m.id } : x) }));
+            })}
+          >
             <div className="flex justify-between items-center mb-4">
               <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">Milestone #{i + 1}</span>
               <button onClick={() => del(m.id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-700 transition"><Trash2 size={14} /></button>
@@ -910,14 +1012,27 @@ function GalleryTab({ doc, setDoc }) {
 
   return (
     <>
-      <Card title="Center (Hero) Image">
+      <Card 
+        title="Center (Hero) Image"
+        onExport={() => exportConfig('galleryHero', { centerImage: g.centerImage, centerCaption: g.centerCaption })}
+        onImport={() => importConfig('galleryHero', data => {
+          upG('centerImage', data.centerImage || '');
+          upG('centerCaption', data.centerCaption || '');
+        })}
+      >
         <ImageField label="Center Image" hint="Displayed with a ripped-paper mask in the gallery" value={g.centerImage} onChange={v => upG('centerImage', v)} />
         <FieldRow label="Center Caption" fieldType="caption" onGenerate={v => upG('centerCaption', v)}>
           <TextInput value={g.centerCaption} onChange={e => upG('centerCaption', e.target.value)} placeholder="Us, always ❤️" />
         </FieldRow>
       </Card>
 
-      <Card title="Supporting Photos">
+      <Card 
+        title="Supporting Photos"
+        onExport={() => exportConfig('gallerySupporting', g.supporting || [])}
+        onImport={() => importConfig('gallerySupporting', data => {
+          if(Array.isArray(data)) setDoc(d => ({ ...d, gallery: { ...d.gallery, supporting: data } }));
+        })}
+      >
         <div className="flex justify-between items-center mb-4">
           <p className="text-slate-400 text-sm">{(g.supporting || []).length} photo{(g.supporting || []).length !== 1 ? 's' : ''}</p>
           <button onClick={addPhoto} className="flex items-center gap-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
@@ -1213,7 +1328,13 @@ function ThingsToDoTab({ doc, setDoc }) {
       </div>
       <div className="space-y-4">
         {items.map((s, i) => (
-          <Card key={s.id}>
+          <Card 
+            key={s.id}
+            onExport={() => exportConfig('thingsToDoItem', s)}
+            onImport={() => importConfig('thingsToDoItem', data => {
+              setDoc(d => ({ ...d, thingsToDo: (d.thingsToDo || []).map(x => x.id === s.id ? { ...data, id: s.id } : x) }));
+            })}
+          >
             <div className="flex justify-between items-center mb-4">
               <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">Bucket List Item #{i+1}</span>
               <button onClick={() => del(s.id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-700 transition">
@@ -1446,6 +1567,62 @@ function SocialLinksTab({ doc, setDoc }) {
               onChange={e => up('youtube', e.target.value)}
               placeholder="https://youtube.com/@yourchannel"
             />
+          </div>
+        </div>
+      </Card>
+    </>
+  );
+}
+
+function CustomTitlesTab({ doc, setDoc }) {
+  const ct = doc.customTitles || {};
+  const up = (field, val) => setDoc(d => ({
+    ...d,
+    customTitles: { ...(d.customTitles || {}), [field]: val }
+  }));
+
+  return (
+    <>
+      <Card title="Global Text & Typography Configuration">
+        <p className="text-[11px] text-slate-500 mb-6 leading-relaxed">
+          Define custom titles and heading overrides globally. If left blank, each template will fall back to its own default texts.
+        </p>
+        <div className="space-y-5">
+          <div>
+            <Label>Global Hero Main Title</Label>
+            <TextInput
+              value={ct.heroMainTitle || ''}
+              onChange={e => up('heroMainTitle', e.target.value)}
+              placeholder="e.g. Happy Anniversary! / Happy Birthday!"
+            />
+            <p className="text-[10px] text-slate-500 mt-1">Overrides the main heading at the very top of the site.</p>
+          </div>
+          <div>
+            <Label>Global Hero Subtitle</Label>
+            <TextInput
+              value={ct.heroSubtitle || ''}
+              onChange={e => up('heroSubtitle', e.target.value)}
+              placeholder="e.g. A little corner of the internet, made just for you 💕"
+            />
+            <p className="text-[10px] text-slate-500 mt-1">Overrides the subtitle or date caption text under the main hero title.</p>
+          </div>
+          <div>
+            <Label>Global Game / Interactive Section Title</Label>
+            <TextInput
+              value={ct.gameSectionTitle || ''}
+              onChange={e => up('gameSectionTitle', e.target.value)}
+              placeholder="e.g. Memory Match / Match the Pairs"
+            />
+            <p className="text-[10px] text-slate-500 mt-1">Overrides the title of memory games or love lock interactive sections.</p>
+          </div>
+          <div>
+            <Label>Global Gallery Section Title</Label>
+            <TextInput
+              value={ct.gallerySectionTitle || ''}
+              onChange={e => up('gallerySectionTitle', e.target.value)}
+              placeholder="e.g. Us, Always ❤️ / Our Memories"
+            />
+            <p className="text-[10px] text-slate-500 mt-1">Overrides the heading for photo grids or scratch galleries.</p>
           </div>
         </div>
       </Card>
@@ -2265,7 +2442,13 @@ export default function AdminEditor() {
   const [saved, setSaved]       = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [error, setError]   = useState('');
+  const [toast, setToast]   = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const showToast = (msg, ok = true) => {
+    setToast({ msg, ok });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     setIsDarkMode(document.documentElement.classList.contains('dark'));
@@ -2407,9 +2590,10 @@ export default function AdminEditor() {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
+            {activeTab === 'customTitles' && <CustomTitlesTab doc={doc} setDoc={setDoc} />}
             {isValentine ? (
               <>
-                {activeTab === 'general'     && <GeneralTab doc={doc} setDoc={setDoc} />}
+                {activeTab === 'general'     && <GeneralTab doc={doc} setDoc={setDoc} showToast={showToast} />}
                 {activeTab === 'music'       && <MusicTab   doc={doc} setDoc={setDoc} />}
                 {activeTab === 'gift'        && <GiftTab    doc={doc} setDoc={setDoc} />}
                 {activeTab === 'thingsToDo'  && <ThingsToDoTab doc={doc} setDoc={setDoc} />}
@@ -2431,7 +2615,7 @@ export default function AdminEditor() {
             ) : isCustom ? (
               <>
                 {activeTab === 'modules'    && <CustomModulesTab  doc={doc} setDoc={setDoc} />}
-                {activeTab === 'general'    && <GeneralTab         doc={doc} setDoc={setDoc} />}
+                {activeTab === 'general'    && <GeneralTab         doc={doc} setDoc={setDoc} showToast={showToast} />}
                 {activeTab === 'music'      && <MusicTab           doc={doc} setDoc={setDoc} />}
                 {activeTab === 'thingsToDo' && <ThingsToDoTab      doc={doc} setDoc={setDoc} />}
                 {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}

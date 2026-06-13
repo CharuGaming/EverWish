@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Video } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 /**
  * GreetingVideo — Premium video player for personal greeting videos.
@@ -80,7 +81,7 @@ export default function GreetingVideo({ videoUrl, primary = '#f59e0b' }) {
           {/* Video element */}
           <video
             ref={videoRef}
-            src={videoUrl}
+            src={optimizeCloudinaryUrl(videoUrl, 854)}
             playsInline
             controls
             className="w-full max-h-[480px] object-cover bg-black"

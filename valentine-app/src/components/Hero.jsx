@@ -22,7 +22,7 @@ export default function Hero({ siteDataOverride }) {
   const d = siteDataOverride || siteData;
   const { coupleName, heroSubtitle, heroImageUrl, heroDate, loveLetterText, coupleEmoji } = d;
 
-  const headingWords = "Our Love Story".split(" ");
+  const headingWords = (d.customTitles?.heroMainTitle || "Our Love Story").split(" ");
 
   return (
     <motion.section
@@ -108,7 +108,7 @@ export default function Hero({ siteDataOverride }) {
         variants={itemVariants}
         className="relative z-10 mt-5 max-w-md text-white/80 text-lg font-light leading-relaxed drop-shadow"
       >
-        {heroSubtitle}
+        {d.customTitles?.heroSubtitle || heroSubtitle}
       </motion.p>
 
       {/* Love letter card - Glassmorphic */}

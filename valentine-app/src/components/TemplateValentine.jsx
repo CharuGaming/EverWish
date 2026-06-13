@@ -7,6 +7,7 @@ import { getContrastYIQ } from '../utils/colorHelpers';
 import ReasonsJar  from './ReasonsJar';
 import Heartbeat   from './Heartbeat';
 import TimeCapsule from './TimeCapsule';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // ── Confetti burst ────────────────────────────────────────────────
 function Confetti({ active }) {
@@ -148,7 +149,7 @@ function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
       <Confetti active={confetti} />
       <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} className="text-center mb-10 px-4">
         <h1 className="cursive-title text-5xl md:text-6xl lock-primary-text flex items-center justify-center gap-3">
-          For My Valentine <span className="inline-block animate-pulse text-4xl md:text-5xl">❤️</span>
+          {siteData.customTitles?.gameSectionTitle || "For My Valentine"} <span className="inline-block animate-pulse text-4xl md:text-5xl">❤️</span>
         </h1>
         <p className="quicksand-subtitle text-xs sm:text-sm text-slate-800 font-semibold tracking-wide mt-6 mb-2">
           Match the pairs to unlock a surprise...
@@ -310,7 +311,7 @@ function ScratchMemories({ scratchMemories = [] }) {
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           className="text-center mb-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-6">
           <span className="text-xs font-bold uppercase tracking-widest text-pink-300 font-mono">Reveal our moments</span>
-          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">Scratch Memories</h2>
+          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">{siteData.customTitles?.gallerySectionTitle || "Scratch Memories"}</h2>
           <p className="text-sm text-white/60">Scratch each card to reveal a hidden memory 💝</p>
           <div className="w-16 h-0.5 bg-pink-400/50 mx-auto mt-4" />
         </motion.div>
@@ -556,8 +557,10 @@ function VirtualGift({ gift }) {
 }
 
 // ── Hero banner ───────────────────────────────────────────────────
-const heroWords = ['Happy', "Valentine's", 'Day'];
 function ValentineHero({ siteData }) {
+  const heroTitleText = siteData.customTitles?.heroMainTitle || siteData.heroTitle || "Happy Valentine's Day";
+  const heroWords = heroTitleText.split(' ');
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden">
       {/* ── Romantic overlay on top of global fixed video ── */}
@@ -612,10 +615,10 @@ function ValentineHero({ siteData }) {
             {siteData.heroDate}
           </motion.p>
         )}
-        {siteData.heroSubtitle && (
+        {(siteData.customTitles?.heroSubtitle || siteData.heroSubtitle) && (
           <motion.p className="text-base font-serif italic text-white/70 max-w-md mx-auto leading-relaxed mb-8"
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}>
-            "{siteData.heroSubtitle}"
+            "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle}"
           </motion.p>
         )}
 
@@ -666,9 +669,9 @@ export default function TemplateValentine({ siteData, onUnlock }) {
 
       {/* ── Global Fixed Background (always mounted — shows through lockscreen too) ── */}
       {isBgVideo
-        ? <video src={bgUrl} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
+        ? <video src={optimizeCloudinaryUrl(bgUrl, 1080)} autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
         : bgUrl
-        ? <img src={bgUrl} alt="" className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
+        ? <img src={optimizeCloudinaryUrl(bgUrl, 1080)} alt="" className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none" />
         : <div className="fixed inset-0 z-0 pointer-events-none"
             style={{ background: 'linear-gradient(135deg, #1a0a1e 0%, #3b0d2a 45%, #1a0a1e 100%)' }} />
       }

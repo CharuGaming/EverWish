@@ -274,6 +274,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTemplateLongScreenshotUpload = async (idx, file) => {
+    if (!file) return;
+    try {
+      showToast("Uploading long screenshot...", true);
+      const res = await uploadImage(file);
+      if (res.success) {
+        handleTemplateChange(idx, 'longScreenshotUrl', res.url);
+        showToast("Screenshot uploaded successfully!", true);
+      } else {
+        showToast(res.message || "Upload failed", false);
+      }
+    } catch (err) {
+      showToast("Upload failed", false);
+    }
+  };
+
   const addTemplate = () => {
     setStorefront({
       ...storefront,
@@ -890,6 +906,37 @@ export default function AdminDashboard() {
                       )}
                       <div className="flex-1 text-xs text-slate-500">
                         Upload a screenshot of the first page to create a live animated preview card.
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Full-Page Screenshot (For Storefront Preview Modal)</label>
+                    <div className="flex items-center gap-3">
+                      {tpl.longScreenshotUrl ? (
+                        <div className="relative w-16 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-black/5 flex-shrink-0 group/img">
+                          <img loading="lazy" src={tpl.longScreenshotUrl} alt="Screenshot" className="w-full h-full object-cover object-top" />
+                          <button 
+                            type="button"
+                            onClick={() => handleTemplateChange(i, 'longScreenshotUrl', '')}
+                            className="absolute inset-0 bg-black/70 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-16 h-24 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-rose-500 transition-colors cursor-pointer bg-white/30 dark:bg-black/10 flex-shrink-0">
+                          <Upload size={16} className="text-slate-400" />
+                          <span className="text-[9px] font-bold text-slate-500 mt-0.5 text-center">Upload</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={e => handleTemplateLongScreenshotUpload(i, e.target.files[0])} 
+                            className="hidden" 
+                          />
+                        </label>
+                      )}
+                      <div className="flex-1 text-xs text-slate-500">
+                        Upload a long, full-page scrolling screenshot. This replaces the iframe preview.
                       </div>
                     </div>
                   </div>
