@@ -753,21 +753,61 @@ function GeneralTab({ doc, setDoc, showToast }) {
         )}
       </Card>
 
-      {/* ── Hero Background Media ─────────────────────────── */}
-      <Card title="🎬 Hero Background (Video or Image)">
+      {/* ── Dual Video Config (Polaroid template) ─────────────── */}
+      <Card title="🎬 Dual-Video Config (Intro + Background)">
         <p className="text-[11px] text-slate-500 mb-4">
-          Upload a looping background video (MP4/WebM — great for Veo AI-generated cinematic clips) or a background image. It will fill the entire background with the greeting text and glassmorphic content overlaid on top.
+          <strong>Opening Animation Video</strong> — plays full-screen when the visitor taps the intro screen. Great for a cinematic reveal. Leave empty to keep the classic tap-to-fill lock screen.
         </p>
         <VideoField
-          label="Hero Background Media"
-          hint="Upload an MP4/WebM video or JPG/PNG image. Videos loop silently. Keep under 20MB for fast load."
+          label="🎞️ Opening Animation Video (Intro)"
+          hint="Plays once full-screen after the visitor taps 'Open'. MP4/WebM, ideally ≤20 MB. Leave blank for the classic tap-lock."
+          value={doc.polaroid?.introVideoUrl || ''}
+          onChange={v => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), introVideoUrl: v } }))}
+        />
+        {doc.polaroid?.introVideoUrl && (
+          <button
+            onClick={() => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), introVideoUrl: '' } }))}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
+          >
+            Remove intro video
+          </button>
+        )}
+
+        <div className="border-t border-white/10 my-4" />
+
+        <p className="text-[11px] text-slate-500 mb-4">
+          <strong>Looping Background Video</strong> — fills the entire Hero section (behind the polaroid photo + text). Loops silently. Ideal for a subtle cinematic atmosphere.
+        </p>
+        <VideoField
+          label="📽️ Looping Background Video (Hero)"
+          hint="Loops silently behind the hero section content. MP4/WebM or JPG/PNG (static fallback). Keep under 20 MB."
+          value={doc.polaroid?.bgVideoUrl || ''}
+          onChange={v => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), bgVideoUrl: v } }))}
+        />
+        {doc.polaroid?.bgVideoUrl && (
+          <button
+            onClick={() => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), bgVideoUrl: '' } }))}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
+          >
+            Remove background video
+          </button>
+        )}
+
+        <div className="border-t border-white/10 my-4" />
+
+        <p className="text-[11px] text-slate-500 mb-4">
+          <strong>Global Background (entire page)</strong> — image or video that fills the full page background (behind all sections).
+        </p>
+        <VideoField
+          label="🖼️ Full-Page Background (optional)"
+          hint="Upload an MP4/WebM video or JPG/PNG image. Applied globally across all sections. Keep under 20MB for fast load."
           value={doc.heroBackgroundMediaUrl || ''}
           onChange={v => setDoc(d => ({ ...d, heroBackgroundMediaUrl: v }))}
         />
         {doc.heroBackgroundMediaUrl && (
           <button onClick={() => setDoc(d => ({ ...d, heroBackgroundMediaUrl: '' }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 block">
-            Remove hero background
+            Remove full-page background
           </button>
         )}
       </Card>

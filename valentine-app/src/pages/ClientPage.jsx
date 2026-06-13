@@ -5,6 +5,7 @@ import { getSite, toComponentData } from '../api';
 
 // Existing components (now accept siteDataOverride / gift props)
 import LockScreen    from '../components/LockScreen';
+import PolaroidIntroScreen from '../components/PolaroidIntroScreen';
 import Hero          from '../components/Hero';
 import FloatingDecor from '../components/FloatingDecor';
 import CursorTrail   from '../components/CursorTrail';
@@ -316,6 +317,17 @@ export default function ClientPage() {
               onUnlockImmediate={handleUnlockImmediate}
               lockProps={lockProps}
               themeColors={siteData.themeColors}
+            />
+        ) : isPolaroid ? (
+            <PolaroidIntroScreen
+              key="polaroid-lock"
+              onUnlock={handleUnlock}
+              introVideoUrl={siteData?.polaroid?.introVideoUrl || ''}
+              heroPhotos={siteData?.gallery?.supporting?.map(s => s.url).filter(Boolean) || []}
+              lockScreenPrompt={lockProps.lockScreenPrompt}
+              valentineMessage={lockProps.valentineMessage}
+              introButtonText={siteData?.introButtonText}
+              themeColors={siteData?.themeColors}
             />
           ) : (
             <LockScreen

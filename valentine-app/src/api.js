@@ -370,6 +370,10 @@ export function toComponentData(doc) {
     unlockTime:   doc.unlockTime || null,
     voiceNoteUrl: doc.voiceNoteUrl || '',
     heroBackgroundMediaUrl: doc.heroBackgroundMediaUrl || '',
+    polaroid: {
+      introVideoUrl: doc.polaroid?.introVideoUrl || '',
+      bgVideoUrl:    doc.polaroid?.bgVideoUrl    || '',
+    },
     scratchPrize: doc.scratchPrize || '',
     yearInReview: doc.yearInReview || [],
     virtualGift:  doc.virtualGift ? {
@@ -445,6 +449,10 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
     images: { heroImageUrl: '', bouquetImageUrl: '' },
     music:  { audioUrl: '', thumbnailUrl: '', isEnabled: true },
     gift:   { recipient: '', message: 'You deserve all the flowers…' },
+    polaroid: {
+      introVideoUrl: '',
+      bgVideoUrl: '',
+    },
     milestones: [],
     gallery: { centerImage: '', centerCaption: 'Us, always ❤️', supporting: [] },
     valentine: { matchImages: ['','','','',''], reasons: [], scratchMemories: [] },

@@ -193,6 +193,11 @@ const SiteSchema = new mongoose.Schema(
     unlockTime:   { type: Date,   default: null },
     voiceNoteUrl: { type: String, default: '' },
     heroBackgroundMediaUrl: { type: String, default: '' },
+    // ── Polaroid Template Video Config ────────────────────────────
+    polaroid: {
+      introVideoUrl: { type: String, default: '' },
+      bgVideoUrl:    { type: String, default: '' },
+    },
     scratchPrize: { type: String, default: '' },
     yearInReview: {
       type: [{ label: { type: String, default: '' }, value: { type: String, default: '' } }],

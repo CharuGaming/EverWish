@@ -1,28 +1,55 @@
-import { motion } from "framer-motion";
-import { Heart, CalendarHeart } from "lucide-react";
-import { siteData } from "../siteData";
-import { optimizeCloudinaryUrl } from "../utils/imageHelpers";
+/**
+ * Hero.jsx  –  Polaroid template hero section.
+ *
+ * Layering (bottom → top):
+ *   0.  bgVideoUrl  (or static gradient if absent)  — fixed background
+ *   1.  Cinematic dark gradient overlay
+ *   2.  Floating polaroid / content (z-10+)
+ *
+ * All Framer Motion animations use `willChange: "transform"` and
+ * `translateZ(0)` hints for GPU compositing, keeping the background
+ * video decode on a separate layer.
+ */
+
+import { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Heart, CalendarHeart } from 'lucide-react';
+import { siteData } from '../siteData';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.18 } },
 };
 const itemVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+  hidden:   { opacity: 0, y: 32 },
+  visible:  { opacity: 1, y: 0, transition: { duration: 0.7, ease: 'easeOut' } },
 };
-
-// Staggered text reveal for heading
 const wordVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+  hidden:  { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export default function Hero({ siteDataOverride }) {
   const d = siteDataOverride || siteData;
-  const { coupleName, heroSubtitle, heroImageUrl, heroDate, loveLetterText, coupleEmoji } = d;
+  const {
+    coupleName,
+    heroSubtitle,
+    heroImageUrl,
+    heroDate,
+    loveLetterText,
+    coupleEmoji,
+    customTitles,
+  } = d;
 
-  const headingWords = (d.customTitles?.heroMainTitle || "Our Love Story").split(" ");
+  const bgVideoUrl = d.polaroid?.bgVideoUrl || '';
+  const isBgVideo  = bgVideoUrl && (
+    /\.(mp4|webm|ogg|mov)(\?|$)/i.test(bgVideoUrl) ||
+    /\/video\/upload\//i.test(bgVideoUrl)
+  );
+
+  const videoRef = useRef(null);
+  const headingWords = (customTitles?.heroMainTitle || 'Our Love Story').split(' ');
 
   return (
     <motion.section
@@ -32,24 +59,60 @@ export default function Hero({ siteDataOverride }) {
       initial="hidden"
       animate="visible"
     >
-      {/* Couple emoji badge */}
+      {/* ── Layer 0: Section-level bg video / fallback ─────────────────── */}
+      {isBgVideo ? (
+        <video
+          ref={videoRef}
+          src={bgVideoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ zIndex: 0, willChange: 'transform' }}
+        />
+      ) : bgVideoUrl ? (
+        /* Static image fallback */
+        <img
+          src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ zIndex: 0 }}
+          loading="lazy"
+        />
+      ) : null}
+
+      {/* ── Layer 1: Cinematic overlay (improves text readability) ──────── */}
+      {bgVideoUrl && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            zIndex: 1,
+            background: 'linear-gradient(to bottom, rgba(5,0,10,0.50) 0%, rgba(10,2,10,0.28) 50%, rgba(5,0,10,0.60) 100%)',
+          }}
+        />
+      )}
+
+      {/* ── Layer 2: Couple emoji badge ─────────────────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="text-5xl mb-6 relative z-10"
+        className="text-5xl mb-6 relative"
+        style={{ zIndex: 10, willChange: 'transform' }}
       >
         {coupleEmoji}
       </motion.div>
 
-      {/* Hero image – polaroid style */}
+      {/* ── Layer 2: Hero image – polaroid style ────────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="relative z-10 mb-10 drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
+        className="relative mb-10 drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
+        style={{ zIndex: 10, willChange: 'transform' }}
         whileHover={{ rotate: 2, scale: 1.03 }}
-        transition={{ type: "spring", stiffness: 200 }}
+        transition={{ type: 'spring', stiffness: 200 }}
       >
         <div
           className="polaroid bg-white p-3 pb-8"
-          style={{ transform: "rotate(-1.5deg)", maxWidth: "320px", borderRadius: "4px" }}
+          style={{ transform: 'rotate(-1.5deg)', maxWidth: '320px', borderRadius: '4px' }}
         >
           <img
             src={optimizeCloudinaryUrl(heroImageUrl, 600)}
@@ -61,7 +124,7 @@ export default function Hero({ siteDataOverride }) {
           />
           <p
             className="serif text-center mt-3 text-sm text-gray-800 font-medium italic"
-            style={{ fontFamily: "var(--font-serif)" }}
+            style={{ fontFamily: 'var(--font-serif)' }}
           >
             {coupleName}
           </p>
@@ -71,16 +134,18 @@ export default function Hero({ siteDataOverride }) {
         <motion.div
           className="absolute -top-4 -right-4 text-3xl"
           animate={{ scale: [1, 1.25, 1], rotate: [0, 8, -8, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ willChange: 'transform' }}
         >
           ❤️
         </motion.div>
       </motion.div>
 
-      {/* Staggered Heading */}
+      {/* ── Layer 2: Staggered Heading ───────────────────────────────────── */}
       <motion.h1
         variants={containerVariants}
-        className="serif text-5xl md:text-7xl font-bold leading-tight relative z-10 flex flex-wrap justify-center gap-x-3 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+        className="serif text-5xl md:text-7xl font-bold leading-tight flex flex-wrap justify-center gap-x-3 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+        style={{ zIndex: 10, position: 'relative', willChange: 'transform' }}
       >
         {headingWords.map((word, index) => (
           <motion.span
@@ -94,47 +159,47 @@ export default function Hero({ siteDataOverride }) {
         ))}
       </motion.h1>
 
-      {/* Date badge */}
+      {/* ── Date badge ──────────────────────────────────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="relative z-10 mt-6 flex items-center gap-2 text-white/90 text-sm font-medium tracking-widest uppercase drop-shadow-md"
+        className="mt-6 flex items-center gap-2 text-white/90 text-sm font-medium tracking-widest uppercase drop-shadow-md"
+        style={{ zIndex: 10, position: 'relative', willChange: 'transform' }}
       >
         <CalendarHeart size={16} />
         <span>{heroDate}</span>
       </motion.div>
 
-      {/* Subtitle */}
+      {/* ── Subtitle ────────────────────────────────────────────────────── */}
       <motion.p
         variants={itemVariants}
-        className="relative z-10 mt-5 max-w-md text-white/80 text-lg font-light leading-relaxed drop-shadow"
+        className="mt-5 max-w-md text-white/80 text-lg font-light leading-relaxed drop-shadow"
+        style={{ zIndex: 10, position: 'relative', willChange: 'transform' }}
       >
-        {d.customTitles?.heroSubtitle || heroSubtitle}
+        {customTitles?.heroSubtitle || heroSubtitle}
       </motion.p>
 
-      {/* Love letter card - Glassmorphic */}
+      {/* ── Love letter card – Glassmorphic ─────────────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="relative z-10 mt-12 max-w-lg bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl px-8 py-7 shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
+        className="mt-12 max-w-lg bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl px-8 py-7 shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
+        style={{ zIndex: 10, position: 'relative', willChange: 'transform' }}
       >
         <Heart size={22} fill="white" color="white" className="mx-auto mb-4 opacity-80" />
-        <p
-          className="serif italic text-white/90 leading-relaxed text-base md:text-lg drop-shadow-sm"
-        >
+        <p className="serif italic text-white/90 leading-relaxed text-base md:text-lg drop-shadow-sm">
           "{loveLetterText}"
         </p>
         <p className="serif mt-4 text-white/80 font-medium tracking-wide drop-shadow-sm">— with all my love ❤️</p>
       </motion.div>
 
-      {/* Scroll cue */}
+      {/* ── Scroll cue ──────────────────────────────────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="relative z-10 mt-16 flex flex-col items-center gap-1 text-white/70 drop-shadow-sm"
+        className="mt-16 flex flex-col items-center gap-1 text-white/70 drop-shadow-sm"
+        style={{ zIndex: 10, position: 'relative' }}
         animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <span className="text-xs tracking-widest uppercase font-semibold">
-          Scroll to explore
-        </span>
+        <span className="text-xs tracking-widest uppercase font-semibold">Scroll to explore</span>
         <span className="text-xl">↓</span>
       </motion.div>
     </motion.section>
