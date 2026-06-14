@@ -22,6 +22,7 @@ import HeartBurst        from '../components/HeartBurst';
 import FloatingBalloons  from '../components/FloatingBalloons';
 import CinematicAnniversary from '../components/CinematicAnniversary';
 import CinematicBirthday   from '../components/CinematicBirthday';
+import ApologyTemplate     from '../components/ApologyTemplate';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // Lazy load components that are below the fold to optimize memory & bundles
@@ -256,6 +257,14 @@ export default function ClientPage() {
         <GlobalMusicPlayer musicData={siteData.music} />
         <HeartBurst show={showBurst} />
         <TemplateCustom siteData={siteData} onUnlock={triggerBurst} />
+      </div>
+    );
+  }
+
+  if (siteData.templateType === 'apology') {
+    return (
+      <div className="relative min-h-screen">
+        <ApologyTemplate siteData={siteData} />
       </div>
     );
   }

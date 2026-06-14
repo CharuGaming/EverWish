@@ -2511,6 +2511,169 @@ function CinBdayInteractiveTab({ doc, setDoc }) {
   );
 }
 
+// ── Apology Tab ────────────────────────────────────────────────────
+function ApologyTab({ doc, setDoc }) {
+  const d = doc.apology || {};
+
+  const upA = (field, val) => setDoc(prev => ({
+    ...prev,
+    apology: { ...(prev.apology || {}), [field]: val }
+  }));
+
+  // Gallery image helpers
+  const addGalleryImage = (url) => {
+    if (!url) return;
+    const imgs = [...(d.galleryImages || []), url];
+    upA('galleryImages', imgs);
+  };
+  const removeGalleryImage = (i) => {
+    const imgs = [...(d.galleryImages || [])];
+    imgs.splice(i, 1);
+    upA('galleryImages', imgs);
+  };
+
+  return (
+    <>
+      {/* Videos */}
+      <Card title="🎬 Apology Videos">
+        <p className="text-[11px] text-slate-500 mb-4">
+          <strong>Intro Video</strong> — plays full-screen when the visitor first taps open. Great for a heartfelt message video.
+        </p>
+        <VideoField
+          label="💔 Intro / Opening Video"
+          hint="MP4/WebM, ideally under 20 MB. Leave blank to skip straight to the main page."
+          value={d.introVideoUrl || ''}
+          onChange={v => upA('introVideoUrl', v)}
+        />
+        {d.introVideoUrl && (
+          <button onClick={() => upA('introVideoUrl', '')}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 mb-4 block">
+            Remove intro video
+          </button>
+        )}
+
+        <div className="border-t border-white/10 my-4" />
+        <p className="text-[11px] text-slate-500 mb-4">
+          <strong>Looping Background Video</strong> — loops silently behind the entire page. Set the mood.
+        </p>
+        <VideoField
+          label="🎞️ Looping Background Video"
+          hint="Loops silently behind all content. MP4/WebM, under 20 MB."
+          value={d.bgVideoUrl || ''}
+          onChange={v => upA('bgVideoUrl', v)}
+        />
+        {d.bgVideoUrl && (
+          <button onClick={() => upA('bgVideoUrl', '')}
+            className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-1 block">
+            Remove background video
+          </button>
+        )}
+      </Card>
+
+      {/* Text Copy */}
+      <Card title="✍️ Text Content">
+        <div className="mb-5">
+          <Label>Hero Title</Label>
+          <TextInput
+            value={d.heroTitle || ''}
+            onChange={e => upA('heroTitle', e.target.value)}
+            placeholder="I Am So Sorry 💔"
+          />
+        </div>
+        <div className="mb-5">
+          <Label>Hero Subtitle (italic tagline)</Label>
+          <TextInput
+            value={d.heroSubtitle || ''}
+            onChange={e => upA('heroSubtitle', e.target.value)}
+            placeholder="From the bottom of my heart..."
+          />
+        </div>
+        <div className="mb-5">
+          <Label>Apology Message (the heartfelt letter)</Label>
+          <TextArea
+            rows={6}
+            value={d.apologyMessage || ''}
+            onChange={e => upA('apologyMessage', e.target.value)}
+            placeholder="Write your sincere apology here…"
+          />
+        </div>
+      </Card>
+
+      {/* Interactive Section */}
+      <Card title="🥺 'Forgive Me?' Interactive Section">
+        <p className="text-[11px] text-slate-500 mb-4">
+          The question displayed above the Yes / No buttons. The "No" button will run away from the cursor!
+        </p>
+        <div className="mb-5">
+          <Label>Forgive Question</Label>
+          <TextInput
+            value={d.forgiveQuestion || ''}
+            onChange={e => upA('forgiveQuestion', e.target.value)}
+            placeholder="Will you forgive me? 🥺"
+          />
+        </div>
+        <div className="mb-5">
+          <Label>"Yes" Button Text</Label>
+          <TextInput
+            value={d.forgiveButtonText || ''}
+            onChange={e => upA('forgiveButtonText', e.target.value)}
+            placeholder="Yes, I forgive you 💕"
+          />
+        </div>
+        <div className="mb-5">
+          <Label>"No" Button Text (the runaway button)</Label>
+          <TextInput
+            value={d.runawayButtonText || ''}
+            onChange={e => upA('runawayButtonText', e.target.value)}
+            placeholder="No 🏃"
+          />
+        </div>
+        <div className="mb-2">
+          <Label>Message shown after clicking "Yes" (Forgiven Screen)</Label>
+          <TextArea
+            rows={3}
+            value={d.forgivenMessage || ''}
+            onChange={e => upA('forgivenMessage', e.target.value)}
+            placeholder="Thank you for giving me another chance. I promise I will do better. 💖"
+          />
+        </div>
+      </Card>
+
+      {/* Gallery */}
+      <Card title="📸 Memory Gallery (optional)">
+        <p className="text-[11px] text-slate-500 mb-4">
+          Upload a few sweet photos of you two. They will appear in a 3-column grid at the bottom of the page.
+        </p>
+        {(d.galleryImages || []).map((url, i) => (
+          <div key={i} className="flex items-center gap-3 mb-3">
+            <img src={url} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0" />
+            <TextInput
+              value={url}
+              onChange={e => {
+                const imgs = [...(d.galleryImages || [])];
+                imgs[i] = e.target.value;
+                upA('galleryImages', imgs);
+              }}
+            />
+            <button onClick={() => removeGalleryImage(i)}
+              className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer flex-shrink-0">
+              ✕
+            </button>
+          </div>
+        ))}
+        <div className="mt-3">
+          <ImageField
+            label="Add Photo"
+            hint="Upload a photo to add to the gallery"
+            value=""
+            onChange={url => addGalleryImage(url)}
+          />
+        </div>
+      </Card>
+    </>
+  );
+}
+
 export default function AdminEditor() {
   const { siteId } = useParams();
   const nav = useNavigate();
@@ -2584,7 +2747,19 @@ export default function AdminEditor() {
       modern: {
         introVideoUrl: doc.modern?.introVideoUrl || '',
         bgVideoUrl:    doc.modern?.bgVideoUrl    || '',
-      }
+      },
+      apology: {
+        introVideoUrl:     doc.apology?.introVideoUrl     || '',
+        bgVideoUrl:        doc.apology?.bgVideoUrl        || '',
+        heroTitle:         doc.apology?.heroTitle         || 'I Am So Sorry 💔',
+        heroSubtitle:      doc.apology?.heroSubtitle      || 'From the bottom of my heart...',
+        apologyMessage:    doc.apology?.apologyMessage    || '',
+        forgiveQuestion:   doc.apology?.forgiveQuestion   || 'Will you forgive me? 🥺',
+        runawayButtonText: doc.apology?.runawayButtonText || 'No 🏃',
+        forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
+        forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
+        galleryImages:     doc.apology?.galleryImages     || [],
+      },
     };
 
     const res = await saveSite(siteId, payload);
@@ -2612,6 +2787,7 @@ export default function AdminEditor() {
   const isValentine        = doc.templateType === 'valentine';
   const isProposal         = doc.templateType === 'proposal';
   const isCustom           = doc.templateType === 'custom';
+  const isApology          = doc.templateType === 'apology';
   const isBirthday         = doc.category === 'birthday' && doc.templateType !== 'bday5';
   const isBirthdayCinematic= doc.templateType === 'bday5';
   const isCinematic        = doc.templateType === 'cinematic';
@@ -2622,6 +2798,7 @@ export default function AdminEditor() {
     : isProposal ? PROPOSAL_TABS
     : isCustom   ? CUSTOM_TABS
     : isCinematic ? CINEMATIC_TABS
+    : isApology ? [{ id: 'apology', label: '💔 Apology Setup' }]
     : doc.templateType === 'modern' ? TABS.filter(t => t.id !== 'milestones')
     : TABS;
   const ActiveTab = availableTabs.find(t => t.id === activeTab) || availableTabs[0];
@@ -2749,6 +2926,10 @@ export default function AdminEditor() {
                 {activeTab === 'milestones' && <MilestonesTab doc={doc} setDoc={setDoc} />}
                 {activeTab === 'gallery'    && <GalleryTab    doc={doc} setDoc={setDoc} />}
                 {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+              </>
+            ) : isApology ? (
+              <>
+                {activeTab === 'apology' && <ApologyTab doc={doc} setDoc={setDoc} />}
               </>
             ) : (
               <div className="text-center py-20 text-slate-500">

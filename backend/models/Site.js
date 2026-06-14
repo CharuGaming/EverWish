@@ -204,6 +204,19 @@ const SiteSchema = new mongoose.Schema(
       introVideoUrl: { type: String, default: '' },
       bgVideoUrl:    { type: String, default: '' },
     },
+    // ── Apology / Forgive Me Template ─────────────────────────────
+    apology: {
+      introVideoUrl:     { type: String, default: '' },
+      bgVideoUrl:        { type: String, default: '' },
+      heroTitle:         { type: String, default: 'I Am So Sorry 💔' },
+      heroSubtitle:      { type: String, default: 'From the bottom of my heart...' },
+      apologyMessage:    { type: String, default: 'I know I messed up. I am truly sorry for hurting you. You mean everything to me and I will do better. Please forgive me.' },
+      forgiveQuestion:   { type: String, default: 'Will you forgive me? 🥺' },
+      runawayButtonText: { type: String, default: 'No 🏃' },
+      forgiveButtonText: { type: String, default: 'Yes, I forgive you 💕' },
+      forgivenMessage:   { type: String, default: 'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖' },
+      galleryImages:     { type: [String], default: [] },
+    },
     scratchPrize: { type: String, default: '' },
     yearInReview: {
       type: [{ label: { type: String, default: '' }, value: { type: String, default: '' } }],

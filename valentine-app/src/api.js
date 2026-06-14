@@ -429,6 +429,18 @@ export function toComponentData(doc) {
       gameSectionTitle:    doc.customTitles?.gameSectionTitle    || '',
       gallerySectionTitle: doc.customTitles?.gallerySectionTitle || '',
     },
+    apology: {
+      introVideoUrl:     doc.apology?.introVideoUrl     || '',
+      bgVideoUrl:        doc.apology?.bgVideoUrl        || '',
+      heroTitle:         doc.apology?.heroTitle         || 'I Am So Sorry 💔',
+      heroSubtitle:      doc.apology?.heroSubtitle      || 'From the bottom of my heart...',
+      apologyMessage:    doc.apology?.apologyMessage    || 'I know I messed up. I am truly sorry for hurting you.',
+      forgiveQuestion:   doc.apology?.forgiveQuestion   || 'Will you forgive me? 🥺',
+      runawayButtonText: doc.apology?.runawayButtonText || 'No 🏃',
+      forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
+      forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
+      galleryImages:     doc.apology?.galleryImages     || [],
+    },
   };
 }
 
@@ -526,6 +538,18 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       heroSubtitle: '',
       gameSectionTitle: '',
       gallerySectionTitle: '',
-    }
+    },
+    apology: {
+      introVideoUrl:     '',
+      bgVideoUrl:        '',
+      heroTitle:         'I Am So Sorry 💔',
+      heroSubtitle:      'From the bottom of my heart...',
+      apologyMessage:    'I know I messed up. I am truly sorry for hurting you. You mean everything to me and I will do better. Please forgive me.',
+      forgiveQuestion:   'Will you forgive me? 🥺',
+      runawayButtonText: 'No 🏃',
+      forgiveButtonText: 'Yes, I forgive you 💕',
+      forgivenMessage:   'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖',
+      galleryImages:     [],
+    },
   };
 }
