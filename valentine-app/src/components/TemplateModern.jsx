@@ -234,7 +234,7 @@ export default function TemplateModern({ siteData }) {
       )}
 
       {/* Liquid Glass Content Wrapper */}
-      <div className={`relative z-10 min-h-screen w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 md:py-20 ${bgVideoUrl ? 'bg-white/20 backdrop-blur-md border-x border-white/30 shadow-2xl' : ''}`}>
+      <div className="relative z-10 min-h-screen w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 md:py-20 bg-white/40 backdrop-blur-md border-x border-white/40 shadow-2xl">
       
       {/* SECTION 2: Memories Layout (Hero) */}
       <section className="relative w-full min-h-[80vh] flex flex-col justify-center items-center py-10 px-4 text-center overflow-hidden">
@@ -245,10 +245,10 @@ export default function TemplateModern({ siteData }) {
             transition={{ duration: 0.8 }}
             className="mb-12"
           >
-            <span className={`text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse ${bgVideoUrl ? 'text-rose-300 drop-shadow-[0_2px_10px_rgba(244,63,94,0.6)] [text-shadow:_0_2px_4px_rgb(0_0_0_/_0.3)]' : 'text-rose-500'}`}>
+            <span className="text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse text-rose-500 drop-shadow-[0_2px_10px_rgba(244,63,94,0.4)]">
               {siteData.customTitles?.heroMainTitle || "Happy Valentine's Day"} {siteData.coupleEmoji || '🥰'}
             </span>
-            <h1 className={`text-xl md:text-2xl font-semibold tracking-[0.25em] uppercase font-sans ${bgVideoUrl ? 'text-white/95 drop-shadow-md [text-shadow:_0_2px_4px_rgb(0_0_0_/_0.3)]' : 'text-slate-500'}`}>
+            <h1 className="text-xl md:text-2xl font-semibold tracking-[0.25em] uppercase font-sans text-slate-600 drop-shadow-sm">
               {siteData.coupleName || 'Our Story'}
             </h1>
             <div className={`w-20 h-0.5 mx-auto mt-6 ${bgVideoUrl ? 'bg-rose-400/40' : 'bg-rose-200'}`} />
@@ -279,7 +279,7 @@ export default function TemplateModern({ siteData }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 1 }}
-            className={`text-lg font-serif italic leading-relaxed max-w-md mx-auto mb-8 px-4 ${bgVideoUrl ? 'text-white/95 drop-shadow-md [text-shadow:_0_1px_3px_rgb(0_0_0_/_0.5)]' : 'text-slate-700'}`}
+            className="text-lg font-serif italic leading-relaxed max-w-md mx-auto mb-8 px-4 text-slate-700 drop-shadow-sm"
           >
             "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
           </motion.p>
