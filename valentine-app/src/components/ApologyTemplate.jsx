@@ -1,22 +1,22 @@
 /**
  * ApologyTemplate.jsx
  * "Forgive Me" — A fully dynamic, mobile-first emotional celebration template.
- * Features: intro video + mending heart transition, fixed looping bg video,
- * glassmorphic content, & a runaway "No" button.
+ * Soft Frosted Glass Aesthetic.
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 
 // ── Confetti / Heart-Burst on Forgiveness ──────────────────────────
-const BURST_PARTICLES = Array.from({ length: 80 }, (_, i) => ({
+const BURST_PARTICLES = Array.from({ length: 100 }, (_, i) => ({
   id: i,
   x: Math.random() * 100,
   y: Math.random() * 30,
-  color: ['#f43f5e','#fb7185','#fbbf24','#a78bfa','#34d399','#ec4899','#f9a8d4','#fff'][i % 8],
-  size: Math.random() * 10 + 5,
-  delay: Math.random() * 0.6,
-  duration: 1.4 + Math.random() * 1.2,
+  color: ['#ffb3ba','#ffdfba','#ffffba','#baffc9','#bae1ff','#ffc0cb','#ff69b4','#ffffff'][i % 8],
+  size: Math.random() * 12 + 6,
+  delay: Math.random() * 0.4,
+  duration: 1.5 + Math.random() * 1.5,
   rotate: Math.random() * 720 - 360,
+  shape: Math.random() > 0.3 ? 'circle' : 'heart'
 }));
 
 function HeartConfetti({ active }) {
@@ -34,10 +34,16 @@ function HeartConfetti({ active }) {
             top: 0,
             width: p.size,
             height: p.size,
-            borderRadius: Math.random() > 0.5 ? '50%' : 2,
-            backgroundColor: p.color,
+            borderRadius: p.shape === 'circle' ? '50%' : 0,
+            backgroundColor: p.shape === 'circle' ? p.color : 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: p.size,
           }}
-        />
+        >
+          {p.shape === 'heart' && <span style={{ color: p.color }}>❤️</span>}
+        </motion.div>
       ))}
     </div>
   );
@@ -61,13 +67,12 @@ function MendingHeartTransition({ onComplete }) {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-      style={{ background: 'radial-gradient(ellipse at center, #1a0010 0%, #0a0005 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%)' }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: 'easeInOut' }}
     >
-      {/* Broken halves */}
-      <div className="relative w-48 h-44 select-none">
+      <div className="relative w-48 h-44 select-none drop-shadow-xl">
         {/* Left half */}
         <motion.svg
           viewBox="0 0 100 90"
@@ -75,27 +80,14 @@ function MendingHeartTransition({ onComplete }) {
           initial={{ x: -30, rotate: -15, opacity: 0 }}
           animate={controls}
           variants={{
-            visible: { x: -20, rotate: -10, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+            visible: { x: -15, rotate: -8, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
             mended:  { x: 0, rotate: 0, opacity: 1, transition: { duration: 0.7, ease: 'easeOut', type: 'spring', stiffness: 200 } },
           }}
         >
-          <clipPath id="leftHalf">
+          <clipPath id="leftHalfIntro">
             <rect x="0" y="0" width="50" height="90" />
           </clipPath>
-          <path
-            d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z"
-            fill="#f43f5e"
-            opacity="0.9"
-            clipPath="url(#leftHalf)"
-          />
-          {/* Crack line */}
-          <polyline
-            points="50,20 48,40 52,55 47,70 50,90"
-            stroke="rgba(255,255,255,0.3)"
-            strokeWidth="1.5"
-            fill="none"
-            clipPath="url(#leftHalf)"
-          />
+          <path d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z" fill="#ff6b81" clipPath="url(#leftHalfIntro)" />
         </motion.svg>
 
         {/* Right half */}
@@ -105,44 +97,30 @@ function MendingHeartTransition({ onComplete }) {
           initial={{ x: 30, rotate: 15, opacity: 0 }}
           animate={controls}
           variants={{
-            visible: { x: 20, rotate: 10, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+            visible: { x: 15, rotate: 8, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
             mended:  { x: 0, rotate: 0, opacity: 1, transition: { duration: 0.7, ease: 'easeOut', type: 'spring', stiffness: 200 } },
           }}
         >
-          <clipPath id="rightHalf">
+          <clipPath id="rightHalfIntro">
             <rect x="50" y="0" width="50" height="90" />
           </clipPath>
-          <path
-            d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z"
-            fill="#f43f5e"
-            opacity="0.9"
-            clipPath="url(#rightHalf)"
-          />
-          <polyline
-            points="50,20 52,40 48,55 53,70 50,90"
-            stroke="rgba(255,255,255,0.3)"
-            strokeWidth="1.5"
-            fill="none"
-            clipPath="url(#rightHalf)"
-          />
+          <path d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z" fill="#ff6b81" clipPath="url(#rightHalfIntro)" />
         </motion.svg>
 
-        {/* Golden sparkle on mend */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           initial={{ opacity: 0, scale: 0 }}
           animate={controls}
           variants={{
             visible: { opacity: 0, scale: 0 },
-            mended:  { opacity: [0, 1, 0], scale: [0, 2, 0], transition: { delay: 0.5, duration: 1 } },
+            mended:  { opacity: [0, 1, 0], scale: [0, 1.5, 0], transition: { delay: 0.5, duration: 1 } },
           }}
         >
           <span className="text-5xl">✨</span>
         </motion.div>
       </div>
-
       <motion.p
-        className="mt-8 text-white/80 text-sm font-light tracking-widest uppercase"
+        className="mt-8 text-rose-400 text-sm font-bold tracking-widest uppercase apology-body"
         initial={{ opacity: 0 }}
         animate={controls}
         variants={{
@@ -150,7 +128,7 @@ function MendingHeartTransition({ onComplete }) {
           mended: { opacity: 1, transition: { delay: 0.3, duration: 0.8 } },
         }}
       >
-        My heart is yours... always.
+        My heart is yours...
       </motion.p>
     </motion.div>
   );
@@ -159,7 +137,7 @@ function MendingHeartTransition({ onComplete }) {
 // ── Intro Video Screen ──────────────────────────────────────────────
 function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
   const videoRef = useRef(null);
-  const [phase, setPhase] = useState('idle'); // idle | playing | transitioning
+  const [phase, setPhase] = useState('idle');
   const [showTap, setShowTap] = useState(true);
 
   const handleTap = () => {
@@ -167,14 +145,10 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
     setShowTap(false);
     setPhase('playing');
     if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch(() => setPhase('transitioning'));
     } else {
       setPhase('transitioning');
     }
-  };
-
-  const handleVideoEnd = () => {
-    setPhase('transitioning');
   };
 
   return (
@@ -185,28 +159,21 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
         <motion.div
           key="intro"
           className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer select-none overflow-hidden"
-          style={{ background: '#0a0005' }}
+          style={{ background: 'linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%)' }}
           onClick={handleTap}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
         >
-          {/* Background Video */}
           {introVideoUrl && (
             <video
               ref={videoRef}
               src={introVideoUrl}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline
-              muted={false}
-              onEnded={handleVideoEnd}
+              onEnded={() => setPhase('transitioning')}
               preload="metadata"
-              style={{ willChange: 'transform' }}
             />
           )}
-
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black/50" />
-
-          {/* Tap prompt */}
+          <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
           <AnimatePresence>
             {showTap && (
               <motion.div
@@ -214,18 +181,12 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.8 }}
               >
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                  className="text-7xl"
-                >
-                  💔
+                <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.8, repeat: Infinity }} className="text-7xl drop-shadow-lg">
+                  🥺
                 </motion.div>
                 <motion.div
-                  className="px-8 py-3 rounded-full border border-white/30 text-white font-semibold tracking-widest text-sm uppercase backdrop-blur-md"
-                  style={{ background: 'rgba(244,63,94,0.25)' }}
+                  className="px-8 py-3 rounded-full border border-rose-200 text-rose-500 font-bold tracking-widest text-sm uppercase bg-white/60 backdrop-blur-md shadow-[0_8px_32px_rgba(255,182,193,0.4)]"
                   animate={{ opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
@@ -234,15 +195,11 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Skip button if video is playing */}
           {phase === 'playing' && (
             <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
               onClick={(e) => { e.stopPropagation(); setPhase('transitioning'); }}
-              className="absolute bottom-8 right-6 z-20 text-white/50 hover:text-white/90 text-xs tracking-widest uppercase transition-colors cursor-pointer"
+              className="absolute bottom-8 right-6 z-20 text-rose-400 hover:text-rose-600 font-bold text-xs tracking-widest uppercase bg-white/50 px-4 py-2 rounded-full backdrop-blur-md shadow-sm"
             >
               Skip →
             </motion.button>
@@ -253,35 +210,163 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
   );
 }
 
-// ── Runaway "No" Button ─────────────────────────────────────────────
+// ── Runaway "No" Button with Emojis ─────────────────────────────────
 function RunawayButton({ text, onEscape }) {
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [escaped, setEscaped] = useState(0); // count attempts
+  const [escaped, setEscaped] = useState(0);
+  const [emojis, setEmojis] = useState([]);
 
   const runAway = useCallback(() => {
-    const randX = (Math.random() - 0.5) * 300;
-    const randY = (Math.random() - 0.5) * 200;
+    const randX = (Math.random() - 0.5) * 250;
+    const randY = (Math.random() - 0.5) * 150;
+    const oldPos = { ...pos };
     setPos({ x: randX, y: randY });
     setEscaped(c => c + 1);
+    
+    const id = Date.now();
+    const char = ['🥺','😭','🏃','💨','💔'][Math.floor(Math.random()*5)];
+    setEmojis(prev => [...prev, { id, x: oldPos.x, y: oldPos.y, char }]);
+    setTimeout(() => {
+      setEmojis(prev => prev.filter(e => e.id !== id));
+    }, 1000);
+    
     if (onEscape) onEscape();
-  }, [onEscape]);
+  }, [pos, onEscape]);
 
   return (
-    <motion.button
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-      onHoverStart={runAway}
-      onTouchStart={runAway}
-      onClick={runAway}
-      className="px-6 py-3 rounded-full font-bold text-sm tracking-wide text-white border border-white/20 backdrop-blur-sm select-none cursor-not-allowed"
-      style={{
-        background: 'rgba(255,255,255,0.1)',
-        fontSize: escaped > 3 ? `${Math.max(8, 14 - escaped)}px` : '14px',
-        opacity: escaped > 6 ? 0.4 : 1,
-      }}
-    >
-      {text || 'No 🏃'}
-    </motion.button>
+    <div className="relative">
+      <motion.button
+        animate={{ x: pos.x, y: pos.y }}
+        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+        onHoverStart={runAway}
+        onTouchStart={runAway}
+        onClick={runAway}
+        className="px-6 py-3 rounded-full font-bold text-sm tracking-wide text-rose-500 border border-rose-200 bg-white/60 backdrop-blur-sm shadow-md cursor-not-allowed z-20 relative apology-body"
+        style={{
+          fontSize: escaped > 3 ? `${Math.max(10, 14 - escaped)}px` : '14px',
+          opacity: escaped > 6 ? 0.6 : 1,
+        }}
+      >
+        {text || 'No 🏃'}
+      </motion.button>
+      
+      {/* Floating Emojis */}
+      <AnimatePresence>
+        {emojis.map(e => (
+          <motion.div
+            key={e.id}
+            initial={{ opacity: 1, x: e.x, y: e.y, scale: 0.5 }}
+            animate={{ opacity: 0, y: e.y - 40, scale: 1.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 text-2xl"
+          >
+            {e.char}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Drag to Mend Slider ─────────────────────────────────────────────
+function DragToMend({ onMended }) {
+  const [progress, setProgress] = useState(0);
+
+  const handleDrag = (e) => {
+    const val = Number(e.target.value);
+    setProgress(val);
+    if (val >= 100) {
+      setTimeout(() => onMended(), 400); // slight delay before revealing button
+    }
+  };
+
+  const leftOffset = -1 * (100 - progress) / 2.5; // moves from -40 to 0
+  const rightOffset = (100 - progress) / 2.5;     // moves from 40 to 0
+  const opacity = 0.5 + (progress / 200);
+
+  return (
+    <div className="w-full flex flex-col items-center py-6">
+      <p className="text-rose-400 font-bold mb-6 text-sm uppercase tracking-widest animate-pulse apology-body">Drag to Mend</p>
+      
+      <div className="relative w-40 h-36 flex justify-center mb-8">
+        {/* Left half */}
+        <motion.svg
+          viewBox="0 0 100 90"
+          className="absolute inset-0 w-full h-full drop-shadow-md"
+          style={{ x: leftOffset, opacity }}
+        >
+          <clipPath id="leftHalfDrag">
+            <rect x="0" y="0" width="50" height="90" />
+          </clipPath>
+          <path d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z" fill={progress === 100 ? '#ff4757' : '#ff6b81'} clipPath="url(#leftHalfDrag)" />
+        </motion.svg>
+        {/* Right half */}
+        <motion.svg
+          viewBox="0 0 100 90"
+          className="absolute inset-0 w-full h-full drop-shadow-md"
+          style={{ x: rightOffset, opacity }}
+        >
+          <clipPath id="rightHalfDrag">
+            <rect x="50" y="0" width="50" height="90" />
+          </clipPath>
+          <path d="M10 35 A22 22 0 0 1 50 28 A22 22 0 0 1 90 35 Q90 62 50 90 Q10 62 10 35 Z" fill={progress === 100 ? '#ff4757' : '#ff6b81'} clipPath="url(#rightHalfDrag)" />
+        </motion.svg>
+        
+        {progress === 100 && (
+          <motion.div initial={{ scale: 0 }} animate={{ scale: [1.2, 1] }} className="absolute inset-0 flex items-center justify-center">
+             <span className="text-4xl drop-shadow-[0_0_15px_rgba(255,71,87,0.8)]">✨</span>
+          </motion.div>
+        )}
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={progress}
+        onChange={handleDrag}
+        disabled={progress >= 100}
+        className="w-full max-w-[200px] accent-rose-400 appearance-none bg-rose-200 h-3 rounded-full outline-none disabled:opacity-50 shadow-inner"
+        style={{
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+        }}
+      />
+    </div>
+  );
+}
+
+// ── Relationship Timeline ───────────────────────────────────────────
+const TIMELINE_STEPS = [
+  { text: "We fight", icon: "🌧️", color: "text-slate-500" },
+  { text: "We talk", icon: "💬", color: "text-blue-400" },
+  { text: "We fix", icon: "🛠️", color: "text-amber-500" },
+  { text: "We stay", icon: "🤝", color: "text-emerald-500" },
+  { text: "We vibe", icon: "✨", color: "text-rose-500" }
+];
+
+function RelationshipTimeline() {
+  return (
+    <div className="w-full max-w-sm mx-auto py-12 px-4 relative mt-12 mb-8">
+      <div className="absolute left-[39px] top-16 bottom-16 w-1 bg-rose-200 rounded-full" />
+      {TIMELINE_STEPS.map((step, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: -20, filter: 'grayscale(100%)' }}
+          whileInView={{ opacity: 1, x: 0, filter: 'grayscale(0%)' }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, delay: i * 0.15 }}
+          className="flex items-center gap-6 mb-8 relative z-10"
+        >
+          <div className="w-12 h-12 rounded-full bg-white border-4 border-rose-100 flex items-center justify-center text-xl shadow-md shrink-0">
+            {step.icon}
+          </div>
+          <div className="bg-white/60 backdrop-blur-md border border-white/60 px-6 py-3 rounded-2xl shadow-[0_4px_20px_rgba(255,182,193,0.3)]">
+            <p className={`apology-title text-3xl font-bold ${step.color}`}>{step.text}</p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
   );
 }
 
@@ -292,92 +377,28 @@ function ForgivenScreen({ message }) {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-      className="flex flex-col items-center justify-center text-center px-6 py-12 min-h-[60vh]"
+      className="flex flex-col items-center justify-center text-center py-8"
     >
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] }}
-        transition={{ duration: 1.5, repeat: 2, ease: 'easeInOut' }}
-        className="text-8xl mb-6"
-      >
-        💖
-      </motion.div>
+      <motion.img 
+        src="https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif" 
+        alt="Bear Hug"
+        className="w-48 h-48 rounded-3xl object-cover mb-6 shadow-xl border-4 border-white"
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
       <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-3xl font-bold text-white mb-4"
-        style={{ fontFamily: "'Dancing Script', cursive", textShadow: '0 2px 20px rgba(244,63,94,0.6)' }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="text-4xl font-bold text-rose-500 mb-4 apology-title drop-shadow-sm"
       >
-        Thank You! 💕
+        Yay! Thank You! 💕
       </motion.h2>
       <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="text-white/90 text-base leading-relaxed max-w-sm"
-        style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+        className="text-slate-700 text-lg leading-relaxed max-w-sm apology-body font-semibold"
       >
         {message || 'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖'}
       </motion.p>
     </motion.div>
-  );
-}
-
-// ── Gallery Row ─────────────────────────────────────────────────────
-function ApologyGallery({ images }) {
-  if (!images || images.length === 0) return null;
-  const [selected, setSelected] = useState(null);
-
-  return (
-    <div className="w-full max-w-2xl mx-auto px-4 pb-16">
-      <p className="text-center text-white/60 text-xs uppercase tracking-widest mb-6 font-mono">Our Memories 💌</p>
-      <div className="grid grid-cols-3 gap-2">
-        {images.map((url, i) => (
-          <motion.div
-            key={i}
-            whileHover={{ scale: 1.04 }}
-            onClick={() => setSelected(url)}
-            className="aspect-square rounded-xl overflow-hidden cursor-pointer shadow-lg"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.07 }}
-          >
-            <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Lightbox */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelected(null)}
-          >
-            <motion.img
-              src={selected}
-              alt=""
-              className="max-w-full max-h-[85vh] rounded-2xl object-contain"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-              onClick={e => e.stopPropagation()}
-            />
-            <button
-              onClick={() => setSelected(null)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white text-3xl font-light cursor-pointer"
-            >
-              ×
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 }
 
@@ -400,33 +421,26 @@ export default function ApologyTemplate({ siteData }) {
   const introButtonText = siteData?.introButtonText || 'Tap to Open 💌';
 
   const [unlocked, setUnlocked] = useState(false);
+  const [mended, setMended] = useState(false);
   const [forgiven, setForgiven] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [noEscapeCount, setNoEscapeCount] = useState(0);
 
   const handleForgive = () => {
     setForgiven(true);
     setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 4000);
-  };
-
-  const handleNoEscape = () => {
-    setNoEscapeCount(c => c + 1);
+    setTimeout(() => setShowConfetti(false), 4500);
   };
 
   return (
     <>
-      {/* Google Fonts */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;1,300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap');
         .apology-title { font-family: 'Dancing Script', cursive; }
-        .apology-body  { font-family: 'Lato', sans-serif; }
+        .apology-body  { font-family: 'Nunito', sans-serif; }
       `}</style>
 
-      {/* Confetti */}
       <HeartConfetti active={showConfetti} />
 
-      {/* ── INTRO VIDEO / LOCKSCREEN ─────────────────── */}
       <AnimatePresence>
         {!unlocked && (
           <ApologyIntroScreen
@@ -438,207 +452,98 @@ export default function ApologyTemplate({ siteData }) {
         )}
       </AnimatePresence>
 
-      {/* ── MAIN PAGE ────────────────────────────────── */}
       {unlocked && (
-        <div className="relative min-h-screen w-full overflow-x-hidden">
-
-          {/* Fixed Looping Background Video */}
-          {bgVideoUrl ? (
+        <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#fff0f5] via-[#ffe4e1] to-[#ffdae0]">
+          {bgVideoUrl && (
             <video
               src={bgVideoUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="fixed inset-0 w-full h-full object-cover pointer-events-none"
-              style={{ zIndex: 0, willChange: 'transform' }}
-            />
-          ) : (
-            <div
-              className="fixed inset-0 pointer-events-none"
-              style={{ zIndex: 0, background: 'radial-gradient(ellipse at top, #1a0010 0%, #0a0005 50%, #120008 100%)' }}
+              autoPlay loop muted playsInline
+              className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-overlay"
+              style={{ zIndex: 0 }}
             />
           )}
 
-          {/* Cinematic gradient overlay for readability */}
-          <div
-            className="fixed inset-0 pointer-events-none"
-            style={{ zIndex: 1, background: 'linear-gradient(to bottom, rgba(10,0,5,0.65) 0%, rgba(10,0,5,0.35) 50%, rgba(10,0,5,0.75) 100%)' }}
-          />
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-16 px-4">
+            
+            {/* Hero */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-16 mt-8">
+              <h1 className="apology-title text-6xl md:text-7xl text-rose-500 mb-4 drop-shadow-sm">{heroTitle}</h1>
+              <p className="apology-body text-rose-400 font-semibold text-lg">{heroSubtitle}</p>
+            </motion.div>
 
-          {/* Scrollable Content */}
-          <div className="relative z-10 flex flex-col items-center min-h-screen">
+            {/* Letter */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="w-full max-w-xl bg-white/50 backdrop-blur-xl border border-white/60 p-8 rounded-[2rem] shadow-[0_8px_32px_rgba(255,182,193,0.3)] mb-8 relative"
+            >
+              <span className="absolute -top-6 left-6 text-6xl text-rose-200 font-serif leading-none">"</span>
+              <p className="apology-body text-slate-700 text-lg leading-relaxed text-center font-medium relative z-10">
+                {apologyMessage}
+              </p>
+              <span className="absolute -bottom-8 right-6 text-6xl text-rose-200 font-serif leading-none">"</span>
+            </motion.div>
 
-            {/* ── HERO SECTION ─────────────────────────────── */}
-            <section className="w-full max-w-2xl mx-auto px-4 pt-20 pb-12 text-center flex flex-col items-center">
-              {/* Animated broken heart */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.2 }}
-                className="text-7xl mb-4 select-none"
-                animate={{ y: [0, -8, 0] }}
-                // eslint-disable-next-line
-                transition={{ y: { duration: 3, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.5 }, scale: { duration: 0.5 } }}
-              >
-                💔
-              </motion.div>
+            {/* Relationship Timeline */}
+            <RelationshipTimeline />
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="apology-title text-5xl md:text-7xl text-white mb-3"
-                style={{ textShadow: '0 4px 30px rgba(244,63,94,0.5)' }}
-              >
-                {heroTitle}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
-                className="apology-body italic text-white/80 text-lg tracking-wide mb-2"
-                style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
-              >
-                {heroSubtitle}
-              </motion.p>
-
-              <motion.div
-                className="w-20 h-px bg-rose-400/50 mx-auto mt-4"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 1, duration: 0.8 }}
-              />
-            </section>
-
-            {/* ── APOLOGY MESSAGE ───────────────────────────── */}
-            <motion.section
+            {/* Interactive Question Section */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="w-full max-w-xl mx-auto px-4 mb-14"
+              className="w-full max-w-lg mt-8 bg-white/50 backdrop-blur-xl border border-white/60 rounded-[2.5rem] p-8 shadow-[0_8px_32px_rgba(255,182,193,0.3)] min-h-[400px] flex flex-col items-center justify-center relative z-20"
             >
-              <div
-                className="relative rounded-3xl p-8 text-center"
-                style={{
-                  background: 'rgba(0,0,0,0.35)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  boxShadow: '0 8px 40px rgba(244,63,94,0.15)',
-                }}
-              >
-                {/* Quote marks */}
-                <span className="absolute -top-5 left-6 text-6xl text-rose-400/30 font-serif leading-none select-none">"</span>
-                <p
-                  className="apology-body text-white/95 text-base leading-relaxed"
-                  style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}
-                >
-                  {apologyMessage}
-                </p>
-                <span className="absolute -bottom-6 right-6 text-6xl text-rose-400/30 font-serif leading-none select-none">"</span>
-              </div>
-            </motion.section>
-
-            {/* ── FORGIVE ME INTERACTIVE SECTION ────────────── */}
-            <motion.section
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="w-full max-w-xl mx-auto px-4 mb-20 flex flex-col items-center"
-            >
-              <div
-                className="w-full rounded-3xl p-8 flex flex-col items-center"
-                style={{
-                  background: 'rgba(244,63,94,0.12)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(244,63,94,0.25)',
-                  boxShadow: '0 8px 40px rgba(244,63,94,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
-                  minHeight: forgiven ? 'auto' : '300px',
-                  overflow: 'hidden',
-                }}
-              >
-                <AnimatePresence mode="wait">
-                  {forgiven ? (
-                    <ForgivenScreen key="forgiven" message={forgivenMessage} />
-                  ) : (
-                    <motion.div
-                      key="question"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex flex-col items-center w-full"
-                    >
-                      {/* Emoji */}
-                      <motion.div
-                        animate={{ rotate: [0, -5, 5, -3, 3, 0] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                        className="text-6xl mb-6 select-none"
+              <AnimatePresence mode="wait">
+                {forgiven ? (
+                  <ForgivenScreen key="forgiven" message={forgivenMessage} />
+                ) : !mended ? (
+                  <motion.div key="slider" exit={{ opacity: 0, scale: 0.9 }} className="w-full">
+                    <DragToMend onMended={() => setMended(true)} />
+                  </motion.div>
+                ) : (
+                  <motion.div key="question" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full flex flex-col items-center">
+                    <h2 className="apology-title text-4xl text-rose-500 mb-10 text-center drop-shadow-sm">{forgiveQuestion}</h2>
+                    <div className="flex flex-col sm:flex-row items-center gap-6 justify-center w-full relative min-h-[80px]">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleForgive}
+                        className="apology-body px-8 py-4 rounded-full font-bold text-white text-base shadow-[0_4px_20px_rgba(255,71,87,0.4)] z-30"
+                        style={{ background: 'linear-gradient(135deg, #ff6b81 0%, #ff4757 100%)' }}
                       >
-                        🥺
-                      </motion.div>
+                        {forgiveButtonText}
+                      </motion.button>
+                      <RunawayButton text={runawayButtonText} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-                      {/* Question */}
-                      <h2
-                        className="apology-title text-3xl md:text-4xl text-white text-center mb-2"
-                        style={{ textShadow: '0 2px 15px rgba(244,63,94,0.6)' }}
-                      >
-                        {forgiveQuestion}
-                      </h2>
-
-                      {/* Escape counter hint */}
-                      {noEscapeCount > 0 && noEscapeCount < 5 && (
-                        <motion.p
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                          className="text-white/40 text-xs mt-1 mb-4 italic"
-                        >
-                          {noEscapeCount === 1 ? "Don't try to run away from love! 💕" : noEscapeCount === 2 ? "Hehe... that's not gonna work 😏" : "You can't escape! 💖"}
-                        </motion.p>
-                      )}
-                      {noEscapeCount >= 5 && (
-                        <p className="text-white/30 text-xs mt-1 mb-4 italic">The "No" button gave up trying to run 😂</p>
-                      )}
-
-                      {/* Buttons */}
-                      <div className="relative w-full flex justify-center items-center gap-6 mt-6" style={{ minHeight: 80 }}>
-                        {/* YES button */}
-                        <motion.button
-                          whileHover={{ scale: 1.08 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={handleForgive}
-                          className="apology-body relative z-10 px-8 py-3 rounded-full font-bold text-white text-sm tracking-wide shadow-xl cursor-pointer"
-                          style={{
-                            background: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
-                            boxShadow: '0 4px 24px rgba(244,63,94,0.5)',
-                          }}
-                        >
-                          {forgiveButtonText}
-                        </motion.button>
-
-                        {/* NO runaway button */}
-                        <RunawayButton text={runawayButtonText} onEscape={handleNoEscape} />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.section>
-
-            {/* ── GALLERY ──────────────────────────────────── */}
+            {/* Gallery */}
             {galleryImages.length > 0 && (
-              <ApologyGallery images={galleryImages} />
+              <div className="w-full max-w-2xl mt-24 mb-12">
+                <h3 className="apology-title text-4xl text-center text-rose-400 mb-8">Our Beautiful Moments</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {galleryImages.map((url, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className="aspect-square rounded-2xl overflow-hidden shadow-md border-4 border-white/60"
+                    >
+                      <img src={url} alt="" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             )}
 
-            {/* Footer */}
-            <div className="pb-12 text-center">
-              <p className="text-white/20 text-[10px] uppercase tracking-[0.3em] font-mono">
-                Made with ❤️ · EverWish
-              </p>
-            </div>
+            <p className="mt-16 text-rose-300 text-xs font-bold uppercase tracking-widest apology-body">Made with ❤️ · EverWish</p>
           </div>
         </div>
       )}
