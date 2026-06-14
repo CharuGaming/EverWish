@@ -261,6 +261,9 @@ export default function ClientPage() {
   }
 
   const isPolaroid = !siteData.templateType || siteData.templateType === 'polaroid';
+  if (siteData.templateType === 'modern') {
+    console.log("Modern Template Video Data:", siteData.modern);
+  }
   const bgUrl = siteData?.heroBackgroundMediaUrl || '';
   // Detect video by extension OR Cloudinary /video/upload/ resource path
   const isBgVideo = bgUrl && (
