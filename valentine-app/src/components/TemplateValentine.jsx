@@ -85,7 +85,7 @@ function MemoryCard({ card, isFlipped, isMatched, onClick, cardColor }) {
   );
 }
 
-function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
+function HeartMemoryMatch({ matchImages, onComplete, themeColors, customTitles }) {
   const imgs = (matchImages && matchImages.length >= 5)
     ? matchImages.slice(0, 5)
     : Array.from({ length: 5 }, () => '');
@@ -149,7 +149,7 @@ function HeartMemoryMatch({ matchImages, onComplete, themeColors }) {
       <Confetti active={confetti} />
       <motion.div initial={{ opacity:0, y:-20 }} animate={{ opacity:1, y:0 }} className="text-center mb-10 px-4">
         <h1 className="cursive-title text-5xl md:text-6xl lock-primary-text flex items-center justify-center gap-3">
-          {siteData.customTitles?.gameSectionTitle || "For My Valentine"} <span className="inline-block animate-pulse text-4xl md:text-5xl">❤️</span>
+          {customTitles?.gameSectionTitle || "For My Valentine"} <span className="inline-block animate-pulse text-4xl md:text-5xl">❤️</span>
         </h1>
         <p className="quicksand-subtitle text-xs sm:text-sm text-slate-800 font-semibold tracking-wide mt-6 mb-2">
           Match the pairs to unlock a surprise...
@@ -303,7 +303,7 @@ function ScratchCard({ imageUrl, caption }) {
   );
 }
 
-function ScratchMemories({ scratchMemories = [] }) {
+function ScratchMemories({ scratchMemories = [], customTitles }) {
   if (!scratchMemories.length) return null;
   return (
     <section className="py-20 px-6">
@@ -311,7 +311,7 @@ function ScratchMemories({ scratchMemories = [] }) {
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           className="text-center mb-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-6">
           <span className="text-xs font-bold uppercase tracking-widest text-pink-300 font-mono">Reveal our moments</span>
-          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">{siteData.customTitles?.gallerySectionTitle || "Scratch Memories"}</h2>
+          <h2 className="text-4xl font-serif text-white mt-2 mb-1 drop-shadow">{customTitles?.gallerySectionTitle || "Scratch Memories"}</h2>
           <p className="text-sm text-white/60">Scratch each card to reveal a hidden memory 💝</p>
           <div className="w-16 h-0.5 bg-pink-400/50 mx-auto mt-4" />
         </motion.div>
@@ -687,6 +687,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
               matchImages={matchImages}
               onComplete={() => { setUnlocked(true); if (onUnlock) onUnlock(); }}
               themeColors={siteData?.themeColors}
+              customTitles={siteData?.customTitles}
             />
           </motion.div>
         ) : (
@@ -706,7 +707,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
       `}</style>
       <ValentineHero siteData={siteData} />
       <WhyILoveYou reasons={reasons} />
-      <ScratchMemories scratchMemories={scratchMemories} />
+      <ScratchMemories scratchMemories={scratchMemories} customTitles={siteData?.customTitles} />
       <LoveLetter text={siteData.loveLetterText} coupleName={siteData.coupleName} />
       <VirtualGift gift={siteData.gift} />
       <ThingsToDoSection items={siteData.thingsToDo} themeColors={siteData.themeColors?.valentine} />

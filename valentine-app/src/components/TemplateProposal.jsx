@@ -597,7 +597,7 @@ export default function TemplateProposal({ siteData, onUnlock }) {
         <LoveLetter text={p.loveLetter} themeColors={themeColors} />
         <VirtualGiftBox giftImageUrl={p.giftImageUrl} giftMessage={p.giftMessage} themeColors={themeColors} />
         <DatePlanner activities={p.activities} foods={p.foods} themeColors={themeColors} />
-        <ThingsToDoSection items={siteData.thingsToDo} themeColors={themeColors} />
+        <ThingsToDoSection items={siteData?.thingsToDo} themeColors={themeColors} />
         <footer className="text-center py-8 text-[10px] uppercase tracking-widest text-rose-300 font-mono border-t border-rose-100"
           style={{ background: themeColors.background }}>
           © {new Date().getFullYear()} · Made with 💕 by EverWish
