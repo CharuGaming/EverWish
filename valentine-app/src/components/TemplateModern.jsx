@@ -25,7 +25,7 @@ function FloatingHeart({ x, y, id, onComplete }) {
 }
 
 // ── Entry Lock Screen (Love Meter Gauge) ───────────────────────────
-export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, themeColors }) {
+export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, themeColors, videoUrl }) {
   const [clicks, setClicks] = useState(0);
   const [hearts, setHearts] = useState([]);
   const maxClicks = 10;
@@ -73,6 +73,20 @@ export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, theme
         .lock-primary-stroke { stroke: ${primaryColor} !important; }
         .lock-heart-icon { fill: ${clicks > 0 ? primaryColor : 'transparent'} !important; stroke: ${clicks > 0 ? primaryColor : '#cbd5e1'} !important; }
       `}</style>
+      
+      {videoUrl && (
+        <>
+          <video
+            src={videoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-0 pointer-events-none"></div>
+        </>
+      )}
       <AnimatePresence>
         {hearts.map(h => (
           <FloatingHeart 
@@ -85,9 +99,11 @@ export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, theme
         ))}
       </AnimatePresence>
 
-      <div className="text-center z-10 max-w-sm pointer-events-none">
-        <h1 className="text-2xl font-serif text-slate-800 mb-2">Surprise Waiting...</h1>
-        <p className="lock-primary-text text-xs uppercase tracking-widest font-semibold mb-8 animate-pulse">
+      <div className="text-center z-10 max-w-sm pointer-events-none relative">
+        <h1 className={`text-2xl font-serif mb-2 ${videoUrl ? 'text-white [text-shadow:_0_2px_10px_rgb(0_0_0_/_0.9)]' : 'text-slate-800'}`}>
+          Surprise Waiting...
+        </h1>
+        <p className={`lock-primary-text text-xs uppercase tracking-widest font-semibold mb-8 animate-pulse ${videoUrl ? '[text-shadow:_0_1px_4px_rgb(0_0_0_/_0.8)]' : ''}`}>
           {lockProps?.lockScreenPrompt || 'Tap repeatedly to fill the meter'}
         </p>
 
@@ -135,7 +151,7 @@ export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, theme
           </div>
         </div>
 
-        <p className="text-[11px] text-slate-400">
+        <p className={`text-[11px] ${videoUrl ? 'text-white/90 [text-shadow:_0_1px_2px_rgb(0_0_0_/_0.8)]' : 'text-slate-400'}`}>
           Tap anywhere inside the window to charge the love meter
         </p>
       </div>
@@ -160,7 +176,7 @@ export default function TemplateModern({ siteData }) {
   const backgroundColor = colors.background || '#f7f5f0';
 
   return (
-    <div className="min-h-screen text-slate-800 font-sans pb-20 template-modern-root" style={{ backgroundColor }}>
+    <div className={`min-h-screen font-sans pb-20 template-modern-root relative ${bgVideoUrl ? 'text-white' : 'text-slate-800'}`} style={bgVideoUrl ? {} : { backgroundColor }}>
       <style>{`
         .template-modern-root {
           --primary-modern: ${primaryColor};
@@ -205,38 +221,34 @@ export default function TemplateModern({ siteData }) {
         }
       `}</style>
       
-      {/* SECTION 2: Memories Layout (Hero) */}
-      <section className="relative w-full min-h-screen flex flex-col justify-center items-center py-20 px-6 text-center overflow-hidden">
-        {/* Looping video background layer (z-0) */}
-        {bgVideoUrl && (
-          <>
-            <video
-              src={bgVideoUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
-            />
-            {/* Elegant glassmorphic / dark overlay (z-10) */}
-            <div 
-              className="absolute inset-0 z-10 pointer-events-none bg-black/30 backdrop-blur-[2px]"
-            />
-          </>
-        )}
+      {/* Full-Page Fixed Video Background (z-0) */}
+      {bgVideoUrl && (
+        <video
+          src={bgVideoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="fixed inset-0 w-full h-full object-cover z-0 pointer-events-none"
+        />
+      )}
 
-        {/* Content Container (z-20) */}
-        <div className={`relative z-20 max-w-2xl mx-auto w-full ${bgVideoUrl ? 'text-white' : ''}`}>
+      {/* Liquid Glass Content Wrapper */}
+      <div className={`relative z-10 min-h-screen w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 md:py-20 ${bgVideoUrl ? 'bg-white/20 backdrop-blur-md border-x border-white/30 shadow-2xl' : ''}`}>
+      
+      {/* SECTION 2: Memories Layout (Hero) */}
+      <section className="relative w-full min-h-[80vh] flex flex-col justify-center items-center py-10 px-4 text-center overflow-hidden">
+        <div className="relative z-20 max-w-2xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="mb-12"
           >
-            <span className={`text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse ${bgVideoUrl ? 'text-rose-300 drop-shadow-[0_2px_10px_rgba(244,63,94,0.4)]' : 'text-rose-500'}`}>
+            <span className={`text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse ${bgVideoUrl ? 'text-rose-300 drop-shadow-[0_2px_10px_rgba(244,63,94,0.6)] [text-shadow:_0_2px_4px_rgb(0_0_0_/_0.3)]' : 'text-rose-500'}`}>
               {siteData.customTitles?.heroMainTitle || "Happy Valentine's Day"} {siteData.coupleEmoji || '🥰'}
             </span>
-            <h1 className={`text-xl md:text-2xl font-semibold tracking-[0.25em] uppercase font-sans ${bgVideoUrl ? 'text-white/95 drop-shadow' : 'text-slate-500'}`}>
+            <h1 className={`text-xl md:text-2xl font-semibold tracking-[0.25em] uppercase font-sans ${bgVideoUrl ? 'text-white/95 drop-shadow-md [text-shadow:_0_2px_4px_rgb(0_0_0_/_0.3)]' : 'text-slate-500'}`}>
               {siteData.coupleName || 'Our Story'}
             </h1>
             <div className={`w-20 h-0.5 mx-auto mt-6 ${bgVideoUrl ? 'bg-rose-400/40' : 'bg-rose-200'}`} />
@@ -267,7 +279,7 @@ export default function TemplateModern({ siteData }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 1 }}
-            className={`text-lg font-serif italic leading-relaxed max-w-md mx-auto mb-8 px-4 ${bgVideoUrl ? 'text-white/90 drop-shadow' : 'text-slate-700'}`}
+            className={`text-lg font-serif italic leading-relaxed max-w-md mx-auto mb-8 px-4 ${bgVideoUrl ? 'text-white/95 drop-shadow-md [text-shadow:_0_1px_3px_rgb(0_0_0_/_0.5)]' : 'text-slate-700'}`}
           >
             "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
           </motion.p>
@@ -590,6 +602,8 @@ export default function TemplateModern({ siteData }) {
           © {new Date().getFullYear()} · Made By EverWish
         </span>
       </footer>
+
+      </div> {/* Close Liquid Glass Content Wrapper */}
 
     </div>
   );
