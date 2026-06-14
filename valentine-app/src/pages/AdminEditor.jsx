@@ -761,12 +761,20 @@ function GeneralTab({ doc, setDoc, showToast }) {
         <VideoField
           label="🎞️ Opening Animation Video (Intro)"
           hint="Plays once full-screen after the visitor taps 'Open'. MP4/WebM, ideally ≤20 MB. Leave blank for the classic tap-lock."
-          value={doc[isModern ? 'modern' : 'polaroid']?.introVideoUrl || ''}
-          onChange={v => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), introVideoUrl: v } }))}
+          value={doc.modern?.introVideoUrl || doc.polaroid?.introVideoUrl || ''}
+          onChange={v => setDoc(d => ({
+            ...d,
+            modern: { ...(d.modern || {}), introVideoUrl: v },
+            polaroid: { ...(d.polaroid || {}), introVideoUrl: v }
+          }))}
         />
-        {(doc[isModern ? 'modern' : 'polaroid']?.introVideoUrl) && (
+        {(doc.modern?.introVideoUrl || doc.polaroid?.introVideoUrl) && (
           <button
-            onClick={() => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), introVideoUrl: '' } }))}
+            onClick={() => setDoc(d => ({
+              ...d,
+              modern: { ...(d.modern || {}), introVideoUrl: '' },
+              polaroid: { ...(d.polaroid || {}), introVideoUrl: '' }
+            }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
           >
             Remove intro video
@@ -781,12 +789,20 @@ function GeneralTab({ doc, setDoc, showToast }) {
         <VideoField
           label="📽️ Looping Background Video (Hero)"
           hint="Loops silently behind the hero section content. MP4/WebM or JPG/PNG (static fallback). Keep under 20 MB."
-          value={doc[isModern ? 'modern' : 'polaroid']?.bgVideoUrl || ''}
-          onChange={v => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), bgVideoUrl: v } }))}
+          value={doc.modern?.bgVideoUrl || doc.polaroid?.bgVideoUrl || ''}
+          onChange={v => setDoc(d => ({
+            ...d,
+            modern: { ...(d.modern || {}), bgVideoUrl: v },
+            polaroid: { ...(d.polaroid || {}), bgVideoUrl: v }
+          }))}
         />
-        {(doc[isModern ? 'modern' : 'polaroid']?.bgVideoUrl) && (
+        {(doc.modern?.bgVideoUrl || doc.polaroid?.bgVideoUrl) && (
           <button
-            onClick={() => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), bgVideoUrl: '' } }))}
+            onClick={() => setDoc(d => ({
+              ...d,
+              modern: { ...(d.modern || {}), bgVideoUrl: '' },
+              polaroid: { ...(d.polaroid || {}), bgVideoUrl: '' }
+            }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
           >
             Remove background video
@@ -2557,7 +2573,21 @@ export default function AdminEditor() {
   const handleSave = async () => {
     setSaving(true);
     setError('');
-    const res = await saveSite(siteId, doc);
+
+    // Ensure video config properties are properly structured and sent in the payload
+    const payload = {
+      ...doc,
+      polaroid: {
+        introVideoUrl: doc.polaroid?.introVideoUrl || '',
+        bgVideoUrl:    doc.polaroid?.bgVideoUrl    || '',
+      },
+      modern: {
+        introVideoUrl: doc.modern?.introVideoUrl || '',
+        bgVideoUrl:    doc.modern?.bgVideoUrl    || '',
+      }
+    };
+
+    const res = await saveSite(siteId, payload);
     setSaving(false);
     if (res.success) {
       setSaved(true);

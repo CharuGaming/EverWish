@@ -261,6 +261,10 @@ export default function ClientPage() {
   }
 
   const isPolaroid = !siteData.templateType || siteData.templateType === 'polaroid';
+  const introVideoUrl = siteData.templateType === 'modern'
+    ? (siteData.modern?.introVideoUrl || siteData.polaroid?.introVideoUrl || '')
+    : (siteData.polaroid?.introVideoUrl || siteData.modern?.introVideoUrl || '');
+
   if (siteData.templateType === 'modern') {
     console.log("Modern Template Video Data:", siteData.modern);
   }
@@ -314,11 +318,11 @@ export default function ClientPage() {
       <AnimatePresence mode="wait">
         {!isUnlocked ? (
           siteData.templateType === 'modern' ? (
-            siteData.modern?.introVideoUrl ? (
+            introVideoUrl ? (
               <PolaroidIntroScreen
                 key="modern-intro-lock"
                 onUnlock={handleUnlock}
-                introVideoUrl={siteData.modern.introVideoUrl}
+                introVideoUrl={introVideoUrl}
                 heroPhotos={siteData?.gallery?.supporting?.map(s => s.url).filter(Boolean) || []}
                 lockScreenPrompt={lockProps.lockScreenPrompt}
                 valentineMessage={lockProps.valentineMessage}
@@ -338,7 +342,7 @@ export default function ClientPage() {
             <PolaroidIntroScreen
               key="polaroid-lock"
               onUnlock={handleUnlock}
-              introVideoUrl={siteData?.polaroid?.introVideoUrl || ''}
+              introVideoUrl={introVideoUrl}
               heroPhotos={siteData?.gallery?.supporting?.map(s => s.url).filter(Boolean) || []}
               lockScreenPrompt={lockProps.lockScreenPrompt}
               valentineMessage={lockProps.valentineMessage}
