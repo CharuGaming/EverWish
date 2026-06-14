@@ -318,7 +318,7 @@ export default function ClientPage() {
               lockProps={lockProps}
               themeColors={siteData.themeColors}
             />
-        ) : isPolaroid ? (
+          ) : isPolaroid ? (
             <PolaroidIntroScreen
               key="polaroid-lock"
               onUnlock={handleUnlock}
