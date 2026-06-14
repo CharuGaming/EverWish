@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X, Gift } from 'lucide-react';
 import ThingsToDoSection from './ThingsToDoSection';
@@ -156,6 +156,95 @@ export function ModernLockScreen({ onUnlock, onUnlockImmediate, lockProps, theme
         </p>
       </div>
     </div>
+  );
+}
+
+// ── Modern Scratch Card for Gallery ────────────────────────────────
+function ModernScratchCard({ img, onClick, primaryColor }) {
+  const canvasRef   = useRef(null);
+  const isDrawing   = useRef(false);
+  const [scratched, setScratched] = useState(false);
+  const [pct, setPct] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    // Elegant gradient for modern theme
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, primaryColor || '#e11d48');
+    grad.addColorStop(1, '#fda4af');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Subtle modern pattern overlay
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    for(let i=0; i<40; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*3 + 1, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✨ Scratch ✨', canvas.width/2, canvas.height/2 - 5);
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillText('to reveal', canvas.width/2, canvas.height/2 + 18);
+  }, [primaryColor]);
+
+  const getPos = (e, canvas) => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x:(src.clientX-r.left)*(canvas.width/r.width), y:(src.clientY-r.top)*(canvas.height/r.height) };
+  };
+
+  const scratch = (e) => {
+    if (!isDrawing.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const { x, y } = getPos(e, canvas);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(x, y, 35, 0, Math.PI*2); ctx.fill();
+    
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let t = 0;
+    for (let i=3; i<data.length; i+=4) if (data[i]<128) t++;
+    const p = Math.round((t/(canvas.width*canvas.height))*100);
+    setPct(p);
+    if (p > 50 && !scratched) setScratched(true);
+  };
+
+  return (
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      className="relative aspect-square bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-1.5 cursor-pointer hover:shadow-md transition-all duration-200"
+    >
+      <div className="relative w-full h-full rounded-xl overflow-hidden" onClick={() => scratched && onClick(img)}>
+        <img src={img.url} alt={img.caption || "Gallery"} className="w-full h-full object-cover" />
+        
+        <canvas ref={canvasRef} width={300} height={300}
+          className={`absolute inset-0 w-full h-full touch-none ${scratched ? 'pointer-events-none' : 'cursor-crosshair'}`}
+          style={{ opacity: scratched ? 0 : 1, transition:'opacity 0.8s ease' }}
+          onMouseDown={(e) => { e.stopPropagation(); isDrawing.current=true; }}
+          onMouseMove={(e) => { e.stopPropagation(); scratch(e); }} 
+          onMouseUp={(e) => { e.stopPropagation(); isDrawing.current=false; }}
+          onMouseLeave={(e) => { e.stopPropagation(); isDrawing.current=false; }}
+          onTouchStart={(e) => { e.stopPropagation(); e.preventDefault(); isDrawing.current=true; }}
+          onTouchMove={(e) => { e.stopPropagation(); e.preventDefault(); scratch(e); }}
+          onTouchEnd={(e) => { e.stopPropagation(); isDrawing.current=false; }}
+        />
+        
+        {!scratched && (
+          <div className="absolute top-2 right-2 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"
+            style={{ backgroundColor: primaryColor || '#e11d48' }}>
+            {pct}%
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }
 
@@ -517,18 +606,7 @@ export default function TemplateModern({ siteData }) {
         {allImages.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {allImages.map((img, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.02 }}
-                onClick={() => setSelectedImg(img)}
-                className="aspect-square bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-1.5 cursor-pointer hover:shadow-md transition-all duration-200"
-              >
-                <img 
-                  src={img.url} 
-                  alt={img.caption || "Gallery picture"} 
-                  className="w-full h-full object-cover rounded-xl"
-                />
-              </motion.div>
+              <ModernScratchCard key={i} img={img} onClick={setSelectedImg} primaryColor={primaryColor} />
             ))}
           </div>
         ) : (
