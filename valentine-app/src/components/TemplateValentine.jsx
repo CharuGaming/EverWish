@@ -557,8 +557,8 @@ function VirtualGift({ gift }) {
 }
 
 // ── Hero banner ───────────────────────────────────────────────────
-function ValentineHero({ siteData }) {
-  const heroTitleText = siteData.customTitles?.heroMainTitle || siteData.heroTitle || "Happy Valentine's Day";
+function ValentineHero({ siteData, heroTitle }) {
+  const heroTitleText = siteData.customTitles?.heroMainTitle || heroTitle || "Happy Valentine's Day";
   const heroWords = heroTitleText.split(' ');
 
   return (
@@ -705,7 +705,7 @@ export default function TemplateValentine({ siteData, onUnlock }) {
           background-color: #fbbf24 !important;
         }
       `}</style>
-      <ValentineHero siteData={siteData} />
+      <ValentineHero siteData={siteData} heroTitle={siteData?.heroTitle} />
       <WhyILoveYou reasons={reasons} />
       <ScratchMemories scratchMemories={scratchMemories} customTitles={siteData?.customTitles} />
       <LoveLetter text={siteData.loveLetterText} coupleName={siteData.coupleName} />

@@ -65,6 +65,7 @@ const SiteSchema = new mongoose.Schema(
     general: {
       coupleName:       { type: String, default: '' },
       coupleEmoji:      { type: String, default: '💌' },
+      heroTitle:        { type: String, default: '' },
       heroSubtitle:     { type: String, default: '' },
       heroDate:         { type: String, default: '' },
       loveLetterText:   { type: String, default: '' },
