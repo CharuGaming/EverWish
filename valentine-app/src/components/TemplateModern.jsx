@@ -204,73 +204,98 @@ export default function TemplateModern({ siteData }) {
       `}</style>
       
       {/* SECTION 2: Memories Layout (Hero) */}
-      <section className="max-w-2xl mx-auto pt-20 px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-12"
-        >
-          <span className="text-rose-500 text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse">
-            {siteData.customTitles?.heroMainTitle || "Happy Valentine's Day"} {siteData.coupleEmoji || '🥰'}
-          </span>
-          <h1 className="text-xl md:text-2xl font-semibold tracking-[0.25em] text-slate-500 uppercase font-sans">
-            {siteData.coupleName || 'Our Story'}
-          </h1>
-          <div className="w-20 h-0.5 bg-rose-200 mx-auto mt-6" />
-        </motion.div>
-
-        {/* Primary Memory Image */}
-        {siteData.heroImageUrl ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            className="w-full max-w-lg mx-auto aspect-[4/5] rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-white p-2.5 mb-8"
-          >
-            <img 
-              src={siteData.heroImageUrl} 
-              alt="Our memory" 
-              className="w-full h-full object-cover rounded-2xl"
+      <section className="relative w-full min-h-screen flex flex-col justify-center items-center py-20 px-6 text-center overflow-hidden">
+        {/* Looping video background layer (z-0) */}
+        {siteData.modern?.bgVideoUrl && (
+          <>
+            <video
+              src={siteData.modern.bgVideoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
             />
-          </motion.div>
-        ) : (
-          <div className="w-full max-w-lg mx-auto aspect-[4/5] rounded-3xl bg-slate-100 flex items-center justify-center text-slate-300 border border-slate-200 mb-8 p-6 text-xs uppercase tracking-widest font-semibold">
-            Primary Memory Image
-          </div>
+            {/* Elegant glassmorphic / dark overlay (z-10) */}
+            <div 
+              className="absolute inset-0 z-10 pointer-events-none bg-black/30 backdrop-blur-[2px]"
+            />
+          </>
         )}
 
-        {/* Romantic Quote */}
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 1 }}
-          className="text-lg font-serif italic text-slate-700 leading-relaxed max-w-md mx-auto mb-8 px-4"
-        >
-          "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
-        </motion.p>
+        {/* Content Container (z-20) */}
+        <div className={`relative z-20 max-w-2xl mx-auto w-full ${siteData.modern?.bgVideoUrl ? 'text-white' : ''}`}>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mb-12"
+          >
+            <span className={`text-5xl md:text-8xl font-serif italic block mb-6 animate-pulse ${siteData.modern?.bgVideoUrl ? 'text-rose-300 drop-shadow-[0_2px_10px_rgba(244,63,94,0.4)]' : 'text-rose-500'}`}>
+              {siteData.customTitles?.heroMainTitle || "Happy Valentine's Day"} {siteData.coupleEmoji || '🥰'}
+            </span>
+            <h1 className={`text-xl md:text-2xl font-semibold tracking-[0.25em] uppercase font-sans ${siteData.modern?.bgVideoUrl ? 'text-white/95 drop-shadow' : 'text-slate-500'}`}>
+              {siteData.coupleName || 'Our Story'}
+            </h1>
+            <div className={`w-20 h-0.5 mx-auto mt-6 ${siteData.modern?.bgVideoUrl ? 'bg-rose-400/40' : 'bg-rose-200'}`} />
+          </motion.div>
 
-        {/* Timeline Dates */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="flex items-center justify-center gap-6 mb-16 text-amber-800"
-        >
-          <div className="text-sm font-semibold tracking-widest font-mono uppercase bg-amber-50/50 border border-amber-900/10 px-4 py-2 rounded-xl">
-            {siteData.timelineDates?.startDate || '2020'}
-          </div>
-          
-          {/* Handdrawn style SVG Curved Arrow */}
-          <svg width="60" height="24" viewBox="0 0 60 24" fill="none" className="opacity-60">
-            <path d="M5 19C15 5 45 5 55 19" stroke="#b45309" strokeWidth="1.5" strokeLinecap="round"/>
-            <path d="M50 17L55 19L53 14" stroke="#b45309" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          {/* Primary Memory Image */}
+          {siteData.heroImageUrl ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              className={`w-full max-w-lg mx-auto aspect-[4/5] rounded-3xl overflow-hidden shadow-sm p-2.5 mb-8 ${siteData.modern?.bgVideoUrl ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white border border-slate-200'}`}
+            >
+              <img 
+                src={siteData.heroImageUrl} 
+                alt="Our memory" 
+                className="w-full h-full object-cover rounded-2xl"
+              />
+            </motion.div>
+          ) : (
+            <div className={`w-full max-w-lg mx-auto aspect-[4/5] rounded-3xl flex items-center justify-center border mb-8 p-6 text-xs uppercase tracking-widest font-semibold ${siteData.modern?.bgVideoUrl ? 'bg-white/5 border-white/10 text-white/40' : 'bg-slate-100 border-slate-200 text-slate-300'}`}>
+              Primary Memory Image
+            </div>
+          )}
 
-          <div className="text-sm font-semibold tracking-widest font-mono uppercase bg-amber-50/50 border border-amber-900/10 px-4 py-2 rounded-xl">
-            {siteData.timelineDates?.endDate || '2026'}
-          </div>
-        </motion.div>
+          {/* Romantic Quote */}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 1 }}
+            className={`text-lg font-serif italic leading-relaxed max-w-md mx-auto mb-8 px-4 ${siteData.modern?.bgVideoUrl ? 'text-white/90 drop-shadow' : 'text-slate-700'}`}
+          >
+            "{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle || 'Love is not about how many days, months, or years you have been together. It is all about how much you love each other every single day.'}"
+          </motion.p>
+
+          {/* Timeline Dates */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className={`flex items-center justify-center gap-6 mb-16 ${siteData.modern?.bgVideoUrl ? 'text-white' : 'text-amber-800'}`}
+          >
+            <div className={`text-sm font-semibold tracking-widest font-mono uppercase border px-4 py-2 rounded-xl ${siteData.modern?.bgVideoUrl ? 'bg-white/10 border-white/20 backdrop-blur-md text-white' : 'bg-amber-50/50 border-amber-900/10'}`}>
+              {siteData.timelineDates?.startDate || '2020'}
+            </div>
+            
+            {/* Curved Arrow (or simple connector line on video background) */}
+            {siteData.modern?.bgVideoUrl ? (
+              <div className="w-12 h-px bg-white/20" />
+            ) : (
+              <svg width="60" height="24" viewBox="0 0 60 24" fill="none" className="opacity-60">
+                <path d="M5 19C15 5 45 5 55 19" stroke="#b45309" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M50 17L55 19L53 14" stroke="#b45309" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+
+            <div className={`text-sm font-semibold tracking-widest font-mono uppercase border px-4 py-2 rounded-xl ${siteData.modern?.bgVideoUrl ? 'bg-white/10 border-white/20 backdrop-blur-md text-white' : 'bg-amber-50/50 border-amber-900/10'}`}>
+              {siteData.timelineDates?.endDate || '2026'}
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Love Message Section */}

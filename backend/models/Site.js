@@ -199,6 +199,11 @@ const SiteSchema = new mongoose.Schema(
       introVideoUrl: { type: String, default: '' },
       bgVideoUrl:    { type: String, default: '' },
     },
+    // ── Modern Template Video Config ──────────────────────────────
+    modern: {
+      introVideoUrl: { type: String, default: '' },
+      bgVideoUrl:    { type: String, default: '' },
+    },
     scratchPrize: { type: String, default: '' },
     yearInReview: {
       type: [{ label: { type: String, default: '' }, value: { type: String, default: '' } }],

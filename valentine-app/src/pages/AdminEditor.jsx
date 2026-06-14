@@ -753,7 +753,7 @@ function GeneralTab({ doc, setDoc, showToast }) {
         )}
       </Card>
 
-      {/* ── Dual Video Config (Polaroid template) ─────────────── */}
+      {/* ── Dual Video Config (Polaroid / Modern templates) ─────────────── */}
       <Card title="🎬 Dual-Video Config (Intro + Background)">
         <p className="text-[11px] text-slate-500 mb-4">
           <strong>Opening Animation Video</strong> — plays full-screen when the visitor taps the intro screen. Great for a cinematic reveal. Leave empty to keep the classic tap-to-fill lock screen.
@@ -761,12 +761,12 @@ function GeneralTab({ doc, setDoc, showToast }) {
         <VideoField
           label="🎞️ Opening Animation Video (Intro)"
           hint="Plays once full-screen after the visitor taps 'Open'. MP4/WebM, ideally ≤20 MB. Leave blank for the classic tap-lock."
-          value={doc.polaroid?.introVideoUrl || ''}
-          onChange={v => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), introVideoUrl: v } }))}
+          value={doc[isModern ? 'modern' : 'polaroid']?.introVideoUrl || ''}
+          onChange={v => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), introVideoUrl: v } }))}
         />
-        {doc.polaroid?.introVideoUrl && (
+        {(doc[isModern ? 'modern' : 'polaroid']?.introVideoUrl) && (
           <button
-            onClick={() => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), introVideoUrl: '' } }))}
+            onClick={() => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), introVideoUrl: '' } }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
           >
             Remove intro video
@@ -781,12 +781,12 @@ function GeneralTab({ doc, setDoc, showToast }) {
         <VideoField
           label="📽️ Looping Background Video (Hero)"
           hint="Loops silently behind the hero section content. MP4/WebM or JPG/PNG (static fallback). Keep under 20 MB."
-          value={doc.polaroid?.bgVideoUrl || ''}
-          onChange={v => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), bgVideoUrl: v } }))}
+          value={doc[isModern ? 'modern' : 'polaroid']?.bgVideoUrl || ''}
+          onChange={v => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), bgVideoUrl: v } }))}
         />
-        {doc.polaroid?.bgVideoUrl && (
+        {(doc[isModern ? 'modern' : 'polaroid']?.bgVideoUrl) && (
           <button
-            onClick={() => setDoc(d => ({ ...d, polaroid: { ...(d.polaroid || {}), bgVideoUrl: '' } }))}
+            onClick={() => setDoc(d => ({ ...d, [isModern ? 'modern' : 'polaroid']: { ...(d[isModern ? 'modern' : 'polaroid'] || {}), bgVideoUrl: '' } }))}
             className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mb-4 block"
           >
             Remove background video

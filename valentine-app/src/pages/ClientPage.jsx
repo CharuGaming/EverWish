@@ -311,13 +311,26 @@ export default function ClientPage() {
       <AnimatePresence mode="wait">
         {!isUnlocked ? (
           siteData.templateType === 'modern' ? (
-            <ModernLockScreen
-              key="modern-lock"
-              onUnlock={handleUnlock}
-              onUnlockImmediate={handleUnlockImmediate}
-              lockProps={lockProps}
-              themeColors={siteData.themeColors}
-            />
+            siteData.modern?.introVideoUrl ? (
+              <PolaroidIntroScreen
+                key="modern-intro-lock"
+                onUnlock={handleUnlock}
+                introVideoUrl={siteData.modern.introVideoUrl}
+                heroPhotos={siteData?.gallery?.supporting?.map(s => s.url).filter(Boolean) || []}
+                lockScreenPrompt={lockProps.lockScreenPrompt}
+                valentineMessage={lockProps.valentineMessage}
+                introButtonText={siteData?.introButtonText}
+                themeColors={siteData?.themeColors}
+              />
+            ) : (
+              <ModernLockScreen
+                key="modern-lock"
+                onUnlock={handleUnlock}
+                onUnlockImmediate={handleUnlockImmediate}
+                lockProps={lockProps}
+                themeColors={siteData.themeColors}
+              />
+            )
           ) : isPolaroid ? (
             <PolaroidIntroScreen
               key="polaroid-lock"

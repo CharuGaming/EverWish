@@ -374,6 +374,10 @@ export function toComponentData(doc) {
       introVideoUrl: doc.polaroid?.introVideoUrl || '',
       bgVideoUrl:    doc.polaroid?.bgVideoUrl    || '',
     },
+    modern: {
+      introVideoUrl: doc.modern?.introVideoUrl || '',
+      bgVideoUrl:    doc.modern?.bgVideoUrl    || '',
+    },
     scratchPrize: doc.scratchPrize || '',
     yearInReview: doc.yearInReview || [],
     virtualGift:  doc.virtualGift ? {
@@ -450,6 +454,10 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
     music:  { audioUrl: '', thumbnailUrl: '', isEnabled: true },
     gift:   { recipient: '', message: 'You deserve all the flowers…' },
     polaroid: {
+      introVideoUrl: '',
+      bgVideoUrl: '',
+    },
+    modern: {
       introVideoUrl: '',
       bgVideoUrl: '',
     },
