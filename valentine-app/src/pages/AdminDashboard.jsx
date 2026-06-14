@@ -1101,6 +1101,7 @@ export default function AdminDashboard() {
                         <option value="proposal">Template 4 - Proposal (Interactive)</option>
                         <option value="custom">Template 5 - Custom (Mix &amp; Match)</option>
                         <option value="cinematic">Template 6 - Cinematic Anniversary</option>
+                        <option value="apology">Template 7 - Apology / Forgive Me</option>
                       </>
                     ) : (
                       <>
