@@ -1111,6 +1111,12 @@ function ValentineMatchTab({ doc, setDoc }) {
   const [errors, setErrors] = useState(['','','','','']);
   const refs = [useRef(),useRef(),useRef(),useRef(),useRef()];
 
+  const ct = doc.customTitles || {};
+  const upTitle = (val) => setDoc(d => ({
+    ...d,
+    customTitles: { ...(d.customTitles || {}), gameSectionTitle: val }
+  }));
+
   const upImg = async (idx, file) => {
     if (!file) return;
     setUploading(u => { const n=[...u]; n[idx]=true; return n; });
@@ -1139,9 +1145,24 @@ function ValentineMatchTab({ doc, setDoc }) {
   };
 
   return (
-    <Card title="Memory Match Images (exactly 5)">
-      <p className="text-[11px] text-slate-500 mb-5">Upload exactly 5 images. They will be duplicated (×2) and shuffled to form 10 cards in a heart shape.</p>
-      <div className="space-y-4">
+    <div className="space-y-6">
+      <Card title="Interactive Match Game Settings">
+        <div className="mb-0">
+          <Label>Game Section Title</Label>
+          <TextInput
+            value={ct.gameSectionTitle || ''}
+            onChange={e => upTitle(e.target.value)}
+            placeholder="e.g. Memory Match / Match the Pairs / For My Valentine"
+          />
+          <p className="text-[10px] text-slate-500 mt-1">
+            Change the default "For My Valentine" heading of the Interactive memory match game.
+          </p>
+        </div>
+      </Card>
+
+      <Card title="Memory Match Images (exactly 5)">
+        <p className="text-[11px] text-slate-500 mb-5">Upload exactly 5 images. They will be duplicated (×2) and shuffled to form 10 cards in a heart shape.</p>
+        <div className="space-y-4">
         {images.map((url, i) => (
           <div key={i}>
             <Label>Image {i+1}</Label>
@@ -1159,8 +1180,9 @@ function ValentineMatchTab({ doc, setDoc }) {
             {url && !errors[i] && <img src={url} alt={`match-${i}`} className="mt-2 h-16 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />}
           </div>
         ))}
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </div>
   );
 }
 
