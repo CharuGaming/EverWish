@@ -130,6 +130,24 @@ app.use('/api/storefront', storefrontRoutes);
 app.use('/api/cron',       cronRoutes);
 app.use('/api/orders',     orderRoutes);
 
+app.get('/api/debug-sites', async (req, res) => {
+  try {
+    const Site = require('./models/Site');
+    const sites = await Site.find({});
+    const simplified = sites.map(s => ({
+      siteId: s.siteId,
+      templateType: s.templateType,
+      category: s.category,
+      modern: s.modern,
+      polaroid: s.polaroid,
+      createdAt: s.createdAt,
+    }));
+    res.json({ success: true, count: sites.length, sites: simplified });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ── Global 404 Handler ────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found.' });
