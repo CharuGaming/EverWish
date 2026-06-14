@@ -2711,6 +2711,14 @@ export default function AdminEditor() {
     getSite(siteId).then(res => {
       if (res.success) {
         setDoc(res.data);
+        const tType = res.data?.templateType;
+        if (tType === 'apology') {
+          setActiveTab('apology');
+        } else if (tType === 'bday5') {
+          setActiveTab('cinbday_general');
+        } else {
+          setActiveTab('general');
+        }
       } else {
         const msg = (res.message || '').toLowerCase();
         if (msg.includes('token') || msg.includes('unauthorized')) {
@@ -2798,7 +2806,7 @@ export default function AdminEditor() {
     : isProposal ? PROPOSAL_TABS
     : isCustom   ? CUSTOM_TABS
     : isCinematic ? CINEMATIC_TABS
-    : isApology ? [{ id: 'apology', label: '💔 Apology Setup' }]
+    : isApology ? [{ id: 'apology', label: '💔 Apology Setup', Icon: Heart }]
     : doc.templateType === 'modern' ? TABS.filter(t => t.id !== 'milestones')
     : TABS;
   const ActiveTab = availableTabs.find(t => t.id === activeTab) || availableTabs[0];
