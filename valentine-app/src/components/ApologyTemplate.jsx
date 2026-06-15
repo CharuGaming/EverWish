@@ -458,7 +458,7 @@ export default function ApologyTemplate({ siteData }) {
             <video
               src={bgVideoUrl}
               autoPlay loop muted playsInline
-              className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-overlay"
+              className="fixed inset-0 w-full h-full object-contain pointer-events-none opacity-40 mix-blend-overlay"
               style={{ zIndex: 0 }}
             />
           )}
