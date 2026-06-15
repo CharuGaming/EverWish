@@ -420,33 +420,80 @@ function RelationshipTimeline() {
 }
 
 // ── Forgiven Celebration ────────────────────────────────────────────
-function ForgivenScreen({ message }) {
+function ForgivenScreen({ message, peaceOfferings = [] }) {
+  const [claimedGift, setClaimedGift] = useState(null);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-      className="flex flex-col items-center justify-center text-center py-8"
+      className="flex flex-col items-center justify-center text-center py-8 w-full"
     >
       <motion.img 
         src="https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif" 
         alt="Bear Hug"
-        className="w-48 h-48 rounded-3xl object-cover mb-6 shadow-xl border-4 border-white"
+        className="w-40 h-40 rounded-3xl object-cover mb-6 shadow-xl border-4 border-white"
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       />
       <motion.h2
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="text-4xl font-bold text-rose-500 mb-4 apology-title drop-shadow-sm"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="text-4xl font-bold text-rose-500 mb-2 apology-title drop-shadow-sm"
       >
         Yay! Thank You! 💕
       </motion.h2>
       <motion.p
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-        className="text-slate-700 text-lg leading-relaxed max-w-sm apology-body font-semibold"
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+        className="text-slate-700 text-base leading-relaxed max-w-sm apology-body font-semibold mb-8"
       >
-        {message || 'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖'}
+        {message}
       </motion.p>
+
+      {/* Coupons Section */}
+      {peaceOfferings.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+          className="w-full flex flex-col items-center mt-4"
+        >
+          <h3 className="apology-title text-3xl text-rose-500 mb-6 drop-shadow-sm">How can I make it up to you? Pick one! 👇</h3>
+          <div className="flex flex-col gap-4 w-full px-2 max-w-sm">
+            {peaceOfferings.map((offering, idx) => {
+              const isClaimed = claimedGift === idx;
+              const isOtherClaimed = claimedGift !== null && claimedGift !== idx;
+
+              return (
+                <motion.div
+                  key={idx}
+                  whileHover={claimedGift === null ? { scale: 1.05 } : {}}
+                  whileTap={claimedGift === null ? { scale: 0.95 } : {}}
+                  onClick={() => { if (claimedGift === null) setClaimedGift(idx); }}
+                  className={`relative w-full bg-white/80 backdrop-blur-md border-2 border-dashed border-rose-300 rounded-2xl p-5 flex items-center justify-center cursor-pointer shadow-[0_4px_15px_rgba(255,182,193,0.3)] transition-all duration-500 ${
+                    isClaimed ? 'scale-105 border-rose-500 bg-rose-50 z-10' : isOtherClaimed ? 'opacity-40 blur-sm grayscale' : ''
+                  }`}
+                >
+                  <p className="apology-body text-rose-600 font-bold text-lg text-center">{offering}</p>
+                  
+                  <AnimatePresence>
+                    {isClaimed && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 3, rotate: -20 }}
+                        animate={{ opacity: 1, scale: 1, rotate: -10 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.2 }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                      >
+                        <div className="border-[5px] border-rose-500 text-rose-500 text-4xl font-black px-6 py-2 rounded-xl uppercase tracking-widest apology-title bg-white/50 backdrop-blur-sm shadow-2xl" style={{ transform: 'rotate(-5deg)' }}>
+                          DEAL! 🤝
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -464,6 +511,7 @@ export default function ApologyTemplate({ siteData }) {
     runawayButtonText  = 'No 🏃',
     forgiveButtonText  = 'Yes, I forgive you 💕',
     forgivenMessage    = 'Thank you for giving me another chance. 💖',
+    peaceOfferings     = ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
     galleryImages      = [],
   } = data;
 
@@ -546,7 +594,7 @@ export default function ApologyTemplate({ siteData }) {
             >
               <AnimatePresence mode="wait">
                 {forgiven ? (
-                  <ForgivenScreen key="forgiven" message={forgivenMessage} />
+                  <ForgivenScreen key="forgiven" message={forgivenMessage} peaceOfferings={peaceOfferings} />
                 ) : !mended ? (
                   <motion.div key="slider" exit={{ opacity: 0, scale: 0.9 }} className="w-full">
                     <DragToMend onMended={() => setMended(true)} />

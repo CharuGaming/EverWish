@@ -2639,6 +2639,41 @@ function ApologyTab({ doc, setDoc }) {
         </div>
       </Card>
 
+      {/* Peace Offerings */}
+      <Card title="🎁 Peace Offerings / Bribe Coupons">
+        <p className="text-[11px] text-slate-500 mb-4">
+          Add options for how you can make it up to them after they say Yes.
+        </p>
+        {(d.peaceOfferings || []).map((text, i) => (
+          <div key={i} className="flex items-center gap-3 mb-3">
+            <TextInput
+              value={text}
+              onChange={e => {
+                const arr = [...(d.peaceOfferings || [])];
+                arr[i] = e.target.value;
+                upA('peaceOfferings', arr);
+              }}
+            />
+            <button
+              onClick={() => {
+                const arr = [...(d.peaceOfferings || [])];
+                arr.splice(i, 1);
+                upA('peaceOfferings', arr);
+              }}
+              className="p-2 bg-red-50 text-red-400 hover:text-red-600 rounded-xl"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => upA('peaceOfferings', [...(d.peaceOfferings || []), 'New Offering 🎁'])}
+          className="text-rose-500 hover:text-rose-600 text-xs font-bold mt-2 flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-lg w-max"
+        >
+          <Plus size={14} /> Add Offering
+        </button>
+      </Card>
+
       {/* Gallery */}
       <Card title="📸 Memory Gallery (optional)">
         <p className="text-[11px] text-slate-500 mb-4">
@@ -2766,6 +2801,7 @@ export default function AdminEditor() {
         runawayButtonText: doc.apology?.runawayButtonText || 'No 🏃',
         forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
         forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
+        peaceOfferings:    doc.apology?.peaceOfferings    || ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
         galleryImages:     doc.apology?.galleryImages     || [],
       },
     };

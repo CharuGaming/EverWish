@@ -439,6 +439,7 @@ export function toComponentData(doc) {
       runawayButtonText: doc.apology?.runawayButtonText || 'No 🏃',
       forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
       forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
+      peaceOfferings:    doc.apology?.peaceOfferings    || ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
       galleryImages:     doc.apology?.galleryImages     || [],
     },
   };
@@ -549,6 +550,7 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       runawayButtonText: 'No 🏃',
       forgiveButtonText: 'Yes, I forgive you 💕',
       forgivenMessage:   'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖',
+      peaceOfferings:    ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
       galleryImages:     [],
     },
   };
