@@ -5,6 +5,7 @@
  */
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 const DEFAULT_THRESHOLD = 42;
 
@@ -173,7 +174,7 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
           {revealed ? (
             <motion.img
               key="revealed"
-              src={src} alt={alt}
+              src={optimizeCloudinaryUrl(src, 600)} alt={alt}
               className="absolute inset-0 w-full h-full object-cover"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1,   opacity: 1 }}
@@ -184,7 +185,7 @@ export default function ScratchPhoto({ src, alt = '', primary = '#f59e0b', thres
           ) : (
             <img
               key="hidden"
-              src={src} alt={alt}
+              src={optimizeCloudinaryUrl(src, 600)} alt={alt}
               loading="lazy" decoding="async"
               className="absolute inset-0 w-full h-full object-cover"
               draggable={false}

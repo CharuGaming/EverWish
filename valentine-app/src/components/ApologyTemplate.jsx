@@ -5,6 +5,7 @@
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 // ── Confetti / Heart-Burst on Forgiveness ──────────────────────────
 const BURST_PARTICLES = Array.from({ length: 100 }, (_, i) => ({
@@ -166,7 +167,7 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
           {introVideoUrl && (
             <video
               ref={videoRef}
-              src={introVideoUrl}
+              src={optimizeCloudinaryUrl(introVideoUrl, 854)}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline
               onEnded={() => setPhase('transitioning')}
@@ -476,7 +477,7 @@ function ApologyScratchCard({ img, enableScratchReveal }) {
 
   return (
     <div className="relative aspect-square w-full h-full rounded-2xl overflow-hidden shadow-md border-4 border-white/60 bg-white cursor-pointer group">
-      <img src={img} alt="Gallery" className={`w-full h-full object-cover transition-transform duration-500 ${!enableScratchReveal || scratched ? 'group-hover:scale-110' : ''}`} loading="lazy" />
+      <img src={optimizeCloudinaryUrl(img, 600)} alt="Gallery" className={`w-full h-full object-cover transition-transform duration-500 ${!enableScratchReveal || scratched ? 'group-hover:scale-110' : ''}`} loading="lazy" />
       
       {enableScratchReveal && (
         <canvas ref={canvasRef} width={300} height={300}
@@ -504,7 +505,7 @@ function ForgivenScreen({ message, peaceOfferings = [], successImageUrl, peaceOf
       className="flex flex-col items-center justify-center text-center py-8 w-full"
     >
       <motion.img 
-        src={successImageUrl || "https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif"} 
+        src={optimizeCloudinaryUrl(successImageUrl || "https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif", 500)} 
         alt="Success Graphic"
         className="w-40 h-40 rounded-3xl object-cover mb-6 shadow-xl border-4 border-white"
         animate={{ scale: [1, 1.05, 1] }}
@@ -631,7 +632,7 @@ export default function ApologyTemplate({ siteData }) {
           {musicUrl && <audio id="apology-audio" src={musicUrl} autoPlay loop />}
           {bgVideoUrl && (
             <video
-              src={bgVideoUrl}
+              src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
               autoPlay loop muted playsInline
               className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-overlay"
               style={{ zIndex: 0 }}

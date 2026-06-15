@@ -76,7 +76,7 @@ function MemoryCard({ card, isFlipped, isMatched, onClick, cardColor }) {
         <div style={{ backfaceVisibility:'hidden', position:'absolute', inset:0, transform:'rotateY(180deg)' }}
           className={`rounded-xl overflow-hidden border-2 shadow-md ${isMatched ? 'border-green-400 ring-2 ring-green-300' : 'border-pink-300'}`}>
           {card.imageUrl
-            ? <img src={card.imageUrl} alt="" className="w-full h-full object-cover" />
+            ? <img src={optimizeCloudinaryUrl(card.imageUrl, 200)} alt="" className="w-full h-full object-cover" />
             : <div className="w-full h-full bg-rose-100 flex items-center justify-center text-2xl">{['💖', '🌹', '🧸', '🍫', '💍'][card.pairIndex] || '💕'}</div>
           }
         </div>
@@ -272,7 +272,7 @@ function ScratchCard({ imageUrl, caption }) {
     <div className="relative rounded-2xl overflow-hidden shadow-lg border border-rose-100 bg-white group">
       {/* Background image */}
       {imageUrl
-        ? <img src={imageUrl} alt={caption||'memory'} className="w-full aspect-square object-cover" />
+        ? <img src={optimizeCloudinaryUrl(imageUrl, 600)} alt={caption||'memory'} className="w-full aspect-square object-cover" />
         : <div className="w-full aspect-square bg-rose-50 flex items-center justify-center text-5xl">💕</div>
       }
       {/* Canvas overlay */}
@@ -535,7 +535,7 @@ function VirtualGift({ gift }) {
                     transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.3 }}
                     className="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-rose-50"
                   >
-                    <img src={gift.bouquetUrl} alt="gift" className="w-full h-full object-contain" />
+                    <img src={optimizeCloudinaryUrl(gift.bouquetUrl, 600)} alt="gift" className="w-full h-full object-contain" />
                   </motion.div>
                 ) : (
                   <div className="w-full aspect-[4/3] rounded-2xl bg-rose-50 border-2 border-dashed border-rose-200 flex items-center justify-center text-4xl mb-5">💐</div>

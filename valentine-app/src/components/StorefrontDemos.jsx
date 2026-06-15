@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, Heart, Sparkles, AlertCircle } from 'lucide-react';
 import { getPublicDemos } from '../api';
+import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 
 export default function StorefrontDemos() {
   const [demos, setDemos] = useState([]);
@@ -92,7 +93,7 @@ export default function StorefrontDemos() {
               <div className="relative h-48 w-full bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                 {demo.previewImage ? (
                   <img
-                    src={demo.previewImage}
+                    src={optimizeCloudinaryUrl(demo.previewImage, 600)}
                     alt={demo.clientNames}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
