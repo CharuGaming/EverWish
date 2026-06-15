@@ -2484,11 +2484,11 @@ function CinBdayInteractiveTab({ doc, setDoc }) {
               )}
             </div>
             {heroPhotos.length < 5 && (
-              <label className={`flex items-center justify-center gap-2 border-2 border-dashed border-slate-600 hover:border-amber-400 rounded-xl py-3 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                {uploading ? <Loader2 size={14} className="animate-spin text-amber-400" /> : <Upload size={14} className="text-slate-400" />}
-                <span className="text-xs text-slate-400 font-medium">{uploading ? 'Uploading…' : `Upload Photos (${heroPhotos.length}/5)`}</span>
-                <input type="file" accept="image/*" multiple className="hidden" onChange={handleHeroPhotos} />
-              </label>
+              <ImageField
+                label={`Upload Hero Photo (${heroPhotos.length}/5)`}
+                value=""
+                onChange={url => up('heroPhotos', [...heroPhotos, url])}
+              />
             )}
           </div>
         </div>
@@ -2568,6 +2568,16 @@ function ApologyTab({ doc, setDoc }) {
             Remove background video
           </button>
         )}
+
+        <div className="border-t border-white/10 my-6" />
+        <p className="text-[11px] text-slate-500 mb-4">
+          <strong>Background Music</strong> — automatically plays behind the template.
+        </p>
+        <AudioField
+          label="🎵 Background Music (MP3/WAV)"
+          value={d.musicUrl || ''}
+          onChange={v => upA('musicUrl', v)}
+        />
       </Card>
 
       {/* Text Copy */}
@@ -2639,11 +2649,10 @@ function ApologyTab({ doc, setDoc }) {
         </div>
         <div className="mt-5">
           <Label>Success Image / GIF (shown on Forgiven Screen)</Label>
-          <MediaUploader
-            onUpload={url => upA('successImageUrl', url)}
+          <ImageField
             label="Upload Success Image/GIF"
-            value={d.successImageUrl}
-            type="image"
+            value={d.successImageUrl || ''}
+            onChange={url => upA('successImageUrl', url)}
           />
         </div>
       </Card>
