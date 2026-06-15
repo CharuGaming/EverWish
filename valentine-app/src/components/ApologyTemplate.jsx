@@ -420,7 +420,7 @@ function RelationshipTimeline() {
 }
 
 // ── Forgiven Celebration ────────────────────────────────────────────
-function ForgivenScreen({ message, peaceOfferings = [] }) {
+function ForgivenScreen({ message, peaceOfferings = [], successImageUrl }) {
   const [claimedGift, setClaimedGift] = useState(null);
 
   return (
@@ -431,8 +431,8 @@ function ForgivenScreen({ message, peaceOfferings = [] }) {
       className="flex flex-col items-center justify-center text-center py-8 w-full"
     >
       <motion.img 
-        src="https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif" 
-        alt="Bear Hug"
+        src={successImageUrl || "https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif"} 
+        alt="Success Graphic"
         className="w-40 h-40 rounded-3xl object-cover mb-6 shadow-xl border-4 border-white"
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -511,6 +511,7 @@ export default function ApologyTemplate({ siteData }) {
     runawayButtonText  = 'No 🏃',
     forgiveButtonText  = 'Yes, I forgive you 💕',
     forgivenMessage    = 'Thank you for giving me another chance. 💖',
+    successImageUrl    = 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
     peaceOfferings     = ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
     galleryImages      = [],
   } = data;
@@ -594,7 +595,7 @@ export default function ApologyTemplate({ siteData }) {
             >
               <AnimatePresence mode="wait">
                 {forgiven ? (
-                  <ForgivenScreen key="forgiven" message={forgivenMessage} peaceOfferings={peaceOfferings} />
+                  <ForgivenScreen key="forgiven" message={forgivenMessage} peaceOfferings={peaceOfferings} successImageUrl={successImageUrl} />
                 ) : !mended ? (
                   <motion.div key="slider" exit={{ opacity: 0, scale: 0.9 }} className="w-full">
                     <DragToMend onMended={() => setMended(true)} />

@@ -2637,6 +2637,15 @@ function ApologyTab({ doc, setDoc }) {
             placeholder="Thank you for giving me another chance. I promise I will do better. 💖"
           />
         </div>
+        <div className="mt-5">
+          <Label>Success Image / GIF (shown on Forgiven Screen)</Label>
+          <MediaUploader
+            onUpload={url => upA('successImageUrl', url)}
+            label="Upload Success Image/GIF"
+            value={d.successImageUrl}
+            type="image"
+          />
+        </div>
       </Card>
 
       {/* Peace Offerings */}
@@ -2801,6 +2810,7 @@ export default function AdminEditor() {
         runawayButtonText: doc.apology?.runawayButtonText || 'No 🏃',
         forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
         forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
+        successImageUrl:   doc.apology?.successImageUrl   || 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
         peaceOfferings:    doc.apology?.peaceOfferings    || ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
         galleryImages:     doc.apology?.galleryImages     || [],
       },

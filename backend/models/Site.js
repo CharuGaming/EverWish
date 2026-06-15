@@ -215,6 +215,7 @@ const SiteSchema = new mongoose.Schema(
       runawayButtonText: { type: String, default: 'No 🏃' },
       forgiveButtonText: { type: String, default: 'Yes, I forgive you 💕' },
       forgivenMessage:   { type: String, default: 'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖' },
+      successImageUrl:   { type: String, default: 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif' },
       peaceOfferings:    { type: [String], default: ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"] },
       galleryImages:     { type: [String], default: [] },
     },
