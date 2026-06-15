@@ -14,6 +14,11 @@ export function optimizeCloudinaryVideoUrl(url, isMobile = false) {
 
   if (!rest) return url;
 
+  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
+  if (rest.split('.').length > 2) {
+    return url;
+  }
+
   // Guard: avoid double-transforming if already optimized
   if (rest.includes('f_auto') || rest.includes('q_auto') || rest.includes('vc_auto')) {
     return url;
@@ -44,6 +49,11 @@ export function optimizeCloudinaryUrl(url, width = 800) {
 
   const parts = url.split('/upload/');
   if (parts.length < 2) return url;
+
+  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
+  if (parts[1].split('.').length > 2) {
+    return url;
+  }
 
   // Guard: avoid double-transforming if already optimized
   if (parts[1].includes('f_auto') || parts[1].includes('q_auto')) {
