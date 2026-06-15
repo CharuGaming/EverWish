@@ -109,6 +109,13 @@ const INITIAL_STOREFRONT = {
       description: 'Video intro, gift box reveal, year recap & custom audio player.',
       gradient: 'from-amber-500 to-orange-600',
     },
+    {
+      id: 'a1', name: 'The Perfect Apology', price: 'Rs. 750',
+      emoji: '🥺', tag: 'Forgive Me',
+      category: 'apology',
+      description: 'A gentle, interactive way to say "I\'m sorry" with a timeline and fun makeup gifts.',
+      gradient: 'from-rose-300 to-red-400',
+    },
   ],
   testimonials: [
     {

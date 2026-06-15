@@ -860,6 +860,7 @@ export default function AdminDashboard() {
                       <select value={tpl.category || 'valentine'} onChange={e => handleTemplateChange(i, 'category', e.target.value)} className="w-full bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm">
                         <option value="valentine">Valentine & Proposal</option>
                         <option value="birthday">Birthday</option>
+                        <option value="apology">Apology</option>
                       </select>
                     </div>
                     <div>
