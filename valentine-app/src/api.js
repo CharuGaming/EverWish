@@ -440,7 +440,10 @@ export function toComponentData(doc) {
       forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
       forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
       successImageUrl:   doc.apology?.successImageUrl   || 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
+      peaceOfferingsTitle:doc.apology?.peaceOfferingsTitle|| 'How can I make it up to you? Pick one! 👇',
       peaceOfferings:    doc.apology?.peaceOfferings    || ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
+      musicUrl:          doc.apology?.musicUrl          || '',
+      enableScratchReveal:doc.apology?.enableScratchReveal ?? false,
       galleryImages:     doc.apology?.galleryImages     || [],
     },
   };
@@ -552,7 +555,10 @@ export function emptyTemplate(siteId, templateType = 'polaroid', category = 'val
       forgiveButtonText: 'Yes, I forgive you 💕',
       forgivenMessage:   'Thank you for giving me another chance. I promise I will do better. You are my everything. 💖',
       successImageUrl:   'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
+      peaceOfferingsTitle:'How can I make it up to you? Pick one! 👇',
       peaceOfferings:    ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
+      musicUrl:          '',
+      enableScratchReveal:false,
       galleryImages:     [],
     },
   };

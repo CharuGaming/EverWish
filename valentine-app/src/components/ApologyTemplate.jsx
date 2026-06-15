@@ -419,8 +419,81 @@ function RelationshipTimeline() {
   );
 }
 
+// ── Gallery Scratch Card ──────────────────────────────────────────
+function ApologyScratchCard({ img, enableScratchReveal }) {
+  const canvasRef   = useRef(null);
+  const isDrawing   = useRef(false);
+  const [scratched, setScratched] = useState(false);
+
+  useEffect(() => {
+    if (!enableScratchReveal) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, '#fbcfe8'); // rose-200
+    grad.addColorStop(1, '#fecdd3'); // rose-300
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    for(let i=0; i<40; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*4 + 1, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = '#f43f5e';
+    ctx.font = 'bold 24px "Dancing Script", cursive';
+    ctx.textAlign = 'center';
+    ctx.fillText('✨ Scratch ✨', canvas.width/2, canvas.height/2 - 5);
+    ctx.font = 'bold 16px "Nunito", sans-serif';
+    ctx.fillStyle = '#fb7185';
+    ctx.fillText('to reveal', canvas.width/2, canvas.height/2 + 20);
+  }, [enableScratchReveal]);
+
+  const getPos = (e, canvas) => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x:(src.clientX-r.left)*(canvas.width/r.width), y:(src.clientY-r.top)*(canvas.height/r.height) };
+  };
+
+  const scratch = (e) => {
+    if (!isDrawing.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const { x, y } = getPos(e, canvas);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI*2); ctx.fill();
+    
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let t = 0;
+    for (let i=3; i<data.length; i+=4) if (data[i]<128) t++;
+    const p = Math.round((t/(canvas.width*canvas.height))*100);
+    if (p > 50 && !scratched) setScratched(true);
+  };
+
+  return (
+    <div className="relative aspect-square w-full h-full rounded-2xl overflow-hidden shadow-md border-4 border-white/60 bg-white cursor-pointer group">
+      <img src={img} alt="Gallery" className={`w-full h-full object-cover transition-transform duration-500 ${!enableScratchReveal || scratched ? 'group-hover:scale-110' : ''}`} loading="lazy" />
+      
+      {enableScratchReveal && (
+        <canvas ref={canvasRef} width={300} height={300}
+          className={`absolute inset-0 w-full h-full touch-none ${scratched ? 'pointer-events-none' : 'cursor-crosshair'}`}
+          style={{ opacity: scratched ? 0 : 1, transition:'opacity 0.8s ease' }}
+          onPointerDown={() => { isDrawing.current = true; }}
+          onPointerMove={scratch}
+          onPointerUp={() => { isDrawing.current = false; }}
+          onPointerCancel={() => { isDrawing.current = false; }}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Forgiven Celebration ────────────────────────────────────────────
-function ForgivenScreen({ message, peaceOfferings = [], successImageUrl }) {
+function ForgivenScreen({ message, peaceOfferings = [], successImageUrl, peaceOfferingsTitle }) {
   const [claimedGift, setClaimedGift] = useState(null);
 
   return (
@@ -456,7 +529,7 @@ function ForgivenScreen({ message, peaceOfferings = [], successImageUrl }) {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
           className="w-full flex flex-col items-center mt-4"
         >
-          <h3 className="apology-title text-3xl text-rose-500 mb-6 drop-shadow-sm">How can I make it up to you? Pick one! 👇</h3>
+          <h3 className="apology-title text-3xl text-rose-500 mb-6 drop-shadow-sm">{peaceOfferingsTitle || "How can I make it up to you? Pick one! 👇"}</h3>
           <div className="flex flex-col gap-4 w-full px-2 max-w-sm">
             {peaceOfferings.map((offering, idx) => {
               const isClaimed = claimedGift === idx;
@@ -512,7 +585,10 @@ export default function ApologyTemplate({ siteData }) {
     forgiveButtonText  = 'Yes, I forgive you 💕',
     forgivenMessage    = 'Thank you for giving me another chance. 💖',
     successImageUrl    = 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
+    peaceOfferingsTitle= 'How can I make it up to you? Pick one! 👇',
     peaceOfferings     = ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
+    musicUrl           = '',
+    enableScratchReveal= false,
     galleryImages      = [],
   } = data;
 
@@ -552,6 +628,7 @@ export default function ApologyTemplate({ siteData }) {
 
       {unlocked && (
         <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#fff0f5] via-[#ffe4e1] to-[#ffdae0]">
+          {musicUrl && <audio id="apology-audio" src={musicUrl} autoPlay loop />}
           {bgVideoUrl && (
             <video
               src={bgVideoUrl}
@@ -577,7 +654,7 @@ export default function ApologyTemplate({ siteData }) {
               className="w-full max-w-xl bg-white/50 backdrop-blur-xl border border-white/60 p-8 rounded-[2rem] shadow-[0_8px_32px_rgba(255,182,193,0.3)] mb-8 relative"
             >
               <span className="absolute -top-6 left-6 text-6xl text-rose-200 font-serif leading-none">"</span>
-              <p className="apology-body text-slate-700 text-lg leading-relaxed text-center font-medium relative z-10">
+              <p className="apology-body text-slate-700 text-lg leading-relaxed text-center font-medium relative z-10 whitespace-pre-wrap">
                 {apologyMessage}
               </p>
               <span className="absolute -bottom-8 right-6 text-6xl text-rose-200 font-serif leading-none">"</span>
@@ -595,7 +672,7 @@ export default function ApologyTemplate({ siteData }) {
             >
               <AnimatePresence mode="wait">
                 {forgiven ? (
-                  <ForgivenScreen key="forgiven" message={forgivenMessage} peaceOfferings={peaceOfferings} successImageUrl={successImageUrl} />
+                  <ForgivenScreen key="forgiven" message={forgivenMessage} peaceOfferings={peaceOfferings} successImageUrl={successImageUrl} peaceOfferingsTitle={peaceOfferingsTitle} />
                 ) : !mended ? (
                   <motion.div key="slider" exit={{ opacity: 0, scale: 0.9 }} className="w-full">
                     <DragToMend onMended={() => setMended(true)} />
@@ -632,9 +709,9 @@ export default function ApologyTemplate({ siteData }) {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className="aspect-square rounded-2xl overflow-hidden shadow-md border-4 border-white/60"
+                      className="aspect-square"
                     >
-                      <img src={url} alt="" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                      <ApologyScratchCard img={url} enableScratchReveal={enableScratchReveal} />
                     </motion.div>
                   ))}
                 </div>

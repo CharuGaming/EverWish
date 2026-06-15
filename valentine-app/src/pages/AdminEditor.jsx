@@ -2651,8 +2651,16 @@ function ApologyTab({ doc, setDoc }) {
       {/* Peace Offerings */}
       <Card title="🎁 Peace Offerings / Bribe Coupons">
         <p className="text-[11px] text-slate-500 mb-4">
-          Add options for how you can make it up to them after they say Yes.
+          Customize the title and options for how you can make it up to them after they say Yes.
         </p>
+        <div className="mb-4">
+          <Label>Title</Label>
+          <TextInput
+            value={d.peaceOfferingsTitle || ''}
+            onChange={e => upA('peaceOfferingsTitle', e.target.value)}
+            placeholder="How can I make it up to you? Pick one! 👇"
+          />
+        </div>
         {(d.peaceOfferings || []).map((text, i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
             <TextInput
@@ -2688,6 +2696,13 @@ function ApologyTab({ doc, setDoc }) {
         <p className="text-[11px] text-slate-500 mb-4">
           Upload a few sweet photos of you two. They will appear in a 3-column grid at the bottom of the page.
         </p>
+        <div className="mb-5">
+          <Toggle
+            checked={d.enableScratchReveal ?? false}
+            onChange={v => upA('enableScratchReveal', v)}
+            label="Enable 'Scratch to Reveal' Effect"
+          />
+        </div>
         {(d.galleryImages || []).map((url, i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
             <img src={url} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0" />
@@ -2811,7 +2826,10 @@ export default function AdminEditor() {
         forgiveButtonText: doc.apology?.forgiveButtonText || 'Yes, I forgive you 💕',
         forgivenMessage:   doc.apology?.forgivenMessage   || 'Thank you for giving me another chance. 💖',
         successImageUrl:   doc.apology?.successImageUrl   || 'https://media1.tenor.com/m/Z-A_2HIfuUEAAAAC/milk-and-mocha-bear-hug.gif',
+        peaceOfferingsTitle:doc.apology?.peaceOfferingsTitle|| 'How can I make it up to you? Pick one! 👇',
         peaceOfferings:    doc.apology?.peaceOfferings    || ["Sushi Date 🍣", "Shopping Spree 🛍️", "Unlimited Cuddles 🤗"],
+        musicUrl:          doc.apology?.musicUrl          || '',
+        enableScratchReveal:doc.apology?.enableScratchReveal ?? false,
         galleryImages:     doc.apology?.galleryImages     || [],
       },
     };
