@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 
 import { getStorefront } from '../api';
-import StorefrontDemos from '../components/StorefrontDemos';
 import PreviewModal from '../components/PreviewModal';
 
 // ── Data ─────────────────────────────────────────────────────────────
@@ -533,13 +532,6 @@ export default function Storefront() {
             <span>All prices include <strong className="text-slate-900">custom content setup, photos, music & 2 weeks of hosting</strong>.</span>
           </motion.div>
         </Section>
-      </section>
-
-      {/* ════════════════════════════════
-           LIVE STOREFRONT DEMOS
-      ════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-6 pb-20 border-t border-slate-200/30 pt-20">
-        <StorefrontDemos />
       </section>
 
       {/* ════════════════════════════════
