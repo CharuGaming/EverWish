@@ -102,6 +102,15 @@ const TEMPLATES = {
     },
     CUSTOM_CARD,
   ],
+  apology: [
+    {
+      id: 'a1', name: 'The Perfect Apology', price: STANDARD_PRICE,
+      emoji: '🥺', tag: 'Forgive Me',
+      desc: 'A gentle, interactive way to say "I\'m sorry" with a timeline and fun makeup gifts.',
+      gradient: 'from-rose-300 to-red-400',
+    },
+    CUSTOM_CARD,
+  ],
 };
 
 const TESTIMONIALS = [
@@ -451,6 +460,17 @@ export default function Storefront() {
             >
               <PartyPopper size={16} />
               Birthday
+            </button>
+            <button
+              onClick={() => setActiveTab('apology')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
+                activeTab === 'apology'
+                  ? 'bg-gradient-to-r from-red-400 to-rose-500 text-white shadow-lg shadow-red-400/30'
+                  : 'text-slate-500 hover:text-red-500'
+              }`}
+            >
+              <Heart size={16} fill={activeTab === 'apology' ? 'white' : 'none'} className={activeTab === 'apology' ? '' : 'text-red-400'} />
+              Apology
             </button>
           </motion.div>
         </Section>
