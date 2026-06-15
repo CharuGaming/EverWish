@@ -338,34 +338,83 @@ function DragToMend({ onMended }) {
 
 // ── Relationship Timeline ───────────────────────────────────────────
 const TIMELINE_STEPS = [
-  { text: "We fight", icon: "🌧️", color: "text-slate-500" },
-  { text: "We talk", icon: "💬", color: "text-blue-400" },
-  { text: "We fix", icon: "🛠️", color: "text-amber-500" },
-  { text: "We stay", icon: "🤝", color: "text-emerald-500" },
-  { text: "We vibe", icon: "✨", color: "text-rose-500" }
+  { text: "We fight", icon: "🌧️", color: "text-slate-500", align: "start" },
+  { text: "We talk", icon: "💬", color: "text-blue-500", align: "end" },
+  { text: "We fix", icon: "🛠️", color: "text-amber-500", align: "start" },
+  { text: "We stay", icon: "🤝", color: "text-emerald-500", align: "end" },
+  { text: "We vibe", icon: "✨", color: "text-rose-500", align: "center" }
 ];
+
+function DownRightArrow() {
+  return (
+    <div className="w-full flex justify-center py-2">
+      <svg className="w-16 h-16 text-rose-300 opacity-60 translate-x-4" viewBox="0 0 40 60" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M 10,5 C 10,35 30,25 30,55" />
+        <polyline points="20,45 30,55 40,45" />
+      </svg>
+    </div>
+  );
+}
+
+function DownLeftArrow() {
+  return (
+    <div className="w-full flex justify-center py-2">
+      <svg className="w-16 h-16 text-rose-300 opacity-60 -translate-x-4" viewBox="0 0 40 60" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M 30,5 C 30,35 10,25 10,55" />
+        <polyline points="0,45 10,55 20,45" />
+      </svg>
+    </div>
+  );
+}
+
+function DownCenterArrow() {
+  return (
+    <div className="w-full flex justify-center py-2">
+      <svg className="w-12 h-16 text-rose-300 opacity-60" viewBox="0 0 40 60" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M 28,5 C 28,30 20,30 20,55" />
+        <polyline points="10,45 20,55 30,45" />
+      </svg>
+    </div>
+  );
+}
 
 function RelationshipTimeline() {
   return (
-    <div className="w-full max-w-sm mx-auto py-12 px-4 relative mt-12 mb-8">
-      <div className="absolute left-[39px] top-16 bottom-16 w-1 bg-rose-200 rounded-full" />
-      {TIMELINE_STEPS.map((step, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -20, filter: 'grayscale(100%)' }}
-          whileInView={{ opacity: 1, x: 0, filter: 'grayscale(0%)' }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: i * 0.15 }}
-          className="flex items-center gap-6 mb-8 relative z-10"
-        >
-          <div className="w-12 h-12 rounded-full bg-white border-4 border-rose-100 flex items-center justify-center text-xl shadow-md shrink-0">
-            {step.icon}
+    <div className="w-full max-w-sm mx-auto py-8 px-4 flex flex-col mt-4 mb-8">
+      {TIMELINE_STEPS.map((step, i) => {
+        const isStart = step.align === 'start';
+        const isEnd = step.align === 'end';
+        const isCenter = step.align === 'center';
+        
+        return (
+          <div key={i} className="w-full flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className={`flex w-full ${isStart ? 'justify-start' : isEnd ? 'justify-end' : 'justify-center'}`}
+            >
+              <div className="bg-white/90 backdrop-blur-md border border-white/60 rounded-[2rem] px-6 py-3.5 flex items-center gap-4 shadow-[0_8px_20px_rgba(255,182,193,0.35)] hover:scale-105 transition-transform duration-300">
+                <span className="text-3xl drop-shadow-sm">{step.icon}</span>
+                <span className={`apology-title text-4xl font-bold ${step.color}`}>{step.text}</span>
+              </div>
+            </motion.div>
+            
+            {/* Draw Arrow to next step */}
+            {i < TIMELINE_STEPS.length - 1 && (
+               <motion.div
+                 initial={{ opacity: 0, pathLength: 0 }}
+                 whileInView={{ opacity: 1, pathLength: 1 }}
+                 viewport={{ once: true }}
+                 transition={{ duration: 0.6, delay: i * 0.1 + 0.2 }}
+               >
+                 {isStart ? <DownRightArrow /> : isEnd && i !== 3 ? <DownLeftArrow /> : <DownCenterArrow />}
+               </motion.div>
+            )}
           </div>
-          <div className="bg-white/60 backdrop-blur-md border border-white/60 px-6 py-3 rounded-2xl shadow-[0_4px_20px_rgba(255,182,193,0.3)]">
-            <p className={`apology-title text-3xl font-bold ${step.color}`}>{step.text}</p>
-          </div>
-        </motion.div>
-      ))}
+        );
+      })}
     </div>
   );
 }
