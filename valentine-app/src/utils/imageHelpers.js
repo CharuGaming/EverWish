@@ -28,7 +28,7 @@ export function optimizeCloudinaryVideoUrl(url, isMobile = false) {
   const videoWidth = isMobile ? 480 : 854; // 480p on mobile, 480p/720p on desktop to keep it super lightweight
   const quality = isMobile ? 'q_auto:eco' : 'q_auto';
 
-  return `${baseUrl}/upload/f_mp4,${quality},vc_auto,w_${videoWidth}/${rest}`;
+  return `${baseUrl}/upload/f_auto,${quality},vc_auto,w_${videoWidth}/${rest}`;
 }
 
 /**

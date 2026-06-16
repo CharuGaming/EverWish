@@ -8,6 +8,7 @@ import ReasonsJar  from './ReasonsJar';
 import Heartbeat   from './Heartbeat';
 import TimeCapsule from './TimeCapsule';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import BorderGlow from './BorderGlow';
 
 // ── Confetti burst ────────────────────────────────────────────────
 function Confetti({ active }) {
@@ -339,19 +340,32 @@ function LoveLetter({ text, coupleName }) {
     <section className="py-20 px-6">
       <div className="max-w-xl mx-auto">
         <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-          className="relative bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl border border-white/20 overflow-hidden p-8 sm:p-12"
+          className="relative"
         >
-          <div className="text-center mb-8">
-            <span className="text-3xl">💌</span>
-            <h2 className="text-3xl font-serif text-white mt-3 drop-shadow">A Love Letter</h2>
-            {coupleName && <p className="text-xs text-pink-300/70 uppercase tracking-widest mt-1 font-mono">for {coupleName}</p>}
-          </div>
-          <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-px bg-white/15" />
-            <p className="pl-10 text-base font-serif italic text-white/85 leading-8 whitespace-pre-line"
-              style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{text}</p>
-          </div>
-          <p className="text-right text-pink-300/70 font-serif italic text-sm mt-8">With all my love 💕</p>
+          <BorderGlow
+            edgeSensitivity={30}
+            glowColor="350 80 80"
+            backgroundColor="rgba(255, 255, 255, 0.12)"
+            borderRadius={28}
+            glowRadius={45}
+            glowIntensity={1.2}
+            colors={['#ff4757', '#ff6b81', '#38bdf8']}
+            className="w-full"
+          >
+            <div className="p-8 sm:p-12 relative overflow-hidden">
+              <div className="text-center mb-8">
+                <span className="text-3xl">💌</span>
+                <h2 className="text-3xl font-serif text-white mt-3 drop-shadow">A Love Letter</h2>
+                {coupleName && <p className="text-xs text-pink-300/70 uppercase tracking-widest mt-1 font-mono">for {coupleName}</p>}
+              </div>
+              <div className="relative">
+                <div className="absolute left-8 top-0 bottom-0 w-px bg-white/15" />
+                <p className="pl-10 text-base font-serif italic text-white/85 leading-8 whitespace-pre-line"
+                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{text}</p>
+              </div>
+              <p className="text-right text-pink-300/70 font-serif italic text-sm mt-8">With all my love 💕</p>
+            </div>
+          </BorderGlow>
         </motion.div>
       </div>
     </section>

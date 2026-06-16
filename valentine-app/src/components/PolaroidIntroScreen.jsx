@@ -199,14 +199,12 @@ export default function PolaroidIntroScreen({
   const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef(null);
   const skipTimerRef = useRef(null);
-  const playTimeoutRef = useRef(null);
 
   // If no intro video → fall back to old tap-lock
   const hasVideo = !!introVideoUrl;
 
   const handleDone = useCallback(() => {
     clearTimeout(skipTimerRef.current);
-    if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
     setPhase('done');
     setTimeout(onUnlock, 600); // let fade-out animate first
   }, [onUnlock]);
@@ -214,42 +212,14 @@ export default function PolaroidIntroScreen({
   const handleSplashTap = useCallback(() => {
     if (!hasVideo) return; // tap-lock handles itself
     setPhase('video');
-    
     // show skip button after 2 s
     skipTimerRef.current = setTimeout(() => setShowSkip(true), 2000);
-    
-    // Fallback timeout: if video doesn't play or load within 8s, skip to main template
-    playTimeoutRef.current = setTimeout(() => {
-      handleDone();
-    }, 8000);
-
     // start video
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.play()
-          .then(() => {
-            // Video started playing successfully
-            if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
-          })
-          .catch((err) => {
-            console.error("Polaroid video play error:", err);
-            if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
-            handleDone();
-          });
-      } else {
-        if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
-        handleDone();
-      }
-    }, 100);
-  }, [hasVideo, handleDone]);
+    setTimeout(() => videoRef.current?.play(), 100);
+  }, [hasVideo]);
 
   // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      clearTimeout(skipTimerRef.current);
-      if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
-    };
-  }, []);
+  useEffect(() => () => clearTimeout(skipTimerRef.current), []);
 
   // ── No intro video → old tap-lock ──────────────────────────────────────────
   if (!hasVideo) {
@@ -371,14 +341,14 @@ export default function PolaroidIntroScreen({
           exit={{ opacity: 0, transition: { duration: 0.6 } }}
           transition={{ duration: 0.5 }}
         >
+          {/* Full-screen intro video */}
           <video
             ref={videoRef}
-            src={optimizeCloudinaryUrl(introVideoUrl, 1080)}
+            src={introVideoUrl}
             playsInline
-            preload="auto"
+            muted={false}
             autoPlay={false}
             onEnded={handleDone}
-            onError={handleDone}
             onCanPlay={() => setVideoReady(true)}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ zIndex: 0 }}

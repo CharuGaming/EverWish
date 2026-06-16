@@ -7,6 +7,7 @@ import InteractiveHero from './InteractiveHero';
 import LoveLetterEnvelope from './LoveLetterEnvelope';
 import HeartMemoryGallery from './HeartMemoryGallery';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import BorderGlow from './BorderGlow';
 
 // ── Google Fonts ────────────────────────────────────────────────────
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Inter:wght@400;600;700&display=swap';
@@ -185,47 +186,16 @@ export default function CinematicBirthday({ siteData = {} }) {
 
   const [phase, setPhase] = useState('intro');
   const introVideoRef = useRef(null);
-  const playTimeoutRef = useRef(null);
 
   const handleTap = useCallback(() => {
-    if (introVideoUrl) {
-      setPhase('playing');
-      
-      // Fallback timeout: if video is buffering or doesn't start playing within 8s, skip it
-      playTimeoutRef.current = setTimeout(() => {
-        setPhase('hero');
-      }, 8000);
-
-      setTimeout(() => {
-        if (introVideoRef.current) {
-          introVideoRef.current.play()
-            .then(() => {
-              // Video plays successfully
-              clearTimeout(playTimeoutRef.current);
-            })
-            .catch((err) => {
-              console.error("Cinematic intro play error:", err);
-              clearTimeout(playTimeoutRef.current);
-              setPhase('hero');
-            });
-        } else {
-          clearTimeout(playTimeoutRef.current);
-          setPhase('hero');
-        }
-      }, 100);
-    } else {
-      setPhase('hero');
-    }
+    if (introVideoUrl) { setPhase('playing'); setTimeout(() => introVideoRef.current?.play(), 100); }
+    else setPhase('hero');
   }, [introVideoUrl]);
 
   useEffect(() => {
     if (phase === 'playing') {
-      // Maximum duration safety net (12 seconds)
-      const t = setTimeout(() => setPhase('hero'), 12000);
-      return () => {
-        clearTimeout(t);
-        if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
-      };
+      const t = setTimeout(() => setPhase('hero'), 10000);
+      return () => clearTimeout(t);
     }
   }, [phase]);
 
@@ -293,7 +263,7 @@ export default function CinematicBirthday({ siteData = {} }) {
           <motion.div key="video" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
             className="fixed inset-0 z-[190] bg-black flex items-center justify-center">
             <video ref={introVideoRef} src={optimizeCloudinaryUrl(introVideoUrl, 1080)} className="w-full h-full object-cover"
-              playsInline preload="auto" onEnded={() => setPhase('hero')} onError={() => setPhase('hero')}/>
+              playsInline onEnded={() => setPhase('hero')}/>
             <button onClick={() => setPhase('hero')}
               className="absolute top-6 right-6 text-white/60 hover:text-white text-xs uppercase tracking-widest font-bold bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm transition">
               Skip →
@@ -352,9 +322,20 @@ export default function CinematicBirthday({ siteData = {} }) {
                   <p className="text-white/50 text-sm">Something special, just for you 🎁</p>
                 </Reveal>
                 <Reveal delay={0.2}>
-                  <div className="rounded-3xl p-8 text-center" style={GLASS}>
-                    <GiftBoxReveal giftImageUrl={giftImageUrl} giftRevealText={giftRevealText}/>
-                  </div>
+                  <BorderGlow
+                    edgeSensitivity={30}
+                    glowColor="45 85 85"
+                    backgroundColor="rgba(10, 8, 6, 0.45)"
+                    borderRadius={24}
+                    glowRadius={40}
+                    glowIntensity={1.2}
+                    colors={['#f59e0b', '#fbbf24', '#d97706']}
+                    className="w-full text-center"
+                  >
+                    <div className="p-8 text-center">
+                      <GiftBoxReveal giftImageUrl={giftImageUrl} giftRevealText={giftRevealText}/>
+                    </div>
+                  </BorderGlow>
                 </Reveal>
               </div>
             </section>
@@ -368,13 +349,24 @@ export default function CinematicBirthday({ siteData = {} }) {
                     <h2 className="font-serif-bday text-4xl md:text-5xl text-white font-light">Your Year in Review</h2>
                   </Reveal>
                   <Reveal delay={0.2}>
-                    <div className="relative rounded-3xl p-8 overflow-hidden" style={GLASS}>
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 rounded-t-3xl"/>
-                      <span className="font-serif-bday text-8xl text-amber-500/20 absolute -top-2 left-6 leading-none select-none">"</span>
-                      <p className="font-serif-bday text-xl md:text-2xl text-white/85 leading-relaxed italic relative z-10 pt-6 whitespace-pre-line">
-                        {yearRecapText}
-                      </p>
-                    </div>
+                    <BorderGlow
+                      edgeSensitivity={30}
+                      glowColor="45 85 85"
+                      backgroundColor="rgba(10, 8, 6, 0.45)"
+                      borderRadius={24}
+                      glowRadius={40}
+                      glowIntensity={1.2}
+                      colors={['#f59e0b', '#fbbf24', '#d97706']}
+                      className="w-full text-left"
+                    >
+                      <div className="relative p-8 overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 rounded-t-3xl"/>
+                        <span className="font-serif-bday text-8xl text-amber-500/20 absolute -top-2 left-6 leading-none select-none">"</span>
+                        <p className="font-serif-bday text-xl md:text-2xl text-white/85 leading-relaxed italic relative z-10 pt-6 whitespace-pre-line">
+                          {yearRecapText}
+                        </p>
+                      </div>
+                    </BorderGlow>
                   </Reveal>
                 </div>
               </section>
@@ -422,9 +414,20 @@ export default function CinematicBirthday({ siteData = {} }) {
                     <p className="text-white/50 text-sm">Play it loud 🎵</p>
                   </Reveal>
                   <Reveal delay={0.2}>
-                    <div className="rounded-3xl p-6" style={GLASS}>
-                      <AudioPlayer audioUrl={songAudioUrl} lyrics={songLyrics}/>
-                    </div>
+                    <BorderGlow
+                      edgeSensitivity={30}
+                      glowColor="45 85 85"
+                      backgroundColor="rgba(10, 8, 6, 0.45)"
+                      borderRadius={24}
+                      glowRadius={40}
+                      glowIntensity={1.2}
+                      colors={['#f59e0b', '#fbbf24', '#d97706']}
+                      className="w-full"
+                    >
+                      <div className="p-6">
+                        <AudioPlayer audioUrl={songAudioUrl} lyrics={songLyrics}/>
+                      </div>
+                    </BorderGlow>
                   </Reveal>
                 </div>
               </section>

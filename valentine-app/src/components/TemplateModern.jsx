@@ -7,6 +7,7 @@ import ReasonsJar from './ReasonsJar';
 import Heartbeat  from './Heartbeat';
 import TimeCapsule from './TimeCapsule';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import BorderGlow from './BorderGlow';
 
 // ── Custom floating hearts for lockscreen tap ───────────────────────
 function FloatingHeart({ x, y, id, onComplete }) {
@@ -409,18 +410,31 @@ export default function TemplateModern({ siteData }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 1 }}
-            className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-3xl p-8 md:p-10 shadow-sm relative overflow-hidden"
+            className="relative"
           >
-            {/* Soft decorative background patterns */}
-            <div className="absolute top-0 left-0 w-24 h-24 bg-rose-50 rounded-br-full -z-10 opacity-60" />
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-amber-50 rounded-tl-full -z-10 opacity-60" />
-            
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-rose-500 font-mono mb-4 block">
-              A Message For You
-            </span>
-            <p className="text-base md:text-lg font-serif text-slate-700 leading-relaxed whitespace-pre-line italic">
-              {siteData.loveLetterText}
-            </p>
+            <BorderGlow
+              edgeSensitivity={30}
+              glowColor="350 80 80"
+              backgroundColor="rgba(255, 255, 255, 0.85)"
+              borderRadius={28}
+              glowRadius={40}
+              glowIntensity={1.0}
+              colors={['#ff6b81', '#f472b6', '#38bdf8']}
+              className="w-full"
+            >
+              <div className="p-8 md:p-10 relative overflow-hidden">
+                {/* Soft decorative background patterns */}
+                <div className="absolute top-0 left-0 w-24 h-24 bg-rose-50 rounded-br-full -z-10 opacity-60" />
+                <div className="absolute bottom-0 right-0 w-24 h-24 bg-amber-50 rounded-tl-full -z-10 opacity-60" />
+                
+                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-rose-500 font-mono mb-4 block">
+                  A Message For You
+                </span>
+                <p className="text-base md:text-lg font-serif text-slate-700 leading-relaxed whitespace-pre-line italic">
+                  {siteData.loveLetterText}
+                </p>
+              </div>
+            </BorderGlow>
           </motion.div>
         </section>
       )}

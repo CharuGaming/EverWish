@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import ThingsToDoSection from './ThingsToDoSection';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import BorderGlow from './BorderGlow';
 
 // ── Shared helpers ──────────────────────────────────────────────────
 function shuffle(arr) {
@@ -548,8 +549,21 @@ export default function TemplateCustom({ siteData, onUnlock }) {
           {siteData?.heroDate && <p className="text-sm font-mono uppercase tracking-widest mt-2" style={{ color: primary }}>{siteData.heroDate}</p>}
           {(siteData?.customTitles?.heroSubtitle || siteData?.heroSubtitle) && <p className="text-base font-serif italic mt-4 max-w-md mx-auto text-slate-600">"{siteData.customTitles?.heroSubtitle || siteData.heroSubtitle}"</p>}
           {siteData?.loveLetterText && (
-            <div className="max-w-lg mx-auto mt-8 bg-white/80 rounded-3xl p-6 shadow-md border border-rose-100 text-left">
-              <p className="font-serif italic text-slate-700 leading-relaxed whitespace-pre-wrap">{siteData.loveLetterText}</p>
+            <div className="max-w-lg mx-auto mt-8">
+              <BorderGlow
+                edgeSensitivity={30}
+                glowColor="350 80 80"
+                backgroundColor="rgba(255, 255, 255, 0.85)"
+                borderRadius={24}
+                glowRadius={35}
+                glowIntensity={1.0}
+                colors={['#f43f5e', '#ec4899', '#a855f7']}
+                className="w-full text-left"
+              >
+                <div className="p-6">
+                  <p className="font-serif italic text-slate-700 leading-relaxed whitespace-pre-wrap">{siteData.loveLetterText}</p>
+                </div>
+              </BorderGlow>
             </div>
           )}
         </motion.div>

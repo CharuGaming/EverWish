@@ -8,6 +8,7 @@ import {
 
 import { getStorefront } from '../api';
 import PreviewModal from '../components/PreviewModal';
+import BorderGlow from '../components/BorderGlow';
 
 // ── Data ─────────────────────────────────────────────────────────────
 // ── Contact Details ──────────────────────────────────────────────────
@@ -175,12 +176,21 @@ function TemplateCard({ tpl, index, onPreview }) {
     <motion.div
       variants={fadeUp}
       custom={index * 0.15}
-      className={`group relative flex flex-col backdrop-blur-xl border rounded-3xl overflow-hidden shadow-lg transition-all duration-300 h-full hover:-translate-y-2 ${
-        isCustom
-          ? 'bg-gradient-to-br from-violet-900/60 to-indigo-900/60 border-violet-400/40 hover:shadow-2xl hover:shadow-violet-500/30'
-          : 'bg-white/60 border-white/70 hover:shadow-2xl hover:shadow-rose-200/40'
-      }`}
+      className="h-full"
     >
+      <BorderGlow
+        edgeSensitivity={30}
+        glowColor={isCustom ? "270 80 80" : "350 80 80"}
+        backgroundColor={isCustom ? "rgba(30, 27, 75, 0.65)" : "rgba(255, 255, 255, 0.65)"}
+        borderRadius={24}
+        glowRadius={35}
+        glowIntensity={1.2}
+        coneSpread={25}
+        animated={false}
+        colors={isCustom ? ['#c084fc', '#f472b6', '#38bdf8'] : ['#f43f5e', '#ec4899', '#a855f7']}
+        className="h-full transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+      >
+        <div className="group relative flex flex-col h-full overflow-hidden">
       {/* Thumbnail */}
       <div className={`relative h-44 bg-gradient-to-br ${tpl.gradient} flex items-center justify-center overflow-hidden shrink-0`}>
         {tpl.imageUrl ? (
@@ -263,7 +273,9 @@ function TemplateCard({ tpl, index, onPreview }) {
             </Link>
           </div>
         </div>
-      </div>
+        </div>
+        </div>
+      </BorderGlow>
     </motion.div>
   );
 }
