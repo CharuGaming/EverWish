@@ -612,6 +612,9 @@ export default function ApologyTemplate({ siteData }) {
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap');
         .apology-title { font-family: 'Dancing Script', cursive; }
         .apology-body  { font-family: 'Nunito', sans-serif; }
+        .apology-text-shadow {
+          text-shadow: 0 2px 10px rgba(255, 240, 245, 0.95), 0 1px 3px rgba(255, 240, 245, 0.9);
+        }
       `}</style>
 
       <HeartConfetti active={showConfetti} />
@@ -631,20 +634,23 @@ export default function ApologyTemplate({ siteData }) {
         <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#fff0f5] via-[#ffe4e1] to-[#ffdae0]">
           {musicUrl && <audio id="apology-audio" src={musicUrl} autoPlay loop />}
           {bgVideoUrl && (
-            <video
-              src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
-              autoPlay loop muted playsInline
-              className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-overlay"
-              style={{ zIndex: 0 }}
-            />
+            <>
+              <video
+                src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
+                autoPlay loop muted playsInline
+                className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-75"
+                style={{ zIndex: 0 }}
+              />
+              <div className="fixed inset-0 bg-gradient-to-tr from-[#fff0f5]/65 via-[#ffe4e1]/45 to-[#ffdae0]/65 backdrop-blur-[3px] pointer-events-none" style={{ zIndex: 1 }} />
+            </>
           )}
 
           <div className="relative z-10 flex flex-col items-center min-h-screen py-16 px-4">
             
             {/* Hero */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-16 mt-8">
-              <h1 className="apology-title text-6xl md:text-7xl text-rose-500 mb-4 drop-shadow-sm">{heroTitle}</h1>
-              <p className="apology-body text-rose-400 font-semibold text-lg">{heroSubtitle}</p>
+              <h1 className="apology-title text-6xl md:text-7xl text-rose-600 mb-4 apology-text-shadow">{heroTitle}</h1>
+              <p className="apology-body text-rose-500 font-bold text-xl apology-text-shadow">{heroSubtitle}</p>
             </motion.div>
 
             {/* Letter */}
@@ -652,7 +658,7 @@ export default function ApologyTemplate({ siteData }) {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="w-full max-w-xl bg-white/50 backdrop-blur-xl border border-white/60 p-8 rounded-[2rem] shadow-[0_8px_32px_rgba(255,182,193,0.3)] mb-8 relative"
+              className="w-full max-w-xl bg-white/80 backdrop-blur-3xl border border-white/80 p-8 rounded-[2rem] shadow-[0_12px_40px_rgba(255,182,193,0.25)] mb-8 relative"
             >
               <span className="absolute -top-6 left-6 text-6xl text-rose-200 font-serif leading-none">"</span>
               <p className="apology-body text-slate-700 text-lg leading-relaxed text-center font-medium relative z-10 whitespace-pre-wrap">
@@ -669,7 +675,7 @@ export default function ApologyTemplate({ siteData }) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="w-full max-w-lg mt-8 bg-white/50 backdrop-blur-xl border border-white/60 rounded-[2.5rem] p-8 shadow-[0_8px_32px_rgba(255,182,193,0.3)] min-h-[400px] flex flex-col items-center justify-center relative z-20"
+              className="w-full max-w-lg mt-8 bg-white/85 backdrop-blur-3xl border border-white/80 rounded-[2.5rem] p-8 shadow-[0_12px_40px_rgba(255,182,193,0.25)] min-h-[400px] flex flex-col items-center justify-center relative z-20"
             >
               <AnimatePresence mode="wait">
                 {forgiven ? (
@@ -680,7 +686,7 @@ export default function ApologyTemplate({ siteData }) {
                   </motion.div>
                 ) : (
                   <motion.div key="question" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full flex flex-col items-center">
-                    <h2 className="apology-title text-4xl text-rose-500 mb-10 text-center drop-shadow-sm">{forgiveQuestion}</h2>
+                    <h2 className="apology-title text-4xl text-rose-600 mb-10 text-center apology-text-shadow">{forgiveQuestion}</h2>
                     <div className="flex flex-col sm:flex-row items-center gap-6 justify-center w-full relative min-h-[80px]">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
