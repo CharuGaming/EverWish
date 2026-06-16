@@ -2738,6 +2738,8 @@ function ApologyTab({ doc, setDoc }) {
           />
         </div>
       </Card>
+
+      <ThemeColorsCard doc={doc} setDoc={setDoc} />
     </>
   );
 }

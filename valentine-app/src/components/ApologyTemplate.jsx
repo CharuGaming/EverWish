@@ -595,6 +595,8 @@ export default function ApologyTemplate({ siteData }) {
   } = data;
 
   const introButtonText = siteData?.introButtonText || 'Tap to Open 💌';
+  const primaryColor = siteData?.themeColors?.apology?.primary || '#e11d48';
+  const bgColor = siteData?.themeColors?.apology?.background || '#fff0f5';
 
   const [unlocked, setUnlocked] = useState(false);
   const [mended, setMended] = useState(false);
@@ -608,7 +610,7 @@ export default function ApologyTemplate({ siteData }) {
   };
 
   return (
-    <>
+    <div id="apology-container">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap');
         .apology-title { font-family: 'Dancing Script', cursive; }
@@ -616,6 +618,26 @@ export default function ApologyTemplate({ siteData }) {
         .apology-text-shadow {
           text-shadow: 0 2px 10px rgba(255, 240, 245, 0.95), 0 1px 3px rgba(255, 240, 245, 0.9);
         }
+        #apology-container {
+          --apology-primary: ${primaryColor};
+          --apology-bg: ${bgColor};
+        }
+        #apology-container .text-rose-600,
+        #apology-container .text-rose-500,
+        #apology-container .text-rose-400,
+        #apology-container .text-rose-300,
+        #apology-container .text-rose-200 { color: var(--apology-primary) !important; }
+        
+        #apology-container .bg-rose-500,
+        #apology-container .bg-rose-600,
+        #apology-container .bg-rose-50,
+        #apology-container .bg-rose-200 { background-color: var(--apology-primary) !important; }
+        
+        #apology-container .border-rose-200,
+        #apology-container .border-rose-300,
+        #apology-container .border-rose-500 { border-color: var(--apology-primary) !important; }
+        
+        #apology-container .accent-rose-400 { accent-color: var(--apology-primary) !important; }
       `}</style>
 
       <HeartConfetti active={showConfetti} />
@@ -632,7 +654,7 @@ export default function ApologyTemplate({ siteData }) {
       </AnimatePresence>
 
       {unlocked && (
-        <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#fff0f5] via-[#ffe4e1] to-[#ffdae0]">
+        <div className="relative min-h-screen w-full overflow-x-hidden" style={{ backgroundColor: bgColor }}>
           {musicUrl && <audio id="apology-audio" src={musicUrl} autoPlay loop />}
           {bgVideoUrl && (
             <>
@@ -642,7 +664,7 @@ export default function ApologyTemplate({ siteData }) {
                 className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-75"
                 style={{ zIndex: 0 }}
               />
-              <div className="fixed inset-0 bg-gradient-to-tr from-[#fff0f5]/65 via-[#ffe4e1]/45 to-[#ffdae0]/65 backdrop-blur-[3px] pointer-events-none" style={{ zIndex: 1 }} />
+              <div className="fixed inset-0 backdrop-blur-[3px] pointer-events-none" style={{ zIndex: 1, backgroundColor: `${bgColor}A0` }} />
             </>
           )}
 
@@ -756,6 +778,6 @@ export default function ApologyTemplate({ siteData }) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
