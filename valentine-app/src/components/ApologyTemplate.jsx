@@ -7,6 +7,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
 import BorderGlow from './BorderGlow';
+import CircularGallery from './CircularGallery';
 
 // ── Confetti / Heart-Burst on Forgiveness ──────────────────────────
 const BURST_PARTICLES = Array.from({ length: 100 }, (_, i) => ({
@@ -733,21 +734,19 @@ export default function ApologyTemplate({ siteData }) {
 
             {/* Gallery */}
             {galleryImages.length > 0 && (
-              <div className="w-full max-w-2xl mt-24 mb-12">
+              <div className="w-full max-w-5xl mt-24 mb-12 px-4">
                 <h3 className="apology-title text-4xl text-center text-rose-400 mb-8">Our Beautiful Moments</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {galleryImages.map((url, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className="aspect-square"
-                    >
-                      <ApologyScratchCard img={url} enableScratchReveal={enableScratchReveal} />
-                    </motion.div>
-                  ))}
+                <div style={{ height: '600px', position: 'relative' }} className="w-full rounded-[2.5rem] overflow-hidden border border-white/30 shadow-[0_12px_40px_rgba(255,182,193,0.25)] bg-black/30 backdrop-blur-md">
+                  <CircularGallery
+                    bend={3}
+                    textColor="#ffffff"
+                    borderRadius={0.05}
+                    scrollEase={0.05}
+                    items={galleryImages.map((url, i) => ({
+                      image: optimizeCloudinaryUrl(url, 800),
+                      text: 'Memory ' + (i + 1)
+                    }))}
+                  />
                 </div>
               </div>
             )}

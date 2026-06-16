@@ -9,7 +9,6 @@ import {
 import { getStorefront } from '../api';
 import PreviewModal from '../components/PreviewModal';
 import BorderGlow from '../components/BorderGlow';
-import CircularGallery from '../components/CircularGallery';
 
 // ── Data ─────────────────────────────────────────────────────────────
 // ── Contact Details ──────────────────────────────────────────────────
@@ -504,25 +503,6 @@ export default function Storefront() {
           </div>
         </motion.div>
 
-        {/* Template Showcase Gallery */}
-        {!loading && storefrontData.templates?.length > 0 && (
-          <motion.div variants={fadeUp} custom={3} className="mb-16 rounded-[2rem] overflow-hidden border border-rose-100 shadow-xl relative" style={{ height: '500px', background: 'radial-gradient(ellipse at center, rgba(30,30,40,1) 0%, rgba(10,10,15,1) 100%)' }}>
-             <CircularGallery
-               bend={3}
-               textColor="#ffffff"
-               borderRadius={0.05}
-               scrollEase={0.1}
-               items={storefrontData.templates.filter(t => t.imageUrl).map(t => ({
-                 image: t.imageUrl,
-                 text: t.name
-               }))}
-             />
-             <div className="absolute top-6 left-1/2 -translate-x-1/2 text-white/80 font-bold tracking-widest uppercase text-[10px] sm:text-xs backdrop-blur-md bg-white/10 px-6 py-2 rounded-full z-10 pointer-events-none border border-white/20 whitespace-nowrap shadow-lg">
-               ✨ Interactive Gallery — Drag horizontally to explore ✨
-             </div>
-          </motion.div>
-        )}
-
         {/* Grid */}
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-rose-500">
@@ -611,26 +591,6 @@ export default function Storefront() {
             Loved by Customers
           </motion.h2>
         </Section>
-
-        {/* Testimonial Showcase Gallery */}
-        <Section className="mb-16">
-          <div className="rounded-[2rem] overflow-hidden border border-rose-100 shadow-xl relative" style={{ height: '400px', background: 'radial-gradient(ellipse at center, rgba(40,30,40,1) 0%, rgba(15,10,15,1) 100%)' }}>
-             <CircularGallery
-               bend={-2}
-               textColor="#ffffff"
-               borderRadius={0.05}
-               scrollEase={0.1}
-               items={(storefrontData.testimonials || []).map((t, i) => ({
-                 image: t.screenshotUrl || `https://picsum.photos/seed/${i + 150}/800/600?grayscale`,
-                 text: `💬 ${t.name}`
-               }))}
-             />
-             <div className="absolute top-6 left-1/2 -translate-x-1/2 text-white/80 font-bold tracking-widest uppercase text-[10px] sm:text-xs backdrop-blur-md bg-white/10 px-6 py-2 rounded-full z-10 pointer-events-none border border-white/20 whitespace-nowrap shadow-lg">
-               💖 Customer Love — Drag to scroll 💖
-             </div>
-          </div>
-        </Section>
-
         <Section>
           {loading ? (
             <div className="py-12 flex justify-center text-rose-500">
