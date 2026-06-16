@@ -185,16 +185,47 @@ export default function CinematicBirthday({ siteData = {} }) {
 
   const [phase, setPhase] = useState('intro');
   const introVideoRef = useRef(null);
+  const playTimeoutRef = useRef(null);
 
   const handleTap = useCallback(() => {
-    if (introVideoUrl) { setPhase('playing'); setTimeout(() => introVideoRef.current?.play(), 100); }
-    else setPhase('hero');
+    if (introVideoUrl) {
+      setPhase('playing');
+      
+      // Fallback timeout: if video is buffering or doesn't start playing within 3.5s, skip it
+      playTimeoutRef.current = setTimeout(() => {
+        setPhase('hero');
+      }, 3500);
+
+      setTimeout(() => {
+        if (introVideoRef.current) {
+          introVideoRef.current.play()
+            .then(() => {
+              // Video plays successfully
+              clearTimeout(playTimeoutRef.current);
+            })
+            .catch((err) => {
+              console.error("Cinematic intro play error:", err);
+              clearTimeout(playTimeoutRef.current);
+              setPhase('hero');
+            });
+        } else {
+          clearTimeout(playTimeoutRef.current);
+          setPhase('hero');
+        }
+      }, 100);
+    } else {
+      setPhase('hero');
+    }
   }, [introVideoUrl]);
 
   useEffect(() => {
     if (phase === 'playing') {
-      const t = setTimeout(() => setPhase('hero'), 10000);
-      return () => clearTimeout(t);
+      // Maximum duration safety net (12 seconds)
+      const t = setTimeout(() => setPhase('hero'), 12000);
+      return () => {
+        clearTimeout(t);
+        if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
+      };
     }
   }, [phase]);
 
@@ -262,7 +293,7 @@ export default function CinematicBirthday({ siteData = {} }) {
           <motion.div key="video" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
             className="fixed inset-0 z-[190] bg-black flex items-center justify-center">
             <video ref={introVideoRef} src={optimizeCloudinaryUrl(introVideoUrl, 1080)} className="w-full h-full object-cover"
-              playsInline onEnded={() => setPhase('hero')}/>
+              playsInline muted preload="auto" onEnded={() => setPhase('hero')} onError={() => setPhase('hero')}/>
             <button onClick={() => setPhase('hero')}
               className="absolute top-6 right-6 text-white/60 hover:text-white text-xs uppercase tracking-widest font-bold bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm transition">
               Skip →

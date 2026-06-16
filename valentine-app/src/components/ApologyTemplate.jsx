@@ -138,6 +138,7 @@ function MendingHeartTransition({ onComplete }) {
 // ── Intro Video Screen ──────────────────────────────────────────────
 function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
   const videoRef = useRef(null);
+  const playTimeout = useRef(null);
   const [phase, setPhase] = useState('idle');
   const [showTap, setShowTap] = useState(true);
 
@@ -145,12 +146,34 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
     if (phase !== 'idle') return;
     setShowTap(false);
     setPhase('playing');
+
+    // 3.5s timeout: if video is buffering or fails to play on mobile, transition automatically
+    playTimeout.current = setTimeout(() => {
+      setPhase('transitioning');
+    }, 3500);
+
     if (videoRef.current) {
-      videoRef.current.play().catch(() => setPhase('transitioning'));
+      videoRef.current.play()
+        .then(() => {
+          // Video started playing successfully
+          clearTimeout(playTimeout.current);
+        })
+        .catch((err) => {
+          console.error("Intro video play error:", err);
+          clearTimeout(playTimeout.current);
+          setPhase('transitioning');
+        });
     } else {
+      clearTimeout(playTimeout.current);
       setPhase('transitioning');
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (playTimeout.current) clearTimeout(playTimeout.current);
+    };
+  }, []);
 
   return (
     <AnimatePresence mode="wait">
@@ -170,8 +193,10 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
               src={optimizeCloudinaryUrl(introVideoUrl, 854)}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline
+              muted
               onEnded={() => setPhase('transitioning')}
-              preload="metadata"
+              onError={() => setPhase('transitioning')}
+              preload="auto"
             />
           )}
           <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
