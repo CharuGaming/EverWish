@@ -218,10 +218,10 @@ export default function PolaroidIntroScreen({
     // show skip button after 2 s
     skipTimerRef.current = setTimeout(() => setShowSkip(true), 2000);
     
-    // Fallback timeout: if video doesn't play or load within 3.5s, skip to main template
+    // Fallback timeout: if video doesn't play or load within 8s, skip to main template
     playTimeoutRef.current = setTimeout(() => {
       handleDone();
-    }, 3500);
+    }, 8000);
 
     // start video
     setTimeout(() => {
@@ -375,7 +375,6 @@ export default function PolaroidIntroScreen({
             ref={videoRef}
             src={optimizeCloudinaryUrl(introVideoUrl, 1080)}
             playsInline
-            muted
             preload="auto"
             autoPlay={false}
             onEnded={handleDone}

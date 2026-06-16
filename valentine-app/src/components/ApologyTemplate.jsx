@@ -147,10 +147,10 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
     setShowTap(false);
     setPhase('playing');
 
-    // 3.5s timeout: if video is buffering or fails to play on mobile, transition automatically
+    // 8s timeout: if video is buffering or fails to play on mobile, transition automatically
     playTimeout.current = setTimeout(() => {
       setPhase('transitioning');
-    }, 3500);
+    }, 8000);
 
     if (videoRef.current) {
       videoRef.current.play()
@@ -193,7 +193,6 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
               src={optimizeCloudinaryUrl(introVideoUrl, 854)}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline
-              muted
               onEnded={() => setPhase('transitioning')}
               onError={() => setPhase('transitioning')}
               preload="auto"
@@ -421,7 +420,7 @@ function RelationshipTimeline() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className={`flex w-full ${isStart ? 'justify-start' : isEnd ? 'justify-end' : 'justify-center'}`}
             >
-              <div className="bg-white/90 backdrop-blur-md border border-white/60 rounded-[2rem] px-6 py-3.5 flex items-center gap-4 shadow-[0_8px_20px_rgba(255,182,193,0.35)] hover:scale-105 transition-transform duration-300">
+              <div className="rounded-[2rem] px-6 py-3.5 flex items-center gap-4 hover:scale-105 transition-transform duration-300 liquid-glass">
                 <span className="text-3xl drop-shadow-sm">{step.icon}</span>
                 <span className={`apology-title text-4xl font-bold ${step.color}`}>{step.text}</span>
               </div>
@@ -501,8 +500,8 @@ function ApologyScratchCard({ img, enableScratchReveal }) {
   };
 
   return (
-    <div className="relative aspect-square w-full h-full rounded-2xl overflow-hidden shadow-md border-4 border-white/60 bg-white cursor-pointer group">
-      <img src={optimizeCloudinaryUrl(img, 600)} alt="Gallery" className={`w-full h-full object-cover transition-transform duration-500 ${!enableScratchReveal || scratched ? 'group-hover:scale-110' : ''}`} loading="lazy" />
+    <div className="relative aspect-square w-full h-full rounded-2xl overflow-hidden shadow-lg border-[3px] border-white/70 bg-white/40 backdrop-blur-sm cursor-pointer group hover:border-white transition-colors duration-300">
+      <img src={optimizeCloudinaryUrl(img, 600)} alt="Gallery" className={`w-full h-full object-cover transition-transform duration-500 ${!enableScratchReveal || scratched ? 'group-hover:scale-105' : ''}`} loading="lazy" />
       
       {enableScratchReveal && (
         <canvas ref={canvasRef} width={300} height={300}
@@ -638,7 +637,34 @@ export default function ApologyTemplate({ siteData }) {
         .apology-title { font-family: 'Dancing Script', cursive; }
         .apology-body  { font-family: 'Nunito', sans-serif; }
         .apology-text-shadow {
-          text-shadow: 0 2px 10px rgba(255, 240, 245, 0.95), 0 1px 3px rgba(255, 240, 245, 0.9);
+          text-shadow: 0 2px 14px rgba(255, 255, 255, 0.95), 0 1px 5px rgba(255, 255, 255, 0.95), 0 0 1px rgba(255, 255, 255, 0.9);
+        }
+        .liquid-glass {
+          background: rgba(255, 255, 255, 0.72) !important;
+          backdrop-filter: blur(25px) saturate(190%) !important;
+          -webkit-backdrop-filter: blur(25px) saturate(190%) !important;
+          border: 1px solid rgba(255, 255, 255, 0.5) !important;
+          box-shadow: 
+            0 15px 35px rgba(255, 182, 193, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.2) !important;
+          position: relative;
+          overflow: hidden;
+        }
+        .liquid-glass::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 50%;
+          background: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          pointer-events: none;
+          z-index: 1;
         }
       `}</style>
 
@@ -663,10 +689,10 @@ export default function ApologyTemplate({ siteData }) {
               <video
                 src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
                 autoPlay loop muted playsInline
-                className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-75"
+                className="fixed inset-0 w-full h-full object-cover pointer-events-none opacity-90"
                 style={{ zIndex: 0 }}
               />
-              <div className="fixed inset-0 bg-gradient-to-tr from-[#fff0f5]/65 via-[#ffe4e1]/45 to-[#ffdae0]/65 backdrop-blur-[3px] pointer-events-none" style={{ zIndex: 1 }} />
+              <div className="fixed inset-0 bg-gradient-to-tr from-[#fff0f5]/30 via-[#ffe4e1]/15 to-[#ffdae0]/30 backdrop-blur-[2px] pointer-events-none" style={{ zIndex: 1 }} />
             </>
           )}
 
@@ -683,7 +709,7 @@ export default function ApologyTemplate({ siteData }) {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="w-full max-w-xl bg-white/80 backdrop-blur-3xl border border-white/80 p-8 rounded-[2rem] shadow-[0_12px_40px_rgba(255,182,193,0.25)] mb-8 relative"
+              className="w-full max-w-xl p-8 rounded-[2rem] shadow-2xl mb-8 relative liquid-glass"
             >
               <span className="absolute -top-6 left-6 text-6xl text-rose-200 font-serif leading-none">"</span>
               <p className="apology-body text-slate-700 text-lg leading-relaxed text-center font-medium relative z-10 whitespace-pre-wrap">
@@ -700,7 +726,7 @@ export default function ApologyTemplate({ siteData }) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="w-full max-w-lg mt-8 bg-white/85 backdrop-blur-3xl border border-white/80 rounded-[2.5rem] p-8 shadow-[0_12px_40px_rgba(255,182,193,0.25)] min-h-[400px] flex flex-col items-center justify-center relative z-20"
+              className="w-full max-w-lg mt-8 rounded-[2.5rem] p-8 min-h-[400px] flex flex-col items-center justify-center relative z-20 liquid-glass"
             >
               <AnimatePresence mode="wait">
                 {forgiven ? (
