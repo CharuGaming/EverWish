@@ -1,11 +1,16 @@
 // CinematicAnniversary.jsx — Premium cinematic anniversary/valentine template
-// Sections: Intro screen → Video hero → Timer → Love letter → Timeline → Music → Why I Love You
+// Sections: Intro → Video hero → Timer → Love letter → Timeline → Music → Why I Love You
+//           + BucketList · LocationTimeline · VoiceNotePlayer · FunFactsQuiz
+//           + OpenWhenLetters · VideoMontage · LoveNoteForm
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { differenceInSeconds, intervalToDuration } from 'date-fns';
-import { Play, Pause, Volume2, VolumeX, Heart, Music2, Clock, ChevronDown } from 'lucide-react';
-import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import {
+  Play, Pause, Volume2, VolumeX, Heart, Music2, Clock, ChevronDown,
+  CheckCircle2, Circle, MapPin, Mic, HelpCircle, Mail, X, MessageSquareHeart, Send, Video,
+} from 'lucide-react';
+import { optimizeCloudinaryUrl, getOptimizedVideoUrl } from '../utils/imageHelpers';
 
 // ── Scroll reveal wrapper ──────────────────────────────────────────────────
 function Reveal({ children, className = '', delay = 0, y = 50 }) {
@@ -177,6 +182,425 @@ function AudioPlayer({ audioUrl, lyrics }) {
   );
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 1 — Future Bucket List
+// ══════════════════════════════════════════════════════════════════════════════
+function BucketList({ items = [], onToggle }) {
+  if (!items.length) return null;
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-2xl mx-auto">
+        <Reveal className="text-center mb-12">
+          <CheckCircle2 className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Our Bucket List</h2>
+          <p className="text-white/40 text-sm">Dreams we'll make real together ✨</p>
+        </Reveal>
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <Reveal key={item.id ?? i} delay={i * 0.05}>
+              <motion.button
+                onClick={() => onToggle && onToggle(i)}
+                whileTap={{ scale: 0.97 }}
+                className="w-full flex items-center gap-4 bg-black/30 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-rose-400/30 rounded-2xl px-5 py-4 text-left transition-all group"
+              >
+                <motion.div
+                  initial={false}
+                  animate={{ scale: item.isCompleted ? [1.2, 1] : 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex-shrink-0"
+                >
+                  {item.isCompleted
+                    ? <CheckCircle2 size={22} className="text-rose-400" fill="currentColor" />
+                    : <Circle size={22} className="text-white/30 group-hover:text-white/60 transition-colors" />}
+                </motion.div>
+                <span className={`text-sm font-medium transition-all ${
+                  item.isCompleted ? 'line-through text-white/30' : 'text-white/80'
+                }`}>{item.item}</span>
+              </motion.button>
+            </Reveal>
+          ))}
+        </div>
+        <p className="text-center text-white/20 text-xs mt-6">
+          {items.filter(x => x.isCompleted).length}/{items.length} completed
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 2 — Special Locations Timeline
+// ══════════════════════════════════════════════════════════════════════════════
+function LocationTimeline({ locations = [] }) {
+  const [active, setActive] = useState(null);
+  if (!locations.length) return null;
+  return (
+    <section className="py-20 px-6 bg-gradient-to-b from-transparent via-indigo-950/20 to-transparent">
+      <div className="max-w-3xl mx-auto">
+        <Reveal className="text-center mb-14">
+          <MapPin className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Our Places</h2>
+          <p className="text-white/40 text-sm">Tap a location to relive the memory</p>
+        </Reveal>
+        {/* Horizontal scroll on mobile, centered flex on desktop */}
+        <div className="flex flex-wrap justify-center gap-6">
+          {locations.map((loc, i) => (
+            <Reveal key={loc.id ?? i} delay={i * 0.08}>
+              <button
+                onClick={() => setActive(active === i ? null : i)}
+                className="group relative flex flex-col items-center gap-2"
+              >
+                {/* Glowing dot */}
+                <motion.div
+                  animate={{ boxShadow: active === i
+                    ? '0 0 0 6px rgba(244,63,94,0.25), 0 0 24px rgba(244,63,94,0.4)'
+                    : '0 0 0 2px rgba(244,63,94,0.15)' }}
+                  className="w-10 h-10 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center transition-all"
+                >
+                  <MapPin size={16} className="text-rose-400" fill="currentColor" />
+                </motion.div>
+                <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest max-w-[80px] text-center leading-tight">
+                  {loc.title}
+                </span>
+              </button>
+            </Reveal>
+          ))}
+        </div>
+        {/* Reveal card */}
+        <AnimatePresence>
+          {active !== null && locations[active] && (
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}
+              className="mt-8 bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden"
+            >
+              {locations[active].imageUrl && (
+                <img
+                  src={optimizeCloudinaryUrl(locations[active].imageUrl, 800)}
+                  alt={locations[active].title}
+                  className="w-full h-52 object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin size={14} className="text-rose-400" />
+                  <h3 className="text-white font-bold text-base">{locations[active].title}</h3>
+                </div>
+                {locations[active].description && (
+                  <p className="text-white/60 text-sm leading-relaxed">{locations[active].description}</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 3 — Voice Note Player
+// ══════════════════════════════════════════════════════════════════════════════
+function VoiceNotePlayer({ url }) {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  if (!url) return null;
+
+  const toggle = () => {
+    if (!audioRef.current) return;
+    if (playing) { audioRef.current.pause(); setPlaying(false); }
+    else { audioRef.current.play(); setPlaying(true); }
+  };
+  const fmt = s => isNaN(s) ? '0:00' : `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  const seek = e => {
+    if (!audioRef.current || !duration) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    audioRef.current.currentTime = ((e.clientX - r.left) / r.width) * duration;
+  };
+
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-md mx-auto">
+        <Reveal className="text-center mb-10">
+          <Mic className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">A Voice Note</h2>
+          <p className="text-white/40 text-sm">Press play to hear my voice 🎙️</p>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-6">
+            <audio
+              ref={audioRef}
+              src={url}
+              onTimeUpdate={() => { const t = audioRef.current?.currentTime||0; setCurrentTime(t); setProgress(duration?(t/duration)*100:0); }}
+              onLoadedMetadata={() => setDuration(audioRef.current?.duration||0)}
+              onEnded={() => setPlaying(false)}
+            />
+            {/* Waveform decoration */}
+            <div className="flex items-center gap-0.5 justify-center mb-6 h-10">
+              {Array.from({length: 28}).map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={playing ? { scaleY: [0.3, 1, 0.3] } : { scaleY: 0.3 }}
+                  transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.04, ease: 'easeInOut' }}
+                  className="w-1 rounded-full bg-rose-400/60"
+                  style={{ height: `${20 + Math.sin(i * 0.7) * 14}px` }}
+                />
+              ))}
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggle}
+                className="w-12 h-12 rounded-full bg-rose-500 hover:bg-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/30 flex-shrink-0 transition-all active:scale-90"
+              >
+                {playing ? <Pause size={18} className="text-white" /> : <Play size={18} className="text-white ml-0.5" />}
+              </button>
+              <div className="flex-1 space-y-1">
+                <div className="w-full h-1.5 bg-white/10 rounded-full cursor-pointer overflow-hidden" onClick={seek}>
+                  <div className="h-full bg-gradient-to-r from-rose-400 to-pink-400 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                </div>
+                <div className="flex justify-between text-[10px] text-white/40 font-mono">
+                  <span>{fmt(currentTime)}</span><span>{fmt(duration)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 4 — Fun Facts Quiz (accordion reveal)
+// ══════════════════════════════════════════════════════════════════════════════
+function FunFactsQuiz({ facts = [] }) {
+  const [open, setOpen] = useState(null);
+  if (!facts.length) return null;
+  return (
+    <section className="py-20 px-6 bg-gradient-to-b from-transparent via-rose-950/10 to-transparent">
+      <div className="max-w-2xl mx-auto">
+        <Reveal className="text-center mb-12">
+          <HelpCircle className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Do You Know Me?</h2>
+          <p className="text-white/40 text-sm">Tap a question to reveal the answer 💭</p>
+        </Reveal>
+        <div className="space-y-3">
+          {facts.map((fact, i) => (
+            <Reveal key={fact.id ?? i} delay={i * 0.05}>
+              <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left group"
+                >
+                  <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors pr-4">
+                    {fact.question}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: open === i ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-shrink-0"
+                  >
+                    <ChevronDown size={16} className="text-rose-400" />
+                  </motion.div>
+                </button>
+                <AnimatePresence>
+                  {open === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 pt-1 border-t border-white/5">
+                        <p className="text-rose-300 text-sm font-medium italic leading-relaxed">
+                          💬 {fact.answer}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 5 — Open When Letters
+// ══════════════════════════════════════════════════════════════════════════════
+function OpenWhenLetters({ letters = [] }) {
+  const [modal, setModal] = useState(null); // index of open letter
+  if (!letters.length) return null;
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-3xl mx-auto">
+        <Reveal className="text-center mb-12">
+          <Mail className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Open When…</h2>
+          <p className="text-white/40 text-sm">Letters sealed with love, for every moment 💌</p>
+        </Reveal>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {letters.map((letter, i) => (
+            <Reveal key={letter.id ?? i} delay={i * 0.07}>
+              <motion.button
+                onClick={() => setModal(i)}
+                whileHover={{ scale: 1.04, y: -4 }}
+                whileTap={{ scale: 0.97 }}
+                className="relative bg-black/30 hover:bg-rose-950/30 backdrop-blur-md border border-white/10 hover:border-rose-400/40 rounded-2xl p-5 text-center transition-colors group cursor-pointer w-full"
+              >
+                {/* Glow */}
+                <div className="absolute inset-0 rounded-2xl bg-rose-500/0 group-hover:bg-rose-500/5 transition-colors" />
+                <Mail size={28} className="mx-auto mb-3 text-rose-400 group-hover:text-rose-300 transition-colors" />
+                <p className="text-[11px] font-bold text-white/60 uppercase tracking-wide leading-snug">
+                  Open when…<br />
+                  <span className="text-white/90 normal-case font-semibold text-xs mt-1 block">
+                    {letter.condition}
+                  </span>
+                </p>
+              </motion.button>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {modal !== null && letters[modal] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[500] flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setModal(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.85, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.85, y: 40 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-[#120a1e] border border-white/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+            >
+              {letters[modal].imageUrl && (
+                <img
+                  src={optimizeCloudinaryUrl(letters[modal].imageUrl, 600)}
+                  alt=""
+                  className="w-full h-52 object-cover"
+                />
+              )}
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-rose-400 text-[10px] uppercase tracking-widest font-bold">Open when…</p>
+                    <h3 className="text-white font-serif-cin text-xl font-light">{letters[modal].condition}</h3>
+                  </div>
+                  <button onClick={() => setModal(null)} className="text-white/30 hover:text-white transition-colors p-1">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <p className="font-serif-cin text-white/80 text-base italic leading-relaxed whitespace-pre-line">
+                    {letters[modal].message}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 6 — Video Montage (vertical reel format)
+// ══════════════════════════════════════════════════════════════════════════════
+function VideoMontage({ url, isMobile }) {
+  if (!url) return null;
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-sm mx-auto">
+        <Reveal className="text-center mb-10">
+          <Video className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Our Reel</h2>
+          <p className="text-white/40 text-sm">A montage of us 🎞️</p>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden">
+            <video
+              src={getOptimizedVideoUrl(url, isMobile)}
+              controls
+              playsInline
+              className="w-full aspect-[9/16] object-cover"
+            />
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FEATURE 7 — Leave a Love Note (WhatsApp redirect)
+// ══════════════════════════════════════════════════════════════════════════════
+function LoveNoteForm({ whatsapp }) {
+  const [text, setText] = useState('');
+  const [sent, setSent] = useState(false);
+
+  if (!whatsapp) return null;
+
+  const handleSend = () => {
+    if (!text.trim()) return;
+    const url = `https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+  };
+
+  return (
+    <section className="py-20 px-6 bg-gradient-to-b from-transparent via-rose-950/15 to-transparent">
+      <div className="max-w-lg mx-auto">
+        <Reveal className="text-center mb-10">
+          <MessageSquareHeart className="mx-auto mb-4 text-rose-400" size={28} />
+          <h2 className="font-serif-cin text-4xl md:text-5xl text-white font-light mb-2">Leave a Love Note</h2>
+          <p className="text-white/40 text-sm">Your words will go straight to my heart 💬</p>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl p-6 space-y-4">
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              rows={5}
+              placeholder="Write something from the heart…"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white/80 placeholder-white/20 focus:outline-none focus:border-rose-400/50 focus:bg-white/8 resize-none transition-all"
+            />
+            <motion.button
+              onClick={handleSend}
+              whileTap={{ scale: 0.96 }}
+              disabled={!text.trim() || sent}
+              className="w-full flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-rose-500/30 active:scale-95"
+            >
+              {sent ? '❤️ Sent!' : <><Send size={16} /> Send via WhatsApp</>}
+            </motion.button>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 // ── Vertical Timeline Item ─────────────────────────────────────────────────
 function TimelineItem({ item, index }) {
   const isLeft = index % 2 === 0;
@@ -241,7 +665,33 @@ export default function CinematicAnniversary({ siteData = {} }) {
     songLyrics       = '',
     reasons          = [],
     startDate        = timelineDates?.startDate || '2022-01-01',
+    // ── 7 New Interactive Romantic Features ──────────────────────
+    bucketList:       rawBucketList    = [],
+    specialLocations: rawLocations     = [],
+    voiceNoteUrl     = '',
+    funFacts         = [],
+    openWhenLetters  = [],
+    videoMontageUrl  = '',
+    partnerWhatsApp  = '',
   } = cinematic || {};
+
+  // ── Responsive mobile detection (for VideoMontage optimization) ─
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // ── Bucket list client-side toggle (visual only, not persisted) ─
+  const [bucketList, setBucketList] = useState(rawBucketList);
+  const handleBucketToggle = useCallback((idx) => {
+    setBucketList(prev => prev.map((it, i) =>
+      i === idx ? { ...it, isCompleted: !it.isCompleted } : it
+    ));
+  }, []);
 
   // ── Intro screen state ─────────────────────────────────────────
   const [phase, setPhase] = useState('intro'); // 'intro' | 'playing' | 'hero'
@@ -598,6 +1048,17 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 </div>
               </section>
             )}
+
+            {/* ════════════════════════════════════════════════
+                 INTERACTIVE ROMANTIC FEATURES (7 Sections)
+            ════════════════════════════════════════════════ */}
+            <BucketList items={bucketList} onToggle={handleBucketToggle} />
+            <LocationTimeline locations={rawLocations} />
+            <VoiceNotePlayer url={voiceNoteUrl} />
+            <FunFactsQuiz facts={funFacts} />
+            <OpenWhenLetters letters={openWhenLetters} />
+            <VideoMontage url={videoMontageUrl} isMobile={isMobile} />
+            <LoveNoteForm whatsapp={partnerWhatsApp} />
 
             {/* ════════════════════════════════════════════════
                  FOOTER

@@ -1,34 +1,44 @@
 /**
- * Optimizes Cloudinary video URLs by downscaling, adjusting quality, and auto-detecting codecs.
+ * Returns an optimized Cloudinary video URL with responsive transformations.
+ *
+ * Desktop (!isMobile): q_auto:best,f_auto,w_1920,c_limit
+ *   → Full quality, large resolution, no cropping — best for widescreen viewing.
+ *
+ * Mobile (isMobile): q_auto:good,f_auto,w_720,h_1280,c_fill,g_auto
+ *   → Auto-cropped to a 9:16 vertical portrait frame, subject-aware gravity,
+ *     massive bandwidth savings on data-limited mobile connections.
+ *
+ * Non-Cloudinary URLs are returned unchanged.
  */
-export function optimizeCloudinaryVideoUrl(url, isMobile = false) {
+export function getOptimizedVideoUrl(url, isMobile = false) {
   if (!url || typeof url !== 'string' || !url.includes('res.cloudinary.com')) {
     return url;
   }
 
-  // Detect if it is video/upload
-  const parts = url.split('/video/upload/');
-  const isVideoUpload = parts.length >= 2;
-  const baseUrl = isVideoUpload ? parts[0] + '/video' : url.split('/upload/')[0];
-  const rest = isVideoUpload ? parts[1] : (url.split('/upload/')[1] || '');
+  // Locate the /upload/ segment — works for both /video/upload/ and /image/upload/
+  const uploadMarker = '/upload/';
+  const uploadIdx = url.indexOf(uploadMarker);
+  if (uploadIdx === -1) return url;
 
-  if (!rest) return url;
+  const beforeUpload = url.slice(0, uploadIdx + uploadMarker.length); // e.g. https://res.cloudinary.com/demo/video/upload/
+  const afterUpload  = url.slice(uploadIdx + uploadMarker.length);    // e.g. v12345/my_video.mp4
 
-  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
-  if (rest.split('.').length > 2) {
+  // Guard: avoid double-transforming if transformations are already present
+  const knownParams = ['f_auto', 'q_auto', 'w_', 'h_', 'c_fill', 'c_limit', 'vc_auto'];
+  if (knownParams.some(p => afterUpload.startsWith(p) || afterUpload.includes('/' + p))) {
     return url;
   }
 
-  // Guard: avoid double-transforming if already optimized
-  if (rest.includes('f_auto') || rest.includes('q_auto') || rest.includes('vc_auto')) {
-    return url;
-  }
+  const transforms = isMobile
+    ? 'q_auto:good,f_auto,w_720,h_1280,c_fill,g_auto'   // Portrait crop, bandwidth-efficient
+    : 'q_auto:best,f_auto,w_1920,c_limit';               // Full quality, capped at 1920px width
 
-  // Downscale and compress heavily on mobile devices (e.g. w_480, q_auto:eco)
-  const videoWidth = isMobile ? 480 : 854; // 480p on mobile, 480p/720p on desktop to keep it super lightweight
-  const quality = isMobile ? 'q_auto:eco' : 'q_auto';
+  return `${beforeUpload}${transforms}/${afterUpload}`;
+}
 
-  return `${baseUrl}/upload/f_auto,${quality},vc_auto,w_${videoWidth}/${rest}`;
+/** @deprecated Use getOptimizedVideoUrl(url, isMobile) instead. */
+export function optimizeCloudinaryVideoUrl(url, isMobile = false) {
+  return getOptimizedVideoUrl(url, isMobile);
 }
 
 /**
@@ -43,8 +53,9 @@ export function optimizeCloudinaryUrl(url, width = 800) {
   // Detect if it is a video URL
   const isVideo = url.includes('/video/') || /\.(mp4|webm|mov|m4v|ogv|3gp)($|\?)/i.test(url.split('?')[0]);
   if (isVideo) {
+    // Fallback UA sniff only — prefer passing isMobile from a React hook in components.
     const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone/i.test(navigator.userAgent);
-    return optimizeCloudinaryVideoUrl(url, isMobile);
+    return getOptimizedVideoUrl(url, isMobile);
   }
 
   const parts = url.split('/upload/');

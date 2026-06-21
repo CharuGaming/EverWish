@@ -159,12 +159,32 @@ const SiteSchema = new mongoose.Schema(
     },
     // ── Cinematic Template ────────────────────────────────────────
     cinematic: {
-      introVideoUrl: { type: String, default: '' },
-      bgVideoUrl:    { type: String, default: '' },
-      heroImageUrl:  { type: String, default: '' },
-      songLyrics:    { type: String, default: '' },
-      reasons:       { type: [String], default: [] },
-      startDate:     { type: String, default: '' },
+      introVideoUrl:   { type: String, default: '' },
+      bgVideoUrl:      { type: String, default: '' },
+      heroImageUrl:    { type: String, default: '' },
+      songLyrics:      { type: String, default: '' },
+      reasons:         { type: [String], default: [] },
+      startDate:       { type: String, default: '' },
+      // ── 7 New Interactive Romantic Features ─────────────────────
+      bucketList: {
+        type: [{ item: { type: String, default: '' }, isCompleted: { type: Boolean, default: false } }],
+        default: [],
+      },
+      specialLocations: {
+        type: [{ title: { type: String, default: '' }, description: { type: String, default: '' }, imageUrl: { type: String, default: '' } }],
+        default: [],
+      },
+      voiceNoteUrl:    { type: String, default: '' },
+      funFacts: {
+        type: [{ question: { type: String, default: '' }, answer: { type: String, default: '' } }],
+        default: [],
+      },
+      openWhenLetters: {
+        type: [{ condition: { type: String, default: '' }, message: { type: String, default: '' }, imageUrl: { type: String, default: '' } }],
+        default: [],
+      },
+      videoMontageUrl: { type: String, default: '' },
+      partnerWhatsApp: { type: String, default: '' },
     },
     // ── Cinematic Birthday Template ───────────────────────────────
     cinematicBirthday: {

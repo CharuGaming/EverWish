@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BirthdayLandingPage from './BirthdayLandingPage';
 import MidnightCountdown from './MidnightCountdown';
-import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import { optimizeCloudinaryUrl, getOptimizedVideoUrl } from '../utils/imageHelpers';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Video Gatekeeper — BirthdayTemplate1 (bday1)
@@ -18,6 +18,16 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
   const [phase, setPhase]       = useState('idle');   // 'idle' | 'playing' | 'unlocked'
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
+
+  /* ── Responsive Video: detect mobile screen width ────────────────────── */
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const b = siteData?.birthday || {};
   const primary              = siteData?.themeColors?.bday1?.primary || '#8b5cf6';
@@ -99,7 +109,7 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
             {hasVideo && (
               <video
                 ref={videoRef}
-                src={optimizeCloudinaryUrl(introVideoUrl, 1080)}
+                src={getOptimizedVideoUrl(introVideoUrl, isMobile)}
                 playsInline
                 preload="metadata"
                 onEnded={handleVideoEnd}
@@ -182,7 +192,7 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
             {/* Base Layer (z-0): Looping HTML5 Background Video (or color fallback) */}
             {bgVideoUrl ? (
               <video
-                src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
+                src={getOptimizedVideoUrl(bgVideoUrl, isMobile)}
                 autoPlay
                 loop
                 muted

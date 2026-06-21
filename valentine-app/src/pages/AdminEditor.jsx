@@ -433,14 +433,15 @@ const TABS = [
 ];
 
 const CINEMATIC_TABS = [
-  { id: 'general',    label: 'General & Videos',  Icon: Settings },
-  { id: 'music',      label: 'Music & Lyrics',    Icon: Music    },
-  { id: 'loveLetter', label: 'Love Letter',       Icon: Gift     },
-  { id: 'milestones', label: 'Milestones',        Icon: MapPin   },
-  { id: 'gallery',    label: 'Photo Gallery',     Icon: Image    },
-  { id: 'reasons',    label: 'Why I Love You',    Icon: Heart    },
-  { id: 'customTitles',label: 'Typography',  Icon: Type     },
-  { id: 'socialLinks',label: 'Social Links',      Icon: Share2   },
+  { id: 'general',     label: 'General & Videos',        Icon: Settings },
+  { id: 'music',       label: 'Music & Lyrics',          Icon: Music    },
+  { id: 'loveLetter',  label: 'Love Letter',             Icon: Gift     },
+  { id: 'milestones',  label: 'Milestones',              Icon: MapPin   },
+  { id: 'gallery',     label: 'Photo Gallery',           Icon: Image    },
+  { id: 'reasons',     label: 'Why I Love You',          Icon: Heart    },
+  { id: 'interactive', label: 'Interactive Features ❤️',  Icon: Sparkles },
+  { id: 'customTitles',label: 'Typography',              Icon: Type     },
+  { id: 'socialLinks', label: 'Social Links',            Icon: Share2   },
 ];
 
 const VALENTINE_TABS = [
@@ -2077,6 +2078,115 @@ function BirthdayGeneralTab({ doc, setDoc }) {
 }
 
 // ── Cinematic: General & Videos tab ─────────────────────────────────
+// ── Cinematic: Interactive Romantic Features tab ────────────────────────────
+function CinInteractiveTab({ doc, setDoc }) {
+  const cin = doc.cinematic || {};
+  const upCin = (f, v) => setDoc(d => ({ ...d, cinematic: { ...(d.cinematic || {}), [f]: v } }));
+
+  // Generic array helpers
+  const addItem = (field, blank) => upCin(field, [...(cin[field] || []), blank]);
+  const delItem = (field, i) => upCin(field, (cin[field] || []).filter((_, j) => j !== i));
+  const updItem = (field, i, patch) => upCin(field,
+    (cin[field] || []).map((it, j) => j === i ? { ...it, ...patch } : it)
+  );
+
+  return (
+    <>
+      {/* 1 — Bucket List */}
+      <Card title="✅ Future Bucket List">
+        <p className="text-[11px] text-slate-500 mb-4">Items visitors can check off. Checked state is local (not saved to DB) for a playful interaction.</p>
+        <div className="space-y-3 mb-4">
+          {(cin.bucketList || []).map((it, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <TextInput value={it.item || ''} onChange={e => updItem('bucketList', i, { item: e.target.value })} placeholder={`Dream #${i + 1}`} />
+              <button onClick={() => delItem('bucketList', i)} className="shrink-0 text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer">✕</button>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addItem('bucketList', { item: '', isCompleted: false })} className="w-full py-2.5 rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 text-xs font-bold hover:border-rose-400 hover:text-rose-500 transition-colors cursor-pointer">+ Add Item</button>
+      </Card>
+
+      {/* 2 — Special Locations */}
+      <Card title="📍 Our Special Places">
+        <p className="text-[11px] text-slate-500 mb-4">Glowing location dots on the client page. Click reveals image + description.</p>
+        <div className="space-y-5 mb-4">
+          {(cin.specialLocations || []).map((loc, i) => (
+            <div key={i} className="bg-white/30 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-2xl p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-rose-500">Location {i + 1}</span>
+                <button onClick={() => delItem('specialLocations', i)} className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer">✕ Remove</button>
+              </div>
+              <TextInput value={loc.title || ''} onChange={e => updItem('specialLocations', i, { title: e.target.value })} placeholder="e.g. Where We First Met" />
+              <TextArea value={loc.description || ''} onChange={e => updItem('specialLocations', i, { description: e.target.value })} placeholder="The story of this place…" rows={2} />
+              <ImageField label="Location Photo" value={loc.imageUrl || ''} onChange={v => updItem('specialLocations', i, { imageUrl: v })} />
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addItem('specialLocations', { title: '', description: '', imageUrl: '' })} className="w-full py-2.5 rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 text-xs font-bold hover:border-rose-400 hover:text-rose-500 transition-colors cursor-pointer">+ Add Location</button>
+      </Card>
+
+      {/* 3 — Voice Note */}
+      <Card title="🎙️ Voice Note Player">
+        <p className="text-[11px] text-slate-500 mb-4">Upload a personal voice message. Renders as a sleek audio player with an animated waveform.</p>
+        <AudioField label="Voice Note Audio" hint="MP3 or M4A recommended. Keep under 5 MB." value={cin.voiceNoteUrl || ''} onChange={v => upCin('voiceNoteUrl', v)} />
+      </Card>
+
+      {/* 4 — Fun Facts Quiz */}
+      <Card title="💭 Fun Facts Quiz">
+        <p className="text-[11px] text-slate-500 mb-4">Accordion Q&A cards. Visitor taps a question to reveal the answer.</p>
+        <div className="space-y-4 mb-4">
+          {(cin.funFacts || []).map((fact, i) => (
+            <div key={i} className="bg-white/30 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-2xl p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-rose-500">Fact {i + 1}</span>
+                <button onClick={() => delItem('funFacts', i)} className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer">✕ Remove</button>
+              </div>
+              <TextInput value={fact.question || ''} onChange={e => updItem('funFacts', i, { question: e.target.value })} placeholder="What is my biggest fear?" />
+              <TextArea value={fact.answer || ''} onChange={e => updItem('funFacts', i, { answer: e.target.value })} placeholder="The answer revealed on tap…" rows={2} />
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addItem('funFacts', { question: '', answer: '' })} className="w-full py-2.5 rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 text-xs font-bold hover:border-rose-400 hover:text-rose-500 transition-colors cursor-pointer">+ Add Fun Fact</button>
+      </Card>
+
+      {/* 5 — Open When Letters */}
+      <Card title="💌 Open When Letters">
+        <p className="text-[11px] text-slate-500 mb-4">Glowing envelope cards. Clicking opens a modal with the full letter and optional photo.</p>
+        <div className="space-y-5 mb-4">
+          {(cin.openWhenLetters || []).map((letter, i) => (
+            <div key={i} className="bg-white/30 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-2xl p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-rose-500">Letter {i + 1}</span>
+                <button onClick={() => delItem('openWhenLetters', i)} className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer">✕ Remove</button>
+              </div>
+              <TextInput value={letter.condition || ''} onChange={e => updItem('openWhenLetters', i, { condition: e.target.value })} placeholder="e.g. you miss me" />
+              <TextArea value={letter.message || ''} onChange={e => updItem('openWhenLetters', i, { message: e.target.value })} placeholder="Dear love, whenever you miss me…" rows={4} />
+              <ImageField label="Optional Photo" value={letter.imageUrl || ''} onChange={v => updItem('openWhenLetters', i, { imageUrl: v })} />
+            </div>
+          ))}
+        </div>
+        <button onClick={() => addItem('openWhenLetters', { condition: '', message: '', imageUrl: '' })} className="w-full py-2.5 rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 text-xs font-bold hover:border-rose-400 hover:text-rose-500 transition-colors cursor-pointer">+ Add Letter</button>
+      </Card>
+
+      {/* 6 — Video Montage */}
+      <Card title="🎞️ Video Montage (Vertical Reel)">
+        <p className="text-[11px] text-slate-500 mb-4">Displayed in a 9:16 vertical player — perfect for phone-shot reels. Cloudinary auto-optimizes for mobile.</p>
+        <VideoField label="Montage Video" hint="Upload a vertical MP4. Cloudinary will serve optimized versions per device." value={cin.videoMontageUrl || ''} onChange={v => upCin('videoMontageUrl', v)} />
+      </Card>
+
+      {/* 7 — Love Note / WhatsApp */}
+      <Card title="💬 Leave a Love Note">
+        <p className="text-[11px] text-slate-500 mb-4">Visitors write a note that opens WhatsApp pre-filled with their message, sent directly to you.</p>
+        <div className="mb-0">
+          <Label>Your WhatsApp Number</Label>
+          <TextInput value={cin.partnerWhatsApp || ''} onChange={e => upCin('partnerWhatsApp', e.target.value)} placeholder="+94771234567 (include country code)" />
+          <p className="text-[11px] text-slate-400 mt-1.5">Include the country code without spaces. Example: +94771234567</p>
+        </div>
+      </Card>
+    </>
+  );
+}
+
 function CinGeneralTab({ doc, setDoc }) {
   const g = doc.general || {};
   const cin = doc.cinematic || {};
@@ -3083,13 +3193,14 @@ export default function AdminEditor() {
                 </>
               ) : isCinematic ? (
                 <>
-                  {activeTab === 'general'    && <CinGeneralTab    doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'music'      && <CinMusicTab      doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'loveLetter' && <CinLoveLetterTab doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'milestones' && <MilestonesTab    doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'gallery'    && <GalleryTab       doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'reasons'    && <CinReasonsTab    doc={doc} setDoc={setDoc} />}
-                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'general'     && <CinGeneralTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'music'       && <CinMusicTab      doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'loveLetter'  && <CinLoveLetterTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'milestones'  && <MilestonesTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gallery'     && <GalleryTab       doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'reasons'     && <CinReasonsTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'interactive' && <CinInteractiveTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab   doc={doc} setDoc={setDoc} />}
                 </>
               ) : doc.templateType === 'polaroid' || doc.templateType === 'modern' || !doc.templateType ? (
                 <>
