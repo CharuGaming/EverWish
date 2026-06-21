@@ -1,1 +1,6 @@
 .vercel
+.DS_Store
+*.log
+backend/backend_dev.log
+backend/dev.log
+backend/scratch_debug.js

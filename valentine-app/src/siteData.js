@@ -12,6 +12,37 @@ export const siteData = {
   valentineMessage: "Happy Valentine's Day! 💕",
   coupleEmoji: "💌",
 
+  // ── Passcode & Video Intro ──────────────────────────────────
+  passcode: {
+    title: "Enter Code",
+    hint: "Hint: The day you finally said 'YES' to me.",
+    targetPasscode: "0214",
+    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+  },
+
+  // ── BirthdayTemplate6 Texts ──────────────────────────────────
+  bday6: {
+    heroBadge: "🎂 Happy Birthday",
+    heroTitle: "Happy Birthday, Jamie!",
+    heroSubtitle: "Today is all about you ✨",
+    scrollText: "Scroll to explore",
+    giftSectionTitle: "A Gift For You",
+    giftSectionSubtitle: "Something special, just for you 🎁",
+    giftUnwrapText: "Tap to Unwrap 🎀",
+    yearRecapIcon: "🌟",
+    yearRecapTitle: "Your Year in Review",
+    bucketListIcon: "✅",
+    bucketListTitle: "Birthday Bucket List",
+    bucketListSubtitle: "Things to do today!",
+    songSectionTitle: "Your Birthday Song",
+    songSectionSubtitle: "Play it loud 🎵",
+    gallerySectionIcon: "💝",
+    gallerySectionTitle: "Our Memories",
+    gallerySectionSubtitle: "Tap a photo to relive the moment",
+    footerText: "Made with love · EverWish",
+    noMusicText: "No music uploaded yet"
+  },
+
   // ── Hero ──────────────────────────────────────────────────
   heroImageUrl:
     "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",

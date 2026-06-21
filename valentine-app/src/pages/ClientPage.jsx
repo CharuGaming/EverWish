@@ -18,6 +18,7 @@ import BirthdayTemplate1 from '../components/BirthdayTemplate1';
 import BirthdayTemplate2 from '../components/BirthdayTemplate2';
 import BirthdayTemplate3 from '../components/BirthdayTemplate3';
 import BirthdayTemplate4 from '../components/BirthdayTemplate4';
+import BirthdayTemplate6 from '../components/BirthdayTemplate6';
 import HeartBurst        from '../components/HeartBurst';
 import FloatingBalloons  from '../components/FloatingBalloons';
 import CinematicAnniversary from '../components/CinematicAnniversary';
@@ -153,6 +154,20 @@ export default function ClientPage() {
 
   }, [siteId]);
 
+  useEffect(() => {
+    const handleMessage = (e) => {
+      if (e.data) {
+        if (e.data.type === 'EVERWISH_PREVIEW_UPDATE') {
+          setSiteData(toComponentData(e.data.data));
+        } else if (e.data.type === 'SYNC_DATA') {
+          setSiteData(toComponentData(e.data.payload));
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const triggerBurst = useCallback(() => {
     setShowBurst(true);
     setTimeout(() => setShowBurst(false), 2000);
@@ -168,7 +183,7 @@ export default function ClientPage() {
   // Apply dark body background for polaroid/cinematic templates
   useEffect(() => {
     if (!siteData) return;
-    const isPol = !siteData.templateType || siteData.templateType === 'polaroid' || siteData.templateType === 'cinematic' || siteData.templateType === 'bday5';
+    const isPol = !siteData.templateType || siteData.templateType === 'polaroid' || siteData.templateType === 'cinematic' || siteData.templateType === 'bday5' || siteData.templateType === 'bday6';
     if (isPol) {
       document.body.classList.add('polaroid-page');
     } else {
@@ -199,6 +214,14 @@ export default function ClientPage() {
     return (
       <div className="relative min-h-screen">
         <CinematicBirthday siteData={siteData} />
+      </div>
+    );
+  }
+
+  if (siteData.templateType === 'bday6') {
+    return (
+      <div className="relative min-h-screen">
+        <BirthdayTemplate6 siteData={siteData} />
       </div>
     );
   }

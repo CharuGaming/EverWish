@@ -1792,6 +1792,79 @@ function BirthdayGeneralTab({ doc, setDoc }) {
 
   return (
     <>
+      {doc.templateType === 'bday1' && (
+        <>
+          <Card title="🎬 Gatekeeper Settings">
+            <p className="text-[11px] text-slate-500 mb-4">
+              Configure the initial gatekeeper screen that appears when the recipient first visits the site.
+            </p>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <Label>Background Color</Label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="color"
+                    value={b.gatekeeperBgColor || '#fdf2f8'}
+                    onChange={e => upBday('gatekeeperBgColor', e.target.value)}
+                    className="w-10 h-10 border border-white/10 rounded cursor-pointer bg-transparent"
+                  />
+                  <TextInput
+                    value={b.gatekeeperBgColor || '#fdf2f8'}
+                    onChange={e => upBday('gatekeeperBgColor', e.target.value)}
+                    placeholder="#fdf2f8"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Button Text</Label>
+                <TextInput
+                  value={b.gatekeeperButtonText || 'Tap to Open 🎁'}
+                  onChange={e => upBday('gatekeeperButtonText', e.target.value)}
+                  placeholder="e.g. Tap to Open 🎁"
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <VideoField
+                label="Intro / Gatekeeper Video"
+                hint="Upload an MP4 or WebM video (keep under 30MB) that plays full-screen on tap."
+                value={b.introVideoUrl || ''}
+                onChange={v => upBday('introVideoUrl', v)}
+              />
+              {b.introVideoUrl && (
+                <button
+                  onClick={() => upBday('introVideoUrl', '')}
+                  className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-2 block"
+                >
+                  Remove intro video
+                </button>
+              )}
+            </div>
+          </Card>
+
+          <Card title="📺 Background Video (Unlocked Phase)">
+            <p className="text-[11px] text-slate-500 mb-4">
+              Upload an ambient background video that loops infinitely behind the landing page layout.
+            </p>
+            <VideoField
+              label="Background Video"
+              hint="Upload an MP4 or WebM video (keep under 30MB). Will play silently in a loop."
+              value={b.bgVideoUrl || ''}
+              onChange={v => upBday('bgVideoUrl', v)}
+            />
+            {b.bgVideoUrl && (
+              <button
+                onClick={() => upBday('bgVideoUrl', '')}
+                className="text-xs text-red-400 hover:text-red-600 underline cursor-pointer mt-2 block"
+              >
+                Remove background video
+              </button>
+            )}
+          </Card>
+        </>
+      )}
+
       <Card title="Birthday Details">
         <div className="grid grid-cols-2 gap-4 mb-5">
           <div>
@@ -2755,6 +2828,21 @@ export default function AdminEditor() {
   const [error, setError]   = useState('');
   const [toast, setToast]   = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const iframeRef = useRef(null);
+
+  // Real-time synchronization with client page preview
+  useEffect(() => {
+    if (doc && iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'EVERWISH_PREVIEW_UPDATE', data: doc },
+        '*'
+      );
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'SYNC_DATA', payload: doc },
+        '*'
+      );
+    }
+  }, [doc]);
 
   const showToast = (msg, ok = true) => {
     setToast({ msg, ok });
@@ -2918,126 +3006,155 @@ export default function AdminEditor() {
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Topbar */}
-        <header className="h-16 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-xl border-b border-white/60 dark:border-white/10 flex items-center justify-between px-8 z-10 shadow-sm">
-          <h1 className="text-lg font-bold text-slate-900 dark:text-white">{ActiveTab?.label}</h1>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={toggleTheme}
-              className="p-2.5 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl hover:scale-105 transition-transform"
-            >
-              {isDarkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-slate-700 dark:text-slate-300" />}
-            </button>
-            {error && <span className="text-xs font-bold text-red-500 flex items-center gap-1.5 bg-red-500/10 px-3 py-1.5 rounded-full"><AlertTriangle size={14} />{error}</span>}
-            <button onClick={handleSave} disabled={saving}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-md ${saved ? 'bg-emerald-500 text-white' : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white'} border border-white/20 disabled:opacity-60 hover:scale-105 active:scale-95`}>
-              {saving ? <Loader2 size={16} className="animate-spin" /> : saved ? <CheckCircle2 size={16} /> : <Save size={16} />}
-              {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Changes'}
-            </button>
-          </div>
-        </header>
+      {/* Main Split View Container */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        {/* Left Pane: Editor */}
+        <div className="flex-1 lg:w-1/2 flex flex-col overflow-hidden border-r border-white/40 dark:border-white/10">
+          {/* Topbar */}
+          <header className="h-16 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-xl border-b border-white/60 dark:border-white/10 flex items-center justify-between px-8 z-10 shadow-sm">
+            <h1 className="text-lg font-bold text-slate-900 dark:text-white">{ActiveTab?.label}</h1>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={toggleTheme}
+                className="p-2.5 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl hover:scale-105 transition-transform"
+              >
+                {isDarkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-slate-700 dark:text-slate-300" />}
+              </button>
+              {error && <span className="text-xs font-bold text-red-500 flex items-center gap-1.5 bg-red-500/10 px-3 py-1.5 rounded-full"><AlertTriangle size={14} />{error}</span>}
+              <button onClick={handleSave} disabled={saving}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-md ${saved ? 'bg-emerald-500 text-white' : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white'} border border-white/20 disabled:opacity-60 hover:scale-105 active:scale-95`}>
+                {saving ? <Loader2 size={16} className="animate-spin" /> : saved ? <CheckCircle2 size={16} /> : <Save size={16} />}
+                {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Changes'}
+              </button>
+            </div>
+          </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-2xl mx-auto">
-            {activeTab === 'customTitles' && <CustomTitlesTab doc={doc} setDoc={setDoc} />}
-            {isValentine ? (
-              <>
-                {activeTab === 'general'     && <GeneralTab doc={doc} setDoc={setDoc} showToast={showToast} />}
-                {activeTab === 'music'       && <MusicTab   doc={doc} setDoc={setDoc} />}
-                {activeTab === 'gift'        && <GiftTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'thingsToDo'  && <ThingsToDoTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'match'       && <ValentineMatchTab   doc={doc} setDoc={setDoc} />}
-                {activeTab === 'reasons'     && <ValentineReasonsTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'scratch'     && <ValentineScratchTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'valFeatures' && <ValentineFeaturesTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isProposal ? (
-              <>
-                {activeTab === 'general'    && <ProposalGeneralTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'music'      && <MusicTab              doc={doc} setDoc={setDoc} />}
-                {activeTab === 'thingsToDo' && <ThingsToDoTab         doc={doc} setDoc={setDoc} />}
-                {activeTab === 'scratch'    && <ProposalScratchTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'activities' && <ProposalActivitiesTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isCustom ? (
-              <>
-                {activeTab === 'modules'    && <CustomModulesTab  doc={doc} setDoc={setDoc} />}
-                {activeTab === 'general'    && <GeneralTab         doc={doc} setDoc={setDoc} showToast={showToast} />}
-                {activeTab === 'music'      && <MusicTab           doc={doc} setDoc={setDoc} />}
-                {activeTab === 'thingsToDo' && <ThingsToDoTab      doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isBirthdayCinematic ? (
-              <>
-                {activeTab === 'cinbday_general'     && <CinBdayGeneralTab     doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_interactive'  && <CinBdayInteractiveTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_gift'         && <CinBdayGiftTab        doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_recap'        && <CinBdayRecapTab       doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_music'        && <CinBdayMusicTab       doc={doc} setDoc={setDoc} />}
-                {activeTab === 'cinbday_gallery'      && <CinBdayGalleryTab     doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks'          && <SocialLinksTab        doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isBirthday ? (
-              <>
-                {activeTab === 'bday_general' && <BirthdayGeneralTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'gallery'      && <GalleryTab         doc={doc} setDoc={setDoc} />}
-                {activeTab === 'music'        && <MusicTab           doc={doc} setDoc={setDoc} />}
-                {activeTab === 'sectionOrder' && <SectionOrderTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks'  && <SocialLinksTab     doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isCinematic ? (
-              <>
-                {activeTab === 'general'    && <CinGeneralTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'music'      && <CinMusicTab      doc={doc} setDoc={setDoc} />}
-                {activeTab === 'loveLetter' && <CinLoveLetterTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'milestones' && <MilestonesTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'gallery'    && <GalleryTab       doc={doc} setDoc={setDoc} />}
-                {activeTab === 'reasons'    && <CinReasonsTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : doc.templateType === 'polaroid' || doc.templateType === 'modern' || !doc.templateType ? (
-              <>
-                {activeTab === 'general'    && <GeneralTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'music'      && <MusicTab      doc={doc} setDoc={setDoc} />}
-                {activeTab === 'gift'       && <GiftTab       doc={doc} setDoc={setDoc} />}
-                {activeTab === 'thingsToDo' && <ThingsToDoTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'milestones' && <MilestonesTab doc={doc} setDoc={setDoc} />}
-                {activeTab === 'gallery'    && <GalleryTab    doc={doc} setDoc={setDoc} />}
-                {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : isApology ? (
-              <>
-                {activeTab === 'apology' && <ApologyTab doc={doc} setDoc={setDoc} />}
-              </>
-            ) : (
-              <div className="text-center py-20 text-slate-500">
-                <p className="text-sm">Editor for {doc.templateType} template is coming soon.</p>
-              </div>
-            )}
-          </div>
-        </main>
+          {/* Form Content */}
+          <main className="flex-1 overflow-y-auto p-6">
+            <div className="max-w-2xl mx-auto">
+              {activeTab === 'customTitles' && <CustomTitlesTab doc={doc} setDoc={setDoc} />}
+              {isValentine ? (
+                <>
+                  {activeTab === 'general'     && <GeneralTab doc={doc} setDoc={setDoc} showToast={showToast} />}
+                  {activeTab === 'music'       && <MusicTab   doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gift'        && <GiftTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'thingsToDo'  && <ThingsToDoTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'match'       && <ValentineMatchTab   doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'reasons'     && <ValentineReasonsTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'scratch'     && <ValentineScratchTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'valFeatures' && <ValentineFeaturesTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isProposal ? (
+                <>
+                  {activeTab === 'general'    && <ProposalGeneralTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'music'      && <MusicTab              doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'thingsToDo' && <ThingsToDoTab         doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'scratch'    && <ProposalScratchTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'activities' && <ProposalActivitiesTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isCustom ? (
+                <>
+                  {activeTab === 'modules'    && <CustomModulesTab  doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'general'    && <GeneralTab         doc={doc} setDoc={setDoc} showToast={showToast} />}
+                  {activeTab === 'music'      && <MusicTab           doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'thingsToDo' && <ThingsToDoTab      doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isBirthdayCinematic ? (
+                <>
+                  {activeTab === 'cinbday_general'     && <CinBdayGeneralTab     doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'cinbday_interactive'  && <CinBdayInteractiveTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'cinbday_gift'         && <CinBdayGiftTab        doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'cinbday_recap'        && <CinBdayRecapTab       doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'cinbday_music'        && <CinBdayMusicTab       doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'cinbday_gallery'      && <CinBdayGalleryTab     doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks'          && <SocialLinksTab        doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isBirthday ? (
+                <>
+                  {activeTab === 'bday_general' && <BirthdayGeneralTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gallery'      && <GalleryTab         doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'music'        && <MusicTab           doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'sectionOrder' && <SectionOrderTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks'  && <SocialLinksTab     doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isCinematic ? (
+                <>
+                  {activeTab === 'general'    && <CinGeneralTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'music'      && <CinMusicTab      doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'loveLetter' && <CinLoveLetterTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'milestones' && <MilestonesTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gallery'    && <GalleryTab       doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'reasons'    && <CinReasonsTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : doc.templateType === 'polaroid' || doc.templateType === 'modern' || !doc.templateType ? (
+                <>
+                  {activeTab === 'general'    && <GeneralTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'music'      && <MusicTab      doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gift'       && <GiftTab       doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'thingsToDo' && <ThingsToDoTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'milestones' && <MilestonesTab doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'gallery'    && <GalleryTab    doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'socialLinks' && <SocialLinksTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : isApology ? (
+                <>
+                  {activeTab === 'apology' && <ApologyTab doc={doc} setDoc={setDoc} />}
+                </>
+              ) : (
+                <div className="text-center py-20 text-slate-500">
+                  <p className="text-sm">Editor for {doc.templateType} template is coming soon.</p>
+                </div>
+              )}
+            </div>
+          </main>
 
-        <footer className="h-8 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-xl border-t border-white/60 dark:border-white/10 flex items-center px-8 z-10">
-          <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-            {isBirthday
-              ? `Birthday Celebration · ${doc.gallery?.supporting?.length||0} gallery photos`
-              : isValentine
-              ? `${doc.valentine?.reasons?.length||0} reasons · ${doc.valentine?.scratchMemories?.length||0} scratch cards · ${doc.thingsToDo?.length||0} bucket items`
-              : isProposal
-              ? `${doc.proposal?.scratchGallery?.length||0} scratch cards · ${doc.proposal?.activities?.length||0} activities · ${doc.proposal?.foods?.length||0} foods · ${doc.thingsToDo?.length||0} bucket items`
-              : isCustom
-              ? `Lockscreen: ${doc.customModules?.lockscreenType || 'tap'} · ${doc.thingsToDo?.length||0} bucket items · ${Object.values(doc.customModules||{}).filter(v=>v===true).length} modules active`
-              : isCinematic
-              ? `Cinematic · ${doc.cinematic?.reasons?.length || 0} reasons · ${doc.milestones?.length || 0} milestones · ${doc.general?.loveLetterText ? 'Love Letter configured' : 'No Love Letter'}`
-              : `${doc.milestones?.length||0} milestones · ${doc.gallery?.supporting?.length||0} gallery photos · ${doc.thingsToDo?.length||0} bucket items`
-            } · Unsaved changes not persisted
-          </span>
-        </footer>
+          {/* Footer */}
+          <footer className="h-8 flex-shrink-0 bg-white/40 dark:bg-black/20 backdrop-blur-xl border-t border-white/60 dark:border-white/10 flex items-center px-8 z-10">
+            <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase truncate">
+              {isBirthday
+                ? `Birthday Celebration · ${doc.gallery?.supporting?.length||0} gallery photos`
+                : isValentine
+                ? `${doc.valentine?.reasons?.length||0} reasons · ${doc.valentine?.scratchMemories?.length||0} scratch cards · ${doc.thingsToDo?.length||0} bucket items`
+                : isProposal
+                ? `${doc.proposal?.scratchGallery?.length||0} scratch cards · ${doc.proposal?.activities?.length||0} activities · ${doc.proposal?.foods?.length||0} foods · ${doc.thingsToDo?.length||0} bucket items`
+                : isCustom
+                ? `Lockscreen: ${doc.customModules?.lockscreenType || 'tap'} · ${doc.thingsToDo?.length||0} bucket items · ${Object.values(doc.customModules||{}).filter(v=>v===true).length} modules active`
+                : isCinematic
+                ? `Cinematic · ${doc.cinematic?.reasons?.length || 0} reasons · ${doc.milestones?.length || 0} milestones · ${doc.general?.loveLetterText ? 'Love Letter configured' : 'No Love Letter'}`
+                : `${doc.milestones?.length||0} milestones · ${doc.gallery?.supporting?.length||0} gallery photos · ${doc.thingsToDo?.length||0} bucket items`
+              } · Unsaved changes not persisted
+            </span>
+          </footer>
+        </div>
+
+        {/* Right Pane: Phone Frame Live Sync Preview */}
+        <div className="hidden lg:flex lg:w-1/2 bg-neutral-950 items-center justify-center p-8 relative overflow-hidden">
+          {/* Ambient center glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-rose-500/5 blur-[120px] pointer-events-none" />
+          
+          {/* Phone Mockup Wrapper */}
+          <div className="w-[340px] h-[680px] rounded-[48px] border-[12px] border-slate-800 dark:border-slate-850 bg-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative flex flex-col overflow-hidden ring-1 ring-white/10 z-10">
+            {/* Notch / Speaker Pill */}
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-5.5 bg-slate-800 rounded-full z-30 flex items-center justify-center gap-1.5">
+              <div className="w-12 h-1 bg-slate-900 rounded-full"></div>
+              <div className="w-2.5 h-2.5 bg-slate-900 rounded-full"></div>
+            </div>
+            
+            {/* Live Sync Preview Iframe */}
+            <iframe
+              ref={iframeRef}
+              src={`/${siteId}?preview=1`}
+              className="w-full h-full border-none bg-black rounded-[36px]"
+              title="Real-time Preview"
+            />
+          </div>
+        </div>
+
       </div>
     </div>
   );

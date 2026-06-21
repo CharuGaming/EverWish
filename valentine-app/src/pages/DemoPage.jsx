@@ -29,6 +29,7 @@ import BirthdayTemplate1 from '../components/BirthdayTemplate1';
 import BirthdayTemplate2 from '../components/BirthdayTemplate2';
 import BirthdayTemplate3 from '../components/BirthdayTemplate3';
 import BirthdayTemplate4 from '../components/BirthdayTemplate4';
+import BirthdayTemplate6 from '../components/BirthdayTemplate6';
 import CinematicAnniversary from '../components/CinematicAnniversary';
 import CinematicBirthday   from '../components/CinematicBirthday';
 
@@ -141,6 +142,15 @@ export default function DemoPage() {
       <div className="relative min-h-screen pt-8">
         <DemoBanner />
         <CinematicBirthday siteData={siteData} />
+      </div>
+    );
+  }
+
+  if (siteData.templateType === 'bday6') {
+    return (
+      <div className="relative min-h-screen pt-8">
+        <DemoBanner />
+        <BirthdayTemplate6 siteData={siteData} />
       </div>
     );
   }

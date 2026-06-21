@@ -3,7 +3,7 @@ import { siteData as defaultData } from "../siteData";
 import {
   Settings, Music, Gift, MapPin, Image,
   Plus, Trash2, Download, Save, ExternalLink,
-  Heart, ChevronRight, AlertCircle, Check
+  Heart, ChevronRight, AlertCircle, Check, Lock, Type
 } from "lucide-react";
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -11,6 +11,8 @@ const uid = () => Date.now() + Math.random();
 
 const TABS = [
   { id: "general",   label: "General",      icon: Settings },
+  { id: "passcode",  label: "Passcode",     icon: Lock     },
+  { id: "landing",   label: "Landing Texts",icon: Type     },
   { id: "music",     label: "Music",        icon: Music    },
   { id: "gift",      label: "Virtual Gift", icon: Gift     },
   { id: "milestones",label: "Milestones",   icon: MapPin   },
@@ -99,6 +101,157 @@ function GeneralTab({ data, set }) {
         </Field>
         <Field label="Valentine Message (shown on unlock)">
           <Input value={data.valentineMessage} onChange={e => set("valentineMessage", e.target.value)} placeholder="Happy Valentine's Day! 💕" />
+        </Field>
+      </SectionCard>
+    </>
+  );
+}
+
+function PasscodeTab({ data, set }) {
+  const updatePasscode = (field, value) => {
+    set("passcode", { ...data.passcode, [field]: value });
+  };
+  return (
+    <>
+      <SectionCard title="Passcode Screen">
+        <Field label="Page Title">
+          <Input value={data.passcode?.title || ""} onChange={e => updatePasscode("title", e.target.value)} placeholder="Enter Code" />
+        </Field>
+        <Field label="Hint Text">
+          <Input value={data.passcode?.hint || ""} onChange={e => updatePasscode("hint", e.target.value)} placeholder="Hint: The day you finally said 'YES' to me." />
+        </Field>
+        <Field label="Target Passcode">
+          <Input value={data.passcode?.targetPasscode || ""} onChange={e => updatePasscode("targetPasscode", e.target.value)} placeholder="0214" type="number" />
+        </Field>
+      </SectionCard>
+      <SectionCard title="Intro Video">
+        <Field label="Video URL">
+          <Input value={data.passcode?.videoUrl || ""} onChange={e => updatePasscode("videoUrl", e.target.value)} placeholder="https://..." />
+        </Field>
+      </SectionCard>
+    </>
+  );
+}
+
+function LandingPageTab({ data, set }) {
+  const updateBday6 = (field, value) => set("bday6", { ...data.bday6, [field]: value });
+  const updateCinematic = (field, value) => set("cinematicBirthday", { ...data.cinematicBirthday, [field]: value });
+  
+  return (
+    <>
+      <SectionCard title="Hero Section">
+        <Field label="Hero Badge">
+          <Input value={data.bday6?.heroBadge || ""} onChange={e => updateBday6("heroBadge", e.target.value)} />
+        </Field>
+        <Field label="Main Title">
+          <Input value={data.bday6?.heroTitle || ""} onChange={e => updateBday6("heroTitle", e.target.value)} />
+        </Field>
+        <Field label="Subtitle">
+          <Input value={data.bday6?.heroSubtitle || ""} onChange={e => updateBday6("heroSubtitle", e.target.value)} />
+        </Field>
+        <Field label="Scroll Text">
+          <Input value={data.bday6?.scrollText || ""} onChange={e => updateBday6("scrollText", e.target.value)} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Gift Section">
+        <Field label="Section Title">
+          <Input value={data.bday6?.giftSectionTitle || ""} onChange={e => updateBday6("giftSectionTitle", e.target.value)} />
+        </Field>
+        <Field label="Section Subtitle">
+          <Input value={data.bday6?.giftSectionSubtitle || ""} onChange={e => updateBday6("giftSectionSubtitle", e.target.value)} />
+        </Field>
+        <Field label="Gift Image URL">
+          <Input value={data.cinematicBirthday?.giftImageUrl || ""} onChange={e => updateCinematic("giftImageUrl", e.target.value)} />
+        </Field>
+        <Field label="Tap to Unwrap Text">
+          <Input value={data.bday6?.giftUnwrapText || ""} onChange={e => updateBday6("giftUnwrapText", e.target.value)} />
+        </Field>
+        <Field label="Gift Reveal Message">
+          <Input value={data.cinematicBirthday?.giftRevealText || ""} onChange={e => updateCinematic("giftRevealText", e.target.value)} rows={3} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Year Recap Section">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Section Icon">
+            <Input value={data.bday6?.yearRecapIcon || ""} onChange={e => updateBday6("yearRecapIcon", e.target.value)} />
+          </Field>
+          <Field label="Section Title">
+            <Input value={data.bday6?.yearRecapTitle || ""} onChange={e => updateBday6("yearRecapTitle", e.target.value)} />
+          </Field>
+        </div>
+        <Field label="Recap Text">
+          <Input value={data.cinematicBirthday?.yearRecapText || ""} onChange={e => updateCinematic("yearRecapText", e.target.value)} rows={3} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Bucket List Section">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-1">
+            <Field label="Section Icon">
+              <Input value={data.bday6?.bucketListIcon || ""} onChange={e => updateBday6("bucketListIcon", e.target.value)} />
+            </Field>
+          </div>
+          <div className="col-span-2">
+            <Field label="Section Title">
+              <Input value={data.bday6?.bucketListTitle || ""} onChange={e => updateBday6("bucketListTitle", e.target.value)} />
+            </Field>
+          </div>
+        </div>
+        <Field label="Section Subtitle">
+          <Input value={data.bday6?.bucketListSubtitle || ""} onChange={e => updateBday6("bucketListSubtitle", e.target.value)} />
+        </Field>
+        <Field label="Bucket List Items" hint="Comma separated">
+          <Input value={data.cinematicBirthday?.birthdayBucketList?.join(", ") || ""} onChange={e => updateCinematic("birthdayBucketList", e.target.value.split(",").map(i => i.trim()))} rows={2} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Love Letter Envelope">
+        <Field label="Letter Content">
+          <Input value={data.cinematicBirthday?.loveLetterContent || ""} onChange={e => updateCinematic("loveLetterContent", e.target.value)} rows={5} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Music Section (Birthday Song)">
+        <Field label="Section Title">
+          <Input value={data.bday6?.songSectionTitle || ""} onChange={e => updateBday6("songSectionTitle", e.target.value)} />
+        </Field>
+        <Field label="Section Subtitle">
+          <Input value={data.bday6?.songSectionSubtitle || ""} onChange={e => updateBday6("songSectionSubtitle", e.target.value)} />
+        </Field>
+        <Field label="No Music Warning">
+          <Input value={data.bday6?.noMusicText || ""} onChange={e => updateBday6("noMusicText", e.target.value)} />
+        </Field>
+        <Field label="Song URL">
+          <Input value={data.cinematicBirthday?.songAudioUrl || ""} onChange={e => updateCinematic("songAudioUrl", e.target.value)} />
+        </Field>
+        <Field label="Song Lyrics">
+          <Input value={data.cinematicBirthday?.songLyrics || ""} onChange={e => updateCinematic("songLyrics", e.target.value)} rows={4} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Gallery Section">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-1">
+            <Field label="Section Icon">
+              <Input value={data.bday6?.gallerySectionIcon || ""} onChange={e => updateBday6("gallerySectionIcon", e.target.value)} />
+            </Field>
+          </div>
+          <div className="col-span-2">
+            <Field label="Section Title">
+              <Input value={data.bday6?.gallerySectionTitle || ""} onChange={e => updateBday6("gallerySectionTitle", e.target.value)} />
+            </Field>
+          </div>
+        </div>
+        <Field label="Section Subtitle">
+          <Input value={data.bday6?.gallerySectionSubtitle || ""} onChange={e => updateBday6("gallerySectionSubtitle", e.target.value)} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard title="Footer">
+        <Field label="Footer Text">
+          <Input value={data.bday6?.footerText || ""} onChange={e => updateBday6("footerText", e.target.value)} />
         </Field>
       </SectionCard>
     </>
@@ -376,6 +529,14 @@ const initialState = {
   giftMessage:     "You deserve all the flowers in the world. Here's a virtual bouquet for you, filled with my endless love, hugs, and a promise to always make you smile.",
   bouquetImageUrl: "https://pngimg.com/uploads/bouquet/bouquet_PNG48.png",
 
+  passcode:   defaultData.passcode || {
+    title: "Enter Code",
+    hint: "Hint: The day you finally said 'YES' to me.",
+    targetPasscode: "0214",
+    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+  },
+  bday6:             defaultData.bday6 || {},
+  cinematicBirthday: defaultData.cinematicBirthday || {},
   milestones: defaultData.milestones,
   gallery:    defaultData.gallery,
 };
@@ -496,6 +657,8 @@ export default function AdminDashboard() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-3xl mx-auto">
             {activeTab === "general"    && <GeneralTab data={data} set={set} />}
+            {activeTab === "passcode"   && <PasscodeTab data={data} set={set} />}
+            {activeTab === "landing"    && <LandingPageTab data={data} set={set} />}
             {activeTab === "music"      && <MusicTab data={data} set={set} />}
             {activeTab === "gift"       && <VirtualGiftTab data={data} set={set} />}
             {activeTab === "milestones" && <MilestonesTab data={data} setMilestones={setMilestones} />}

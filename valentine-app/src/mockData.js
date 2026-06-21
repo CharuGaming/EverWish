@@ -236,6 +236,51 @@ export const MOCK_DATA = {
       loveLetterContent: "Dear Babe,\n\nHappy Birthday to the most amazing person in my life! You make every single moment brighter, and I am so grateful for all the love and laughter we share.\n\nHere's to making many more beautiful memories together.\n\nWith all my love,\nAlways 💛"
     }
   },
+  b6: {
+    ...birthdayBase,
+    templateType: 'bday6',
+    category: 'birthday',
+    passcode: {
+      title: "Enter Code",
+      hint: "Hint: The day you finally said 'YES' to me.",
+      targetPasscode: "0214",
+      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    bday6: {
+      heroBadge: "🎂 Happy Birthday",
+      heroTitle: "Happy Birthday, Jamie!",
+      heroSubtitle: "Today is all about you ✨",
+      scrollText: "Scroll to explore",
+      giftSectionTitle: "A Gift For You",
+      giftSectionSubtitle: "Something special, just for you 🎁",
+      giftUnwrapText: "Tap to Unwrap 🎀",
+      yearRecapIcon: "🌟",
+      yearRecapTitle: "Your Year in Review",
+      bucketListIcon: "✅",
+      bucketListTitle: "Birthday Bucket List",
+      bucketListSubtitle: "Things to do today!",
+      songSectionTitle: "Your Birthday Song",
+      songSectionSubtitle: "Play it loud 🎵",
+      gallerySectionIcon: "💝",
+      gallerySectionTitle: "Our Memories",
+      gallerySectionSubtitle: "Tap a photo to relive the moment",
+      footerText: "Made with love · EverWish",
+      noMusicText: "No music uploaded yet"
+    },
+    cinematicBirthday: {
+      giftImageUrl: UNSPLASH.bday2,
+      giftRevealText: 'A special gift just for you! 🎁',
+      yearRecapText: 'This year has been amazing, and it is all because of you.',
+      birthdayBucketList: [
+        'More road trips 🚗',
+        'Late night ice cream 🍦'
+      ],
+      songAudioUrl: '',
+      songLyrics: 'Happy birthday to you...',
+      galleryImages: [UNSPLASH.bday1, UNSPLASH.bday2, UNSPLASH.bday3],
+      loveLetterContent: "Dear Jamie,\nHappy Birthday!"
+    }
+  },
 };
 
 // WhatsApp number (single source of truth shared with Storefront)

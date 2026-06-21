@@ -367,14 +367,6 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden relative">
       
-      {/* Floating Theme Toggle */}
-      <button 
-        onClick={toggleTheme}
-        className="fixed top-5 right-6 z-40 p-3 bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-full hover:scale-105 transition-transform"
-      >
-        {isDarkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-slate-700" />}
-      </button>
-
       {/* Toast */}
       <AnimatePresence>
         {toast && (
@@ -392,7 +384,7 @@ export default function AdminDashboard() {
 
       {/* Header */}
       <header className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm relative z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img loading="lazy" src="/logo.png" alt="EverWish Logo" className="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-rose-500/20" />
             <div>
@@ -400,27 +392,34 @@ export default function AdminDashboard() {
               <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Admin Portal</p>
             </div>
           </div>
+          {/* Header Theme Toggle */}
+          <button 
+            onClick={toggleTheme}
+            className="p-3 bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-full hover:scale-105 transition-transform"
+          >
+            {isDarkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-slate-700" />}
+          </button>
         </div>
       </header>
 
       {/* Main Navigation Tabs */}
-      <div className="max-w-6xl mx-auto px-6 pt-6 relative z-10">
-        <div className="flex gap-2 p-1 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl w-fit shadow-sm">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 relative z-10">
+        <div className="flex gap-2 p-1 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 rounded-2xl w-full md:w-fit overflow-x-auto hide-scrollbar shadow-sm">
           <button 
             onClick={() => setActiveTab('sites')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'sites' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'sites' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
           >
             <Users size={16} /> Client Sites
           </button>
           <button 
             onClick={() => setActiveTab('storefront')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'storefront' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'storefront' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
           >
             <Store size={16} /> Manage Storefront
           </button>
           <button 
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'orders' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
           >
             <ShoppingBag size={16} /> Orders Received
             {orders.filter(o => o.status === 'pending').length > 0 && (
@@ -432,7 +431,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-6 py-8 relative z-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 relative z-10">
         {activeTab === 'sites' ? (
           <>
             <motion.div 
@@ -441,41 +440,45 @@ export default function AdminDashboard() {
               transition={{ duration: 0.5 }}
               className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
-          <div>
-            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Client Sites</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">Manage all active celebration websites</p>
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            <button onClick={handleWipeDemos} disabled={wipingDemos} className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
-              {wipingDemos ? 'Wiping...' : 'Wipe Demos'}
-            </button>
-            <button onClick={handleWipeClients} disabled={wipingClients} className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
-              {wipingClients ? 'Wiping...' : 'Wipe Users'}
-            </button>
-            <div className="flex bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 p-1 rounded-2xl shadow-sm">
-              <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
-                <List size={18} />
-              </button>
-              <button onClick={() => setViewMode('grid')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
-                <LayoutGrid size={18} />
-              </button>
-            </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-xl shadow-rose-500/20 transition-all hover:scale-105 active:scale-95"
+              <div>
+                <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Client Sites</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">Manage all active celebration websites</p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 w-full md:w-auto">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                  <button onClick={handleWipeDemos} disabled={wipingDemos} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
+                    {wipingDemos ? 'Wiping...' : 'Wipe Demos'}
+                  </button>
+                  <button onClick={handleWipeClients} disabled={wipingClients} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 transition shadow-sm bg-white/40 dark:bg-black/30 backdrop-blur-md whitespace-nowrap">
+                    {wipingClients ? 'Wiping...' : 'Wipe Users'}
+                  </button>
+                </div>
+                <div className="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
+                  <div className="flex bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/60 dark:border-white/10 p-1 rounded-2xl shadow-sm">
+                    <button onClick={() => setViewMode('list')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
+                      <List size={18} />
+                    </button>
+                    <button onClick={() => setViewMode('grid')} className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-800 shadow text-rose-600 dark:text-rose-400' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
+                      <LayoutGrid size={18} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-xl shadow-rose-500/20 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                  >
+                    <Plus size={16} strokeWidth={3} /> Create Site
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+ 
+            {/* Main Glassy Container */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-4 sm:p-6 md:p-8"
             >
-              <Plus size={16} strokeWidth={3} /> Create Site
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Main Glassy Container */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 rounded-3xl p-6 md:p-8"
-        >
           {/* Search */}
           <div className="relative mb-8">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
@@ -681,28 +684,28 @@ export default function AdminDashboard() {
                             </div>
                           </div>
 
-                          <div className={`flex items-center gap-3 mt-4 md:mt-0 ${viewMode === 'grid' ? 'pt-4 border-t border-slate-200 dark:border-slate-800 justify-between' : ''}`}>
-                            <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
-                              {status.text}
-                            </span>
-                            <div className="flex items-center gap-1.5 ml-auto md:ml-0">
-                              <button onClick={() => handleSetDemo(site._id)} title="Set as Demo" className="p-2 rounded-xl transition shadow-sm border text-slate-500 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 border-transparent hover:border-amber-200">
-                                <Star size={16} />
-                              </button>
-                              <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                <Copy size={16} />
-                              </button>
-                              <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? 'Deactivate Site' : 'Activate Site'} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
-                              </button>
-                              <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                <Edit3 size={16} />
-                              </button>
-                              <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
+                           <div className={`flex items-center gap-3 mt-4 md:mt-0 justify-between ${viewMode === 'list' ? 'w-full md:w-auto border-t border-slate-200/50 dark:border-white/5 pt-4 md:pt-0 md:border-t-0' : 'pt-4 border-t border-slate-200 dark:border-slate-800'}`}>
+                             <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-extrabold shadow-sm ${status.color}`}>
+                               {status.text}
+                             </span>
+                             <div className="flex items-center gap-1.5 flex-wrap">
+                               <button onClick={() => handleSetDemo(site._id)} title="Set as Demo" className="p-2 rounded-xl transition shadow-sm border text-slate-500 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 border-transparent hover:border-amber-200">
+                                 <Star size={16} />
+                               </button>
+                               <button onClick={() => handleCopyLink(site.siteId)} title="Copy Public Link" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                 <Copy size={16} />
+                               </button>
+                               <button onClick={() => handleToggleStatus(site.siteId, site.isActive)} title={site.isActive ? 'Deactivate Site' : 'Activate Site'} className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                 {site.isActive !== false ? <ToggleRight size={16} className="text-emerald-500" /> : <ToggleLeft size={16} />}
+                               </button>
+                               <button onClick={() => nav(`/admin/edit/${site.siteId}`)} title="Edit Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                                 <Edit3 size={16} />
+                               </button>
+                               <button onClick={() => setDeleteModal({ isOpen: true, siteId: site.siteId })} title="Delete Site" className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm border border-transparent hover:border-red-200 dark:hover:border-red-900">
+                                 <Trash2 size={16} />
+                               </button>
+                             </div>
+                           </div>
                         </motion.div>
                       );
                     })}
@@ -1111,6 +1114,7 @@ export default function AdminDashboard() {
                         <option value="bday3">Birthday Template 3 - The Card Flip</option>
                         <option value="bday4">Birthday Template 4 - The Surprise Party</option>
                         <option value="bday5">Birthday Template 5 - Cinematic Birthday</option>
+                        <option value="bday6">Birthday Template 6 - Passcode & Cinematic Experience</option>
                       </>
                     )}
                   </select>

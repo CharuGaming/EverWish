@@ -1,0 +1,415 @@
+# 🎂 Birthday Template 1 - The Unwrapping & Interactive Classic Experience
+
+This document contains a complete specification, architecture detail, database schema mapping, and source configuration for **EverWish Birthday Template 1 (`bday1`)**.
+
+---
+
+## 🌟 1. Overview & Concept
+* **Template Type ID:** `bday1`
+* **Core Theme Name:** *The Unwrapping*
+* **Design Philosophy:** A rich, gamified premium celebration site that starts with an interactive **3D perspective gift box** floating on custom particles. Unwrapping the box triggers a confetti explosion, unlocking the main personalized dashboard which dynamically renders different visual segments.
+
+---
+
+## 🔐 2. Gatekeeper Screen (Interactive 3D Gift Box)
+Before access is granted to the celebratory landing page, a full-screen ambient lockscreeen is loaded.
+
+### 🎨 Visuals & Animations:
+* **Background Gradient:** A radial focal backdrop using the custom primary color highlight: `radial-gradient(ellipse at 50% 60%, ${primary}22 0%, #0f0a1a 55%, #080510 100%)`.
+* **Particle Systems:** 
+  - **Ambient Floating Particles:** 32 vertical rising bubbles fading out towards the top.
+  - **Shining Sparkles:** 18 random twinkling 4-point SVG stars fading in and out.
+* **3D Gift Box SVG:** 
+  - Rendered using pure vector paths layered to create an isometric box.
+  - Mouse coordinates track desktop cursor hover actions, utilizing Framer Motion's `useMotionValue`, `useTransform`, and `useSpring` to dynamically rotate the box (`rotX` / `rotY`) up to $18^\circ$, generating a natural depth illusion.
+  - Clicking the box triggers a fast shake rotation sequence, launches a confetti blast of 20 color particles, flies off the lid, and transitions to the landing page.
+
+---
+
+## 🖥️ 3. Landing Page Sections
+Once unlocked, the site reads `siteData.sectionOrder` to stack and display interactive elements in a fully-configurable order.
+
+### Section Modules:
+1. **Immersive Hero Section (`hero`):**
+   - Supports a high-resolution background video (`.mp4`, `.webm`, `.mov`) or static image (`heroBackgroundMediaUrl`).
+   - Renders a multi-layer dark cinematic overlay gradient for maximum text contrast.
+   - Shows recipient's name (`coupleName`) and age pill badge (`birthday.recipientAge`).
+   - Renders an **interactive vector birthday cake** where the number of glowing, flickering candles dynamically adjusts to the recipient's age (up to 5 max).
+2. **Personalized Greeting Message (`message`):**
+   - Shows custom letter/paragraph greeting narrative (`birthday.birthdayMessage`).
+3. **Life Stats Dashboard (`lifeStats`):**
+   - Takes `birthday.birthDate` and computes/displays live tickers counting down their exact lifetime metrics (Years, Months, Days, Hours, Minutes, Seconds).
+4. **Photo Gallery (`gallery`):**
+   - Displays uploaded memories using standard collage grid alignments.
+5. **Personal Voice Message (`voiceNote`):**
+   - Renders a retro-themed audio tape player linked to `voiceNoteUrl`.
+6. **Year in Review (`yearInReview`):**
+   - Custom milestones list showcasing achievements or fun memories.
+7. **Interactive Unwrap Gift (`gift`):**
+   - A secondary unwrapping container revealing custom image rewards (`virtualGift.imageUrl`) and a reveal note (`virtualGift.message`).
+8. **Scratch Card Prize Coupon (`scratchPrize`):**
+   - An interactive foil-coated coupon. Visitors scratch away the surface to reveal a custom prize.
+
+---
+
+## 🛠️ 4. Data Schema & Config Properties
+
+Here is the exact schema representation mapping both the styling options and content fields in the Mongo database:
+
+### Core Configuration Properties
+
+| Field Path | Type | Default Value | Description |
+|---|---|---|---|
+| `themeColors.bday1.primary` | String | `"#8b5cf6"` | Accent color for buttons, headings, cakes, and confetti |
+| `themeColors.bday1.background` | String | `"#fffbeb"` | Backdrop color of the landing pages |
+| `sectionOrder` | Array | `['hero', 'message', 'lifeStats', 'gallery', 'voiceNote', 'yearInReview', 'gift', 'scratchPrize']` | Array mapping the stacking order of pages |
+| `heroBackgroundMediaUrl` | String | `""` | Optional background video or image link |
+| `coupleName` | String | `"You"` | Main name of the recipient |
+| `birthday.recipientAge` | Number | `null` | Age of the recipient (controls the number of cake candles) |
+| `birthday.birthdayMessage` | String | `""` | Personal text message |
+| `birthday.birthDate` | String/Date | `null` | Birthday date used to calculate live lifetime counter |
+| `birthdayGallery` | Array | `[]` | List of gallery image strings |
+| `voiceNoteUrl` | String | `""` | Audio file for voice notes |
+| `yearInReview` | Array | `[]` | List of items for milestones |
+| `virtualGift.imageUrl` | String | `""` | Image URL of the hidden gift |
+| `virtualGift.message` | String | `""` | Message revealed after unwrapping |
+| `scratchPrize` | Object | `null` | Scratch coupon containing coupon code and prize text |
+
+---
+
+## 💾 5. Technical Implementation (Source Codes)
+
+### Gatekeeper & 3D Gift Box Component (`BirthdayTemplate1.jsx`)
+```jsx
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import BirthdayLandingPage from './BirthdayLandingPage';
+import MidnightCountdown from './MidnightCountdown';
+
+// Floating background particles
+function Particle({ x, color, size, delay, duration }) {
+  return (
+    <motion.div
+      className="absolute rounded-full pointer-events-none"
+      style={{ left: `${x}%`, bottom: '-5%', width: size, height: size, background: color, filter: 'blur(0.5px)' }}
+      animate={{ y: [0, -window.innerHeight * 1.2], opacity: [0, 0.9, 0.7, 0], rotate: [0, 360] }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeOut', repeatDelay: Math.random() * 4 }}
+    />
+  );
+}
+
+// 3D Gift Box with Perspective Tilt
+function Gift3D({ primary, accentLight, accentDark, onClick, isOpen }) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotY = useSpring(useTransform(mouseX, [-200, 200], [-18, 18]), { stiffness: 80, damping: 20 });
+  const rotX = useSpring(useTransform(mouseY, [-200, 200], [12, -12]), { stiffness: 80, damping: 20 });
+
+  const onMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left - rect.width / 2);
+    mouseY.set(e.clientY - rect.top - rect.height / 2);
+  };
+  const onMouseLeave = () => { mouseX.set(0); mouseY.set(0); };
+
+  return (
+    <motion.div
+      className="relative cursor-pointer select-none"
+      style={{ width: 260, height: 260, perspective: 800 }}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
+      whileTap={{ scale: 0.94 }}
+    >
+      <motion.div
+        style={{ rotateY: rotY, rotateX: rotX, transformStyle: 'preserve-3d', width: '100%', height: '100%' }}
+        animate={isOpen ? { rotateY: [0, 25, -25, 0], rotateX: [-10, 10, -10, 0], scale: [1, 1.05, 0.9, 1.15] } : {
+          rotateY: [0, 4, -4, 0],
+          rotateX: [0, -3, 3, 0],
+        }}
+        transition={isOpen ? { duration: 0.7, ease: 'easeInOut' } : {
+          duration: 6, repeat: Infinity, ease: 'easeInOut',
+        }}
+      >
+        <svg viewBox="0 0 260 260" width="260" height="260" style={{ overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="boxFront" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={accentLight} />
+              <stop offset="100%" stopColor={primary} />
+            </linearGradient>
+            <linearGradient id="boxTop" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor={primary} />
+              <stop offset="100%" stopColor={accentLight} />
+            </linearGradient>
+            <linearGradient id="boxSide" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor={accentDark} />
+              <stop offset="100%" stopColor={primary} />
+            </linearGradient>
+            <linearGradient id="lidFront" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={accentLight} stopOpacity="0.95"/>
+              <stop offset="100%" stopColor={primary} stopOpacity="0.9"/>
+            </linearGradient>
+            <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fff" stopOpacity="0.85"/>
+              <stop offset="100%" stopColor="#fff" stopOpacity="0.45"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="16" stdDeviation="18" floodColor={primary} floodOpacity="0.55"/>
+            </filter>
+          </defs>
+
+          {/* Ambient Glow */}
+          <ellipse cx="130" cy="228" rx="72" ry="14" fill={primary} opacity="0.35" filter="url(#glow)" />
+
+          {/* Box faces */}
+          <path d="M178,108 L218,88 L218,188 L178,208 Z" fill="url(#boxSide)" filter="url(#shadow)" />
+          <path d="M82,108 L178,108 L178,208 L82,208 Z" fill="url(#boxFront)" />
+          <path d="M82,108 L122,88 L218,88 L178,108 Z" fill="url(#boxTop)" />
+
+          {/* Ribbon */}
+          <path d="M124,108 L136,108 L136,208 L124,208 Z" fill="url(#ribbon)" />
+          <path d="M82,148 L178,148 L178,160 L82,160 Z" fill="url(#ribbon)" />
+          <path d="M178,148 L218,128 L218,140 L178,160 Z" fill="url(#ribbon)" opacity="0.6"/>
+
+          {/* Lid animation group */}
+          <motion.g
+            animate={isOpen ? { y: -45, rotate: -18, opacity: 0 } : { y: 0, rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: isOpen ? 0.1 : 0 }}
+            style={{ originX: '130px', originY: '88px' }}
+          >
+            <path d="M178,92 L218,72 L218,90 L178,110 Z" fill="url(#boxSide)" opacity="0.85" />
+            <path d="M82,92 L178,92 L178,110 L82,110 Z" fill="url(#lidFront)" />
+            <path d="M82,92 L122,72 L218,72 L178,92 Z" fill="url(#boxTop)" opacity="0.95" />
+            <path d="M124,92 L136,92 L136,110 L124,110 Z" fill="url(#ribbon)" />
+            <path d="M82,92 L178,92 L178,96 L82,96 Z" fill="url(#ribbon)" opacity="0.5" />
+
+            {/* Bow ribbon */}
+            <ellipse cx="115" cy="68" rx="20" ry="13" fill={primary} opacity="0.9" transform="rotate(-20,115,68)" />
+            <ellipse cx="113" cy="66" rx="13" ry="8" fill={accentLight} opacity="0.6" transform="rotate(-20,113,66)" />
+            <ellipse cx="147" cy="65" rx="20" ry="13" fill={primary} opacity="0.9" transform="rotate(20,147,65)" />
+            <ellipse cx="149" cy="63" rx="13" ry="8" fill={accentLight} opacity="0.6" transform="rotate(20,149,63)" />
+            <ellipse cx="130" cy="67" rx="9" ry="7" fill="#fff" opacity="0.9" />
+          </motion.g>
+        </svg>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Sparkle animation
+function Sparkle({ x, y, delay, size = 6, color = '#fff' }) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{ left: x, top: y, width: size, height: size }}
+      animate={{ scale: [0, 1.4, 0], opacity: [0, 1, 0], rotate: [0, 90, 180] }}
+      transition={{ duration: 1.5 + Math.random(), delay, repeat: Infinity, repeatDelay: 2 + Math.random() * 4 }}
+    >
+      <svg viewBox="0 0 24 24" width={size} height={size} fill={color}>
+        <path d="M12 2 L13.5 10 L22 12 L13.5 14 L12 22 L10.5 14 L2 12 L10.5 10 Z" />
+      </svg>
+    </motion.div>
+  );
+}
+
+export default function BirthdayTemplate1({ siteData, onUnlock }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const primary    = siteData?.themeColors?.bday1?.primary    || '#8b5cf6';
+  const accentLight = lighten(primary, 40);
+  const accentDark  = darken(primary, 25);
+
+  const particles = useRef(
+    Array.from({ length: 32 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      size: 3 + Math.random() * 7,
+      color: [primary, accentLight, '#fff', '#fbbf24', '#f472b6'][i % 5],
+      delay: Math.random() * 8,
+      duration: 5 + Math.random() * 7,
+    }))
+  ).current;
+
+  const sparkles = useRef(
+    Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      x: `${5 + Math.random() * 90}%`,
+      y: `${5 + Math.random() * 85}%`,
+      delay: Math.random() * 4,
+      size: 8 + Math.random() * 10,
+      color: [primary, accentLight, '#fff', '#fbbf24'][i % 4],
+    }))
+  ).current;
+
+  const handleOpen = () => {
+    if (opened) return;
+    setOpened(true);
+    setTimeout(() => {
+      setUnlocked(true);
+      if (onUnlock) onUnlock();
+    }, 900);
+  };
+
+  return (
+    <MidnightCountdown unlockTime={siteData?.unlockTime}>
+      <AnimatePresence mode="wait">
+        {!unlocked ? (
+          <motion.div
+            key="lockscreen"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+            style={{ background: `radial-gradient(ellipse at 50% 60%, ${primary}22 0%, #0f0a1a 55%, #080510 100%)` }}
+            exit={{ opacity: 0, scale: 1.06 }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: `linear-gradient(${primary}08 1px, transparent 1px), linear-gradient(90deg, ${primary}08 1px, transparent 1px)`,
+                backgroundSize: '40px 40px',
+              }}
+            />
+
+            {particles.map(p => <Particle key={p.id} {...p} />)}
+            {sparkles.map(s => <Sparkle key={s.id} {...s} />)}
+
+            <div className="absolute pointer-events-none"
+              style={{
+                width: 500, height: 500,
+                background: `radial-gradient(circle, ${primary}18 0%, transparent 70%)`,
+                top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+              }}
+            />
+
+            <motion.div
+              className="text-center mb-10 relative z-10"
+              initial={{ opacity: 0, y: -30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <motion.p
+                className="text-xs font-black uppercase tracking-[0.4em] mb-3"
+                style={{ color: primary }}
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                ✨ Something Special Awaits ✨
+              </motion.p>
+              <h1 className="text-5xl md:text-6xl font-black leading-tight"
+                style={{
+                  background: `linear-gradient(135deg, #fff 30%, ${accentLight})`,
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.2))',
+                }}
+              >
+                A Gift<br />
+                <span style={{
+                  background: `linear-gradient(135deg, ${accentLight}, ${primary})`,
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                }}>
+                  For You!
+                </span>
+              </h1>
+            </motion.div>
+
+            <motion.div
+              className="relative z-10"
+              initial={{ opacity: 0, scale: 0.5, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.5 }}
+            >
+              <Gift3D primary={primary} accentLight={accentLight} accentDark={accentDark}
+                onClick={handleOpen} isOpen={opened} />
+            </motion.div>
+
+            <motion.div
+              className="mt-10 relative z-10 flex flex-col items-center gap-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1 }}
+            >
+              <motion.div
+                className="flex items-center gap-2 px-6 py-3 rounded-full border font-bold text-sm uppercase tracking-widest"
+                style={{
+                  color: primary,
+                  borderColor: `${primary}50`,
+                  background: `${primary}12`,
+                  backdropFilter: 'blur(8px)',
+                }}
+                animate={{ y: [0, -5, 0], boxShadow: [`0 0 0px ${primary}00`, `0 0 20px ${primary}55`, `0 0 0px ${primary}00`] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>
+                  🎁
+                </motion.span>
+                Tap to Unwrap
+                <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.6 }}>
+                  🎁
+                </motion.span>
+              </motion.div>
+            </motion.div>
+
+            <AnimatePresence>
+              {opened && (
+                <>
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute rounded-full pointer-events-none z-20"
+                      style={{
+                        width: 8 + Math.random() * 12,
+                        height: 8 + Math.random() * 12,
+                        background: [primary, accentLight, '#fbbf24', '#f472b6', '#38bdf8'][i % 5],
+                        left: '50%', top: '50%',
+                      }}
+                      initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                      animate={{
+                        x: (Math.random() - 0.5) * 600,
+                        y: (Math.random() - 0.5) * 500,
+                        scale: 0,
+                        opacity: 0,
+                      }}
+                      transition={{ duration: 0.9, ease: 'easeOut' }}
+                    />
+                  ))}
+                </>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ) : (
+          <motion.div key="content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+            <BirthdayLandingPage siteData={siteData} themeColors={siteData?.themeColors?.bday1} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// Internal Color helper utilities
+function hexToRgb(hex) {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function toHex(r, g, b) {
+  return '#' + [r, g, b].map(v => Math.min(255, Math.max(0, v)).toString(16).padStart(2, '0')).join('');
+}
+function lighten(hex, amount) {
+  try {
+    const { r, g, b } = hexToRgb(hex);
+    return toHex(r + amount, g + amount, b + amount);
+  } catch { return hex; }
+}
+function darken(hex, amount) {
+  try {
+    const { r, g, b } = hexToRgb(hex);
+    return toHex(r - amount, g - amount, b - amount);
+  } catch { return hex; }
+}
+```
+
+---
+*Generated by EverWish Engine System documentation.*
