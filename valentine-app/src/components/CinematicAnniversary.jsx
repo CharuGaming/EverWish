@@ -540,10 +540,10 @@ function VideoMontage({ url, isMobile }) {
         <Reveal delay={0.2}>
           <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden">
             <video
-              src={getOptimizedVideoUrl(url, isMobile)}
+              src={url}
               controls
               playsInline
-              className="w-full aspect-[9/16] object-cover"
+              className="w-full h-full object-cover"
             />
           </div>
         </Reveal>
@@ -813,7 +813,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
           >
             <video
               ref={introVideoRef}
-              src={optimizeCloudinaryUrl(introVideoUrl, 1080)}
+              src={introVideoUrl}
               className="w-full h-full object-cover"
               playsInline
               onEnded={handleVideoEnd}
@@ -846,7 +846,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                 <video
                   autoPlay loop muted playsInline
                   className="absolute inset-0 w-full h-full object-cover"
-                  src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
+                  src={bgVideoUrl}
                 />
               ) : (
                 <div className="absolute inset-0" style={{ background: heroBg, backgroundSize: 'cover', backgroundPosition: 'center' }} />

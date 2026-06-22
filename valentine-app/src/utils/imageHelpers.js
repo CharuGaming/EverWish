@@ -4,14 +4,18 @@
  * Desktop (!isMobile): q_auto:best,f_auto,w_1920,c_limit
  *   → Full quality, large resolution, no cropping — best for widescreen viewing.
  *
- * Mobile (isMobile): q_auto:good,f_auto,w_720,h_1280,c_fill,g_auto
- *   → Auto-cropped to a 9:16 vertical portrait frame, subject-aware gravity,
- *     massive bandwidth savings on data-limited mobile connections.
+ * Mobile (isMobile): q_auto,f_auto,w_720,c_scale
+ *   → Scaled down for mobile, safer transformation to prevent 400 Bad Request errors.
  *
  * Non-Cloudinary URLs are returned unchanged.
  */
 export function getOptimizedVideoUrl(url, isMobile = false) {
   if (!url || typeof url !== 'string' || !url.includes('res.cloudinary.com')) {
+    return url;
+  }
+
+  // Bypass transformation for video files (Cloudinary Free Tier restriction)
+  if (url.includes('.mp4') || url.includes('.webm') || url.includes('.mov')) {
     return url;
   }
 
@@ -30,7 +34,7 @@ export function getOptimizedVideoUrl(url, isMobile = false) {
   }
 
   const transforms = isMobile
-    ? 'q_auto:good,f_auto,w_720,h_1280,c_fill,g_auto'   // Portrait crop, bandwidth-efficient
+    ? 'q_auto,f_auto,w_720,c_scale'                      // Safer mobile scale
     : 'q_auto:best,f_auto,w_1920,c_limit';               // Full quality, capped at 1920px width
 
   return `${beforeUpload}${transforms}/${afterUpload}`;

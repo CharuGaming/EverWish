@@ -16,7 +16,6 @@ import { optimizeCloudinaryUrl, getOptimizedVideoUrl } from '../utils/imageHelpe
 
 export default function BirthdayTemplate1({ siteData, onUnlock }) {
   const [phase, setPhase]       = useState('idle');   // 'idle' | 'playing' | 'unlocked'
-  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
 
   /* ── Responsive Video: detect mobile screen width ────────────────────── */
@@ -36,7 +35,7 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
   const introVideoUrl        = b.introVideoUrl || '';
   const bgVideoUrl           = b.bgVideoUrl || '';
   
-  const hasVideo             = !!introVideoUrl && !videoError;
+  const hasVideo             = !!introVideoUrl;
 
   /* ── Tap handler ─────────────────────────────────────── */
   const handleTap = useCallback(() => {
@@ -73,15 +72,6 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
     if (onUnlock) onUnlock();
   }, [onUnlock]);
 
-  /* ── Video load error ────────────────────────────────── */
-  const handleVideoError = useCallback(() => {
-    setVideoError(true);
-    if (phase === 'playing') {
-      setPhase('unlocked');
-      if (onUnlock) onUnlock();
-    }
-  }, [phase, onUnlock]);
-
   return (
     <MidnightCountdown unlockTime={siteData?.unlockTime}>
       <AnimatePresence mode="wait">
@@ -109,11 +99,10 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
             {hasVideo && (
               <video
                 ref={videoRef}
-                src={getOptimizedVideoUrl(introVideoUrl, isMobile)}
+                src={introVideoUrl}
                 playsInline
                 preload="metadata"
                 onEnded={handleVideoEnd}
-                onError={handleVideoError}
                 className="absolute inset-0 w-full h-full object-cover z-20"
                 style={{
                   opacity: phase === 'playing' ? 1 : 0,
@@ -192,7 +181,7 @@ export default function BirthdayTemplate1({ siteData, onUnlock }) {
             {/* Base Layer (z-0): Looping HTML5 Background Video (or color fallback) */}
             {bgVideoUrl ? (
               <video
-                src={getOptimizedVideoUrl(bgVideoUrl, isMobile)}
+                src={bgVideoUrl}
                 autoPlay
                 loop
                 muted
