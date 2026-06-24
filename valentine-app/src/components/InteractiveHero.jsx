@@ -3,6 +3,7 @@
  * Floating Polaroid hero with nickname in script font.
  * Used in CinematicBirthday when useInteractiveHero = true.
  */
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
@@ -29,7 +30,18 @@ const FLOAT_VARIANTS = {
 export default function InteractiveHero({ nickname, heroPhotos = [], coupleName, heroSubtitle, onScroll, customTitles }) {
   const displayName = customTitles?.heroMainTitle || nickname || coupleName || 'Happy Birthday!';
   const displaySub = customTitles?.heroSubtitle || heroSubtitle;
-  const photos = heroPhotos.slice(0, 5);
+
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const photos = isMobile ? heroPhotos.slice(0, 3) : heroPhotos.slice(0, 5);
 
   return (
     <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -53,6 +65,7 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
                 rotate: cfg.rotate,
                 scale: cfg.scale,
                 zIndex: cfg.zIndex,
+                willChange: 'transform',
               }}
             >
               {/* Polaroid frame */}

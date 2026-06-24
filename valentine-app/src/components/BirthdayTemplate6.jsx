@@ -14,9 +14,9 @@ const FONT_LINK = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:i
 
 // ── Glass card style (shared) ───────────────────────────────────────
 const GLASS = {
-  background: 'rgba(0,0,0,0.25)',
-  backdropFilter: 'blur(18px)',
-  WebkitBackdropFilter: 'blur(18px)',
+  background: typeof window !== 'undefined' && window.innerWidth < 768 ? 'rgba(15, 12, 10, 0.85)' : 'rgba(0,0,0,0.25)',
+  backdropFilter: typeof window !== 'undefined' && window.innerWidth < 768 ? 'none' : 'blur(18px)',
+  WebkitBackdropFilter: typeof window !== 'undefined' && window.innerWidth < 768 ? 'none' : 'blur(18px)',
   border: '1px solid rgba(255,255,255,0.10)',
   boxShadow: '0 8px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)',
 };
@@ -238,8 +238,10 @@ const ShaderBackground = () => {
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Downscale resolution on mobile devices/smaller screens to improve GPU performance significantly
+      const scale = window.innerWidth < 768 ? 0.25 : 0.5;
+      canvas.width = Math.floor(window.innerWidth * scale);
+      canvas.height = Math.floor(window.innerHeight * scale);
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     window.addEventListener('resize', resize);
