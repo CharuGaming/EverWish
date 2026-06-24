@@ -138,7 +138,6 @@ export default function ClientPage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [playTrigger, setPlayTrigger] = useState(false);
   const [showBurst, setShowBurst] = useState(false);
-
   useEffect(() => {
     getSite(siteId).then(res => {
       if (res.success && res.data) {
@@ -151,8 +150,21 @@ export default function ClientPage() {
       setNotFound(true);
       setLoading(false);
     });
-
   }, [siteId]);
+
+  // Load unlocked state from localStorage on page load
+  useEffect(() => {
+    if (siteData && !siteData.isPreview && siteId) {
+      try {
+        const stored = localStorage.getItem(`everwish_unlocked_${siteId}`);
+        if (stored === 'true') {
+          setIsUnlocked(true);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [siteData, siteId]);
 
   useEffect(() => {
     const handleMessage = (e) => {
@@ -180,7 +192,14 @@ export default function ClientPage() {
   const handleUnlock = useCallback(() => {
     setIsUnlocked(true);
     triggerBurst();
-  }, [triggerBurst]);
+    if (siteId && siteData && !siteData.isPreview) {
+      try {
+        localStorage.setItem(`everwish_unlocked_${siteId}`, 'true');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [triggerBurst, siteId, siteData]);
   
   const handleUnlockImmediate = useCallback(() => setPlayTrigger(true), []);
 

@@ -395,7 +395,22 @@ const IntroVideo = ({ videoUrl, onVideoEnd }) => {
 
 // --- Main Template Component ---
 export default function BirthdayTemplate6({ siteData }) {
-  const [phase, setPhase] = useState(() => siteData?.isPreview ? 'landing' : 'passcode'); // 'passcode' | 'video' | 'landing'
+  const siteId = siteData?.siteId || '';
+  const storageKey = siteId ? `everwish_unlocked_${siteId}` : '';
+
+  const [phase, setPhase] = useState(() => {
+    if (siteData?.isPreview) return 'landing';
+    if (typeof window !== 'undefined' && storageKey) {
+      try {
+        if (localStorage.getItem(storageKey) === 'true') {
+          return 'landing';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return 'passcode';
+  });
 
   useEffect(() => {
     if (siteData?.isPreview && phase === 'passcode') {
@@ -475,7 +490,16 @@ export default function BirthdayTemplate6({ siteData }) {
             title={passcodeTitle}
             hint={passcodeHint}
             targetPasscode={passcodeTarget}
-            onUnlock={() => setPhase('video')}
+            onUnlock={() => {
+              if (storageKey && !siteData?.isPreview) {
+                try {
+                  localStorage.setItem(storageKey, 'true');
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+              setPhase('video');
+            }}
           />
         )}
 

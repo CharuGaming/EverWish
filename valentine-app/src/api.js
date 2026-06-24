@@ -236,6 +236,7 @@ export async function updateOrderStatus(orderId, status) {
 export function toComponentData(doc) {
   if (!doc) return null;
   return {
+    siteId:           doc.siteId || doc._id || '',
     isActive:         doc.isActive !== false,
     expiresAt:        doc.expiresAt,
     introButtonText:  doc.introButtonText || 'Tap to Open',
