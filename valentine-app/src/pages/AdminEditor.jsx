@@ -2478,6 +2478,33 @@ function CinBdayGeneralTab({ doc, setDoc }) {
         </div>
       </Card>
 
+      {doc.templateType === 'bday6' && (
+        <Card title="Header Layout Labels">
+          <div className="mb-5">
+            <Label>Hero Badge Text</Label>
+            <TextInput
+              value={doc.bday6?.heroBadge || ''}
+              onChange={e => {
+                const badge = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), heroBadge: badge } }));
+              }}
+              placeholder="e.g. 🎂 Happy Birthday / 2004.06.26"
+            />
+          </div>
+          <div>
+            <Label>Scroll Assist Text</Label>
+            <TextInput
+              value={doc.bday6?.scrollText || ''}
+              onChange={e => {
+                const scroll = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), scrollText: scroll } }));
+              }}
+              placeholder="e.g. Scroll to explore / Pallehata yamuda..."
+            />
+          </div>
+        </Card>
+      )}
+
       <Card title="Cinematic Video Elements">
         <div className="mb-5">
           <Label>Custom Intro Button Text</Label>
@@ -2528,7 +2555,46 @@ function CinBdayGiftTab({ doc, setDoc }) {
         />
       </div>
     </Card>
-  );
+
+    {doc.templateType === 'bday6' && (
+      <Card title="Gift Section Labels">
+        <div className="mb-4">
+          <Label>Gift Section Title</Label>
+          <TextInput
+            value={doc.bday6?.giftSectionTitle || ''}
+            onChange={e => {
+              const val = e.target.value;
+              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionTitle: val } }));
+            }}
+            placeholder="e.g. A Gift For You"
+          />
+        </div>
+        <div className="mb-4">
+          <Label>Gift Section Subtitle</Label>
+          <TextInput
+            value={doc.bday6?.giftSectionSubtitle || ''}
+            onChange={e => {
+              const val = e.target.value;
+              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionSubtitle: val } }));
+            }}
+            placeholder="e.g. Something special, just for you 🎁"
+          />
+        </div>
+        <div>
+          <Label>Gift Unwrap Button Text</Label>
+          <TextInput
+            value={doc.bday6?.giftUnwrapText || ''}
+            onChange={e => {
+              const val = e.target.value;
+              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftUnwrapText: val } }));
+            }}
+            placeholder="e.g. Tap to Unwrap 🎀 / ඔබන්න"
+          />
+        </div>
+      </Card>
+    )}
+  </>
+);
 }
 
 // ── Cinematic Birthday: Year Recap & Bucket List ──────────────────
@@ -2553,6 +2619,71 @@ function CinBdayRecapTab({ doc, setDoc }) {
           rows={8}
         />
       </Card>
+
+      {doc.templateType === 'bday6' && (
+        <Card title="Year Recap Section Labels">
+          <div className="mb-4">
+            <Label>Year Recap Section Icon</Label>
+            <TextInput
+              value={doc.bday6?.yearRecapIcon || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), yearRecapIcon: val } }));
+              }}
+              placeholder="e.g. 🌟 / ✨"
+            />
+          </div>
+          <div>
+            <Label>Year Recap Section Title</Label>
+            <TextInput
+              value={doc.bday6?.yearRecapTitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), yearRecapTitle: val } }));
+              }}
+              placeholder="e.g. Your Year in Review / Mathakada Handawe"
+            />
+          </div>
+        </Card>
+      )}
+
+      {doc.templateType === 'bday6' && (
+        <Card title="Bucket List Section Labels">
+          <div className="mb-4">
+            <Label>Bucket List Section Icon</Label>
+            <TextInput
+              value={doc.bday6?.bucketListIcon || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), bucketListIcon: val } }));
+              }}
+              placeholder="e.g. ✅ / 📝"
+            />
+          </div>
+          <div className="mb-4">
+            <Label>Bucket List Section Title</Label>
+            <TextInput
+              value={doc.bday6?.bucketListTitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), bucketListTitle: val } }));
+              }}
+              placeholder="e.g. Birthday Bucket List / Things to do today!"
+            />
+          </div>
+          <div>
+            <Label>Bucket List Section Subtitle</Label>
+            <TextInput
+              value={doc.bday6?.bucketListSubtitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), bucketListSubtitle: val } }));
+              }}
+              placeholder="e.g. Things to do today! / Projects..."
+            />
+          </div>
+        </Card>
+      )}
 
       <Card title="Birthday Bucket List">
         <p className="text-[11px] text-slate-500 mb-4">Things to do on their birthday. Each item is revealed with a scroll animation.</p>
@@ -2581,7 +2712,10 @@ function CinBdayRecapTab({ doc, setDoc }) {
 // ── Cinematic Birthday: Music & Lyrics ────────────────────────────
 function CinBdayMusicTab({ doc, setDoc }) {
   const cb = doc.cinematicBirthday || {};
-  const up = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+  const b6 = doc.bday6 || {};
+  
+  const upCb = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
+  const upB6 = (f, v) => setDoc(d => ({ ...d, bday6: { ...(d.bday6||{}), [f]: v } }));
 
   return (
     <>
@@ -2590,15 +2724,37 @@ function CinBdayMusicTab({ doc, setDoc }) {
           label="Birthday Song"
           hint="Upload an MP3 or paste a direct audio URL"
           value={cb.songAudioUrl}
-          onChange={v => up('songAudioUrl', v)}
+          onChange={v => upCb('songAudioUrl', v)}
         />
       </Card>
+
+      {doc.templateType === 'bday6' && (
+        <Card title="Music Player Labels">
+          <div className="mb-4">
+            <Label>Song Title</Label>
+            <TextInput
+              value={b6.songSectionTitle || ''}
+              onChange={e => upB6('songSectionTitle', e.target.value)}
+              placeholder="e.g. Mathakada Handawe..."
+            />
+          </div>
+          <div>
+            <Label>Song Subtitle / Caption</Label>
+            <TextInput
+              value={b6.songSectionSubtitle || ''}
+              onChange={e => upB6('songSectionSubtitle', e.target.value)}
+              placeholder="e.g. Ahala Balannako"
+            />
+          </div>
+        </Card>
+      )}
+
       <Card title="Song Lyrics">
         <Label>Lyrics</Label>
         <p className="text-[11px] text-slate-500 mb-2">Displayed below the audio player with a soft glow effect.</p>
         <TextArea
           value={cb.songLyrics || ''}
-          onChange={e => up('songLyrics', e.target.value)}
+          onChange={e => upCb('songLyrics', e.target.value)}
           placeholder="Paste song lyrics here…"
           rows={10}
         />
@@ -2675,6 +2831,45 @@ function CinBdayGalleryTab({ doc, setDoc }) {
           rows={3}
         />
       </div>
+
+      {doc.templateType === 'bday6' && (
+        <div className="mt-6 border-t border-slate-700/50 pt-5 space-y-4">
+          <h3 className="text-sm font-semibold text-slate-200">Gallery & Footer Labels</h3>
+          <div>
+            <Label>Gallery Section Icon</Label>
+            <TextInput
+              value={doc.bday6?.gallerySectionIcon || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), gallerySectionIcon: val } }));
+              }}
+              placeholder="e.g. 📸 / 💝"
+            />
+          </div>
+          <div>
+            <Label>Gallery Section Subtitle</Label>
+            <TextInput
+              value={doc.bday6?.gallerySectionSubtitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), gallerySectionSubtitle: val } }));
+              }}
+              placeholder="e.g. Tap a photo to relive the moment / Captured moments"
+            />
+          </div>
+          <div>
+            <Label>Footer Text</Label>
+            <TextInput
+              value={doc.bday6?.footerText || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), footerText: val } }));
+              }}
+              placeholder="e.g. Made with ❤️ / EVERWISH"
+            />
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
