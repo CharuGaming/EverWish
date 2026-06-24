@@ -8,6 +8,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import OptimizedImage from './OptimizedImage';
 
 const FONT_LINK =
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,400&family=Dancing+Script:wght@500;700&display=swap';
@@ -62,11 +63,12 @@ export default function HeartMemoryGallery({ photos = [], labels = [], showCapti
               >
                 {/* Photo: Uncropped (h-auto) */}
                 {img ? (
-                  <img
-                    src={optimizeCloudinaryUrl(img, 600)}
+                  <OptimizedImage
+                    src={img}
                     alt={memLabels[i]}
-                    className="w-full h-auto rounded-sm shadow-inner"
-                    style={{ display: 'block' }}
+                    width={600}
+                    className="w-full rounded-sm shadow-inner"
+                    style={{ display: 'block', height: 'auto' }}
                     draggable={false}
                     loading="lazy"
                   />
@@ -144,12 +146,14 @@ export default function HeartMemoryGallery({ photos = [], labels = [], showCapti
               transition={{ type: 'spring', stiffness: 340, damping: 32 }}
             >
               {/* Full image — contain so it never crops */}
-              <img
-                src={optimizeCloudinaryUrl(imgs[selected], 1200)}
+              <OptimizedImage
+                src={imgs[selected]}
                 alt={memLabels[selected]}
+                width={1200}
                 className="w-full h-full"
                 style={{ objectFit: 'contain' }}
                 draggable={false}
+                loading="eager"
               />
 
               {/* Label bar */}

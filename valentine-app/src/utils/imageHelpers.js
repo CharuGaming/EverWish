@@ -77,3 +77,52 @@ export function optimizeCloudinaryUrl(url, width = 800) {
 
   return `${parts[0]}/upload/f_auto,q_auto,c_scale,w_${width}/${parts[1]}`;
 }
+
+/**
+ * Generates a tiny, highly compressed blurred placeholder URL for Cloudinary images.
+ */
+export function getBlurPlaceholderUrl(url) {
+  if (!url || typeof url !== 'string' || !url.includes('res.cloudinary.com')) {
+    return null;
+  }
+  
+  // Guard: if it's a video, no image placeholder
+  const isVideo = url.includes('/video/') || /\.(mp4|webm|mov|m4v|ogv|3gp)($|\?)/i.test(url.split('?')[0]);
+  if (isVideo) return null;
+
+  const parts = url.split('/upload/');
+  if (parts.length < 2) return null;
+
+  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
+  if (parts[1].split('.').length > 2) {
+    return null;
+  }
+
+  return `${parts[0]}/upload/f_auto,q_10,w_40,e_blur:1000/${parts[1]}`;
+}
+
+/**
+ * Generates a poster image URL for a video.
+ * If Cloudinary, generates a optimized frame-0 thumbnail.
+ * If not Cloudinary, returns empty so browser falls back.
+ */
+export function getVideoPosterUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  if (url.includes('res.cloudinary.com')) {
+    // Standardize url to remove query parameters
+    const base = url.split('?')[0];
+    // Change extension to jpg to request a thumbnail image
+    const cleanUrl = base.replace(/\.(mp4|webm|mov|m4v|ogv|3gp)$/i, '.jpg');
+    
+    const uploadMarker = '/upload/';
+    const uploadIdx = cleanUrl.indexOf(uploadMarker);
+    if (uploadIdx !== -1) {
+      const beforeUpload = cleanUrl.slice(0, uploadIdx + uploadMarker.length);
+      const afterUpload  = cleanUrl.slice(uploadIdx + uploadMarker.length);
+      // Request auto-quality, auto-format, and frame offset 0
+      return `${beforeUpload}f_auto,q_auto,so_0,w_800/${afterUpload}`;
+    }
+    return cleanUrl;
+  }
+  return '';
+}

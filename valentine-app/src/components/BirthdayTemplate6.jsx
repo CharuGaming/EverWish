@@ -5,7 +5,8 @@ import { Play, Pause, Volume2, VolumeX, Music2, Gift, ChevronDown, Check } from 
 import InteractiveHero from './InteractiveHero';
 import LoveLetterEnvelope from './LoveLetterEnvelope';
 import HeartMemoryGallery from './HeartMemoryGallery';
-import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import { optimizeCloudinaryUrl, getVideoPosterUrl } from '../utils/imageHelpers';
+import OptimizedImage from './OptimizedImage';
 import BorderGlow from './BorderGlow';
 
 // ── Google Fonts ────────────────────────────────────────────────────
@@ -63,10 +64,15 @@ function AudioPlayer({ audioUrl, lyrics, noMusicText }) {
 
   return (
     <div className="space-y-4">
-      <audio ref={audioRef} src={audioUrl} muted={muted}
+      <audio 
+        ref={audioRef} 
+        src={audioUrl} 
+        muted={muted}
+        preload="metadata"
         onTimeUpdate={() => { const t = audioRef.current?.currentTime||0; setCurrent(t); setProgress(duration?(t/duration)*100:0); }}
         onLoadedMetadata={() => setDuration(audioRef.current?.duration||0)}
-        onEnded={() => setPlaying(false)} />
+        onEnded={() => setPlaying(false)} 
+      />
       <div className="flex items-center gap-4">
         <button onClick={toggle} className="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/30 transition-all active:scale-90 flex-shrink-0">
           {playing ? <Pause size={20} className="text-white"/> : <Play size={20} className="text-white ml-0.5"/>}
@@ -127,14 +133,25 @@ function GiftBoxReveal({ giftImageUrl, giftRevealText, tapToUnwrapText }) {
         ) : (
           <motion.div key="opened" initial={{ scale:0.6, opacity:0, y:40 }} animate={{ scale:1, opacity:1, y:0 }}
             transition={{ type:'spring', stiffness:200, damping:18 }} className="text-center max-w-sm">
-            {giftImageUrl
-              ? <motion.img src={optimizeCloudinaryUrl(giftImageUrl, 600)} alt="Gift" initial={{ scale:0, rotate:-10 }} animate={{ scale:1, rotate:0 }}
-                  transition={{ delay:0.2, type:'spring', stiffness:250 }}
+            {giftImageUrl ? (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 250 }}
+                className="w-48 h-48 md:w-56 md:h-56 mx-auto mb-6 shadow-2xl shadow-amber-500/30 border-2 border-amber-400/30 rounded-3xl overflow-hidden"
+              >
+                <OptimizedImage
+                  src={giftImageUrl}
+                  alt="Gift"
+                  width={600}
+                  className="w-full h-full object-cover"
                   loading="lazy"
-                  className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-3xl mx-auto mb-6 shadow-2xl shadow-amber-500/30 border-2 border-amber-400/30"/>
-              : <motion.div initial={{ scale:0 }} animate={{ scale:1 }} transition={{ delay:0.2, type:'spring' }}
-                  className="text-8xl mb-6">🎁</motion.div>
-            }
+                />
+              </motion.div>
+            ) : (
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }}
+                className="text-8xl mb-6">🎁</motion.div>
+            )}
             {giftRevealText && (
               <motion.p initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.5 }}
                 className="text-white/90 text-lg md:text-xl font-light italic leading-relaxed px-4"
@@ -340,6 +357,8 @@ const PasscodeScreen = ({ title, hint, targetPasscode, onUnlock }) => {
 
 // --- Intro Video Component ---
 const IntroVideo = ({ videoUrl, onVideoEnd }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <motion.div 
       className="fixed inset-0 z-50 bg-black flex items-center justify-center"
@@ -348,16 +367,25 @@ const IntroVideo = ({ videoUrl, onVideoEnd }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 1 }}
     >
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black">
+          <div className="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mb-4" />
+          <p className="text-white/60 text-sm font-sans tracking-wide">Loading celebration...</p>
+        </div>
+      )}
       <video 
         src={videoUrl}
         autoPlay 
         playsInline 
+        poster={getVideoPosterUrl(videoUrl)}
+        onPlay={() => setIsLoading(false)}
+        onLoadedData={() => setIsLoading(false)}
         onEnded={onVideoEnd}
         className="w-full h-full object-cover"
       />
       <button 
         onClick={onVideoEnd}
-        className="absolute top-8 right-8 text-white/50 hover:text-white transition px-4 py-2 bg-black/30 rounded-full text-sm backdrop-blur-md"
+        className="absolute top-8 right-8 z-20 text-white/50 hover:text-white transition px-4 py-2 bg-black/30 rounded-full text-sm backdrop-blur-md"
       >
         Skip
       </button>
@@ -470,9 +498,15 @@ export default function BirthdayTemplate6({ siteData }) {
             {/* ══ GLOBAL FIXED BACKGROUND ══════════════════════════════════ */}
             <div className="fixed inset-0 w-full h-full" style={{ zIndex: -1 }}>
               {bgVideoUrl ? (
-                <video autoPlay loop muted playsInline
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  poster={getVideoPosterUrl(bgVideoUrl)}
                   className="absolute inset-0 w-full h-full object-cover"
-                  src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}/>
+                  src={optimizeCloudinaryUrl(bgVideoUrl, 1080)}
+                />
               ) : (
                 <div className="absolute inset-0"
                   style={{ background: 'radial-gradient(ellipse at 40% 40%, #3d1a00 0%, #1a0800 50%, #0a0806 100%)' }}/>

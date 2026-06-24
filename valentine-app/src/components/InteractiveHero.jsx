@@ -5,7 +5,7 @@
  */
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { optimizeCloudinaryUrl } from '../utils/imageHelpers';
+import OptimizedImage from './OptimizedImage';
 
 const SCRIPT_FONT = "'Dancing Script', cursive";
 
@@ -63,9 +63,12 @@ export default function InteractiveHero({ nickname, heroPhotos = [], coupleName,
                 borderRadius: '4px',
                 width: '150px',
               }}>
-                <img src={optimizeCloudinaryUrl(url, 400)} alt={`Memory ${i+1}`}
-                  className="w-full object-cover rounded-sm"
-                  style={{ height: '140px' }}
+                <OptimizedImage
+                  src={url}
+                  alt={`Memory ${i+1}`}
+                  width={400}
+                  className="w-full rounded-sm"
+                  style={{ height: '140px', objectFit: 'cover' }}
                   draggable={false}
                   loading="lazy"
                 />
