@@ -17,7 +17,7 @@ const DEFAULT_LABELS = ['Proposal 💍', 'First Date ☕', 'Our Travels ✈️',
 // Randomish rotations for the polaroids to look natural and scattered
 const ROTATIONS = [-3, 2, -1, 3, -2, 1];
 
-export default function HeartMemoryGallery({ photos = [], labels = [] }) {
+export default function HeartMemoryGallery({ photos = [], labels = [], showCaptions = true }) {
   const [selected, setSelected]     = useState(null);
   const [originRect, setOriginRect] = useState(null);
   const itemRefs = useRef([]);
@@ -51,7 +51,7 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
             >
               <motion.div
                 ref={el => (itemRefs.current[i] = el)}
-                className="bg-[#FDFBF7] p-3 pb-10 sm:p-4 sm:pb-12 rounded-sm shadow-xl cursor-pointer"
+                className={`bg-[#FDFBF7] p-3 rounded-sm shadow-xl cursor-pointer ${showCaptions ? 'pb-10 sm:pb-12' : 'pb-4 sm:pb-4'}`}
                 style={{ 
                   border: '1px solid rgba(0,0,0,0.05)'
                 }}
@@ -78,16 +78,18 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
                 )}
 
                 {/* Polaroid Caption */}
-                <div className="absolute bottom-3 left-0 right-0 text-center pointer-events-none px-2">
-                  <span
-                    className="text-[#3B2F25] text-base sm:text-lg font-bold"
-                    style={{
-                      fontFamily: "'Dancing Script', cursive",
-                    }}
-                  >
-                    {memLabels[i]}
-                  </span>
-                </div>
+                {showCaptions && (
+                  <div className="absolute bottom-3 left-0 right-0 text-center pointer-events-none px-2">
+                    <span
+                      className="text-[#3B2F25] text-base sm:text-lg font-bold"
+                      style={{
+                        fontFamily: "'Dancing Script', cursive",
+                      }}
+                    >
+                      {memLabels[i]}
+                    </span>
+                  </div>
+                )}
               </motion.div>
             </div>
           ))}
@@ -151,22 +153,24 @@ export default function HeartMemoryGallery({ photos = [], labels = [] }) {
               />
 
               {/* Label bar */}
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 px-6 py-6"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.4 }}
-                style={{
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                }}
-              >
-                <p
-                  className="text-white text-3xl text-center"
-                  style={{ fontFamily: "'Dancing Script', cursive" }}
+              {showCaptions && (
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 px-6 py-6"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25, duration: 0.4 }}
+                  style={{
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
+                  }}
                 >
-                  {memLabels[selected]}
-                </p>
-              </motion.div>
+                  <p
+                    className="text-white text-3xl text-center"
+                    style={{ fontFamily: "'Dancing Script', cursive" }}
+                  >
+                    {memLabels[selected]}
+                  </p>
+                </motion.div>
+              )}
 
               {/* Close button */}
               <button

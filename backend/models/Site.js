@@ -202,6 +202,7 @@ const SiteSchema = new mongoose.Schema(
       heroPhotos:         { type: [String], default: [] },
       useInteractiveHero: { type: Boolean,  default: false },
       loveLetterContent:  { type: String,   default: '' },
+      galleryMessage:     { type: String,   default: '' },
     },
     // ── Bday6 Template ──────────────────────────────────────────────
     bday6: {

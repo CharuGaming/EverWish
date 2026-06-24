@@ -158,9 +158,13 @@ export default function ClientPage() {
     const handleMessage = (e) => {
       if (e.data) {
         if (e.data.type === 'EVERWISH_PREVIEW_UPDATE') {
-          setSiteData(toComponentData(e.data.data));
+          const newData = toComponentData(e.data.data);
+          if (newData) newData.isPreview = true;
+          setSiteData(newData);
         } else if (e.data.type === 'SYNC_DATA') {
-          setSiteData(toComponentData(e.data.payload));
+          const newData = toComponentData(e.data.payload);
+          if (newData) newData.isPreview = true;
+          setSiteData(newData);
         }
       }
     };

@@ -367,7 +367,13 @@ const IntroVideo = ({ videoUrl, onVideoEnd }) => {
 
 // --- Main Template Component ---
 export default function BirthdayTemplate6({ siteData }) {
-  const [phase, setPhase] = useState('passcode'); // 'passcode' | 'video' | 'landing'
+  const [phase, setPhase] = useState(() => siteData?.isPreview ? 'landing' : 'passcode'); // 'passcode' | 'video' | 'landing'
+
+  useEffect(() => {
+    if (siteData?.isPreview && phase === 'passcode') {
+      setPhase('landing');
+    }
+  }, [siteData?.isPreview, phase]);
 
   const passcodeData = siteData?.passcode || {};
   const passcodeTitle = passcodeData.title || "Enter Code";
@@ -377,10 +383,16 @@ export default function BirthdayTemplate6({ siteData }) {
 
   const bday6Data = siteData?.bday6 || {};
   const cinematicBirthday = siteData?.cinematicBirthday || {};
+  const recipientName = siteData?.general?.coupleName || '';
 
   const heroBadge = bday6Data.heroBadge || "🎂 Happy Birthday";
-  const heroTitle = bday6Data.heroTitle || "Happy Birthday, Jamie!";
-  const heroSubtitle = bday6Data.heroSubtitle || "Today is all about you ✨";
+  const heroTitle = siteData?.customTitles?.heroMainTitle 
+    || (bday6Data.heroTitle && bday6Data.heroTitle !== 'Happy Birthday' ? bday6Data.heroTitle : '')
+    || (recipientName ? `Happy Birthday, ${recipientName}!` : "Happy Birthday, Jamie!");
+  const heroSubtitle = siteData?.customTitles?.heroSubtitle 
+    || (bday6Data.heroSubtitle && bday6Data.heroSubtitle !== 'A cinematic celebration...' ? bday6Data.heroSubtitle : '')
+    || siteData?.general?.heroSubtitle 
+    || "Today is all about you ✨";
   const scrollText = bday6Data.scrollText || "Scroll to explore";
   const giftSectionTitle = bday6Data.giftSectionTitle || "A Gift For You";
   const giftSectionSubtitle = bday6Data.giftSectionSubtitle || "Something special, just for you 🎁";
@@ -393,23 +405,23 @@ export default function BirthdayTemplate6({ siteData }) {
   const songSectionTitle = bday6Data.songSectionTitle || "Your Birthday Song";
   const songSectionSubtitle = bday6Data.songSectionSubtitle || "Play it loud 🎵";
   const gallerySectionIcon = bday6Data.gallerySectionIcon || "💝";
-  const gallerySectionTitle = bday6Data.gallerySectionTitle || "Our Memories";
+  const gallerySectionTitle = siteData?.customTitles?.gallerySectionTitle || bday6Data.gallerySectionTitle || "Our Memories";
   const gallerySectionSubtitle = bday6Data.gallerySectionSubtitle || "Tap a photo to relive the moment";
-  const footerText = bday6Data.footerText || "Made with love · EverWish";
+  const footerText = bday6Data.footerText || (recipientName ? `Made with ❤️ for ${recipientName}` : "Made with love · EverWish");
   const noMusicText = bday6Data.noMusicText || "No music uploaded yet";
 
   const bgVideoUrl = cinematicBirthday.bgVideoUrl || '';
-  const giftImageUrl = cinematicBirthday.giftImageUrl || '';
-  const giftRevealText = cinematicBirthday.giftRevealText || '';
+  const giftImageUrl = cinematicBirthday.giftImageUrl || siteData?.virtualGift?.giftImageUrl || '';
+  const giftRevealText = cinematicBirthday.giftRevealText || siteData?.virtualGift?.giftMessage || '';
   const yearRecapText = cinematicBirthday.yearRecapText || '';
   const birthdayBucketList = cinematicBirthday.birthdayBucketList || [];
-  const songAudioUrl = cinematicBirthday.songAudioUrl || '';
+  const songAudioUrl = cinematicBirthday.songAudioUrl || siteData?.musicUrl || '';
   const songLyrics = cinematicBirthday.songLyrics || '';
   const galleryImages = cinematicBirthday.galleryImages || [];
   const nickname = cinematicBirthday.nickname || '';
   const heroPhotos = cinematicBirthday.heroPhotos || [];
   const useInteractiveHero = cinematicBirthday.useInteractiveHero ?? false;
-  const loveLetterContent = cinematicBirthday.loveLetterContent || '';
+  const loveLetterContent = cinematicBirthday.loveLetterContent || siteData?.general?.loveLetterText || '';
 
   const allGalleryImages = [
     ...galleryImages,
@@ -634,8 +646,15 @@ export default function BirthdayTemplate6({ siteData }) {
                     <p className="text-white/50 text-sm mt-2">{gallerySectionSubtitle}</p>
                   </Reveal>
                   <Reveal delay={0.15}>
-                    <HeartMemoryGallery photos={allGalleryImages} />
+                    <HeartMemoryGallery photos={allGalleryImages} showCaptions={false} />
                   </Reveal>
+                  {cinematicBirthday.galleryMessage && (
+                    <Reveal delay={0.2} className="text-center mt-8 max-w-xl mx-auto px-4">
+                      <p className="text-white/70 text-sm font-light leading-relaxed tracking-wide whitespace-pre-line italic">
+                        {cinematicBirthday.galleryMessage}
+                      </p>
+                    </Reveal>
+                  )}
                 </div>
               </section>
             )}

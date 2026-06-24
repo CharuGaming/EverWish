@@ -182,10 +182,17 @@ export default function CinematicBirthday({ siteData = {} }) {
     heroPhotos         = [],
     useInteractiveHero = false,
     loveLetterContent  = '',
+    galleryMessage     = '',
   } = cinematicBirthday || {};
 
-  const [phase, setPhase] = useState('intro');
+  const [phase, setPhase] = useState(() => siteData?.isPreview ? 'hero' : 'intro');
   const introVideoRef = useRef(null);
+
+  useEffect(() => {
+    if (siteData?.isPreview && (phase === 'intro' || phase === 'playing')) {
+      setPhase('hero');
+    }
+  }, [siteData?.isPreview, phase]);
 
   const handleTap = useCallback(() => {
     if (introVideoUrl) { setPhase('playing'); setTimeout(() => introVideoRef.current?.play(), 100); }
@@ -445,6 +452,13 @@ export default function CinematicBirthday({ siteData = {} }) {
                   <Reveal delay={0.15}>
                     <HeartMemoryGallery photos={allGalleryImages} />
                   </Reveal>
+                  {galleryMessage && (
+                    <Reveal delay={0.2} className="text-center mt-8 max-w-xl mx-auto px-4">
+                      <p className="text-white/70 text-sm font-light leading-relaxed tracking-wide whitespace-pre-line italic">
+                        {galleryMessage}
+                      </p>
+                    </Reveal>
+                  )}
                 </div>
               </section>
             )}

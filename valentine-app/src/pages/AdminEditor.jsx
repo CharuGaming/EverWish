@@ -5,7 +5,7 @@ import {
   Save, ArrowLeft, Upload, Loader2, CheckCircle2,
   Plus, Trash2, Settings, Music, Gift, MapPin, Image,
   ExternalLink, AlertTriangle, ToggleLeft, ToggleRight, Layers, Sun, Moon, Heart,
-  Share2, Sparkles, Download, UploadCloud, Type
+  Share2, Sparkles, Download, UploadCloud, Type, Lock
 } from 'lucide-react';
 import { generateRandomContent } from '../utils/aiContentBank';
 import { exportConfig, importConfig } from '../utils/configSync';
@@ -2386,6 +2386,71 @@ function CinReasonsTab({ doc, setDoc }) {
   );
 }
 
+// ── Passcode Setup Tab ─────────────────────────────────────────────
+function PasscodeTab({ doc, setDoc }) {
+  const p = doc.passcode || {};
+  const up = (field, val) => setDoc(d => ({
+    ...d,
+    passcode: { ...(d.passcode || {}), [field]: val }
+  }));
+
+  return (
+    <>
+      <Card title="🔒 Passcode Screen Settings">
+        <p className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+          Configure the passcode lock screen that appears when the recipient first opens the link.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <Label>Page Title</Label>
+            <TextInput
+              value={p.title || ''}
+              onChange={e => up('title', e.target.value)}
+              placeholder="e.g. Enter Code"
+            />
+          </div>
+          <div>
+            <Label>Hint Text</Label>
+            <TextInput
+              value={p.hint || ''}
+              onChange={e => up('hint', e.target.value)}
+              placeholder="e.g. Hint: The day you finally said 'YES' to me."
+            />
+          </div>
+          <div>
+            <Label>Target Passcode</Label>
+            <TextInput
+              value={p.targetPasscode || ''}
+              onChange={e => up('targetPasscode', e.target.value)}
+              placeholder="e.g. 0214"
+            />
+          </div>
+        </div>
+      </Card>
+      
+      <Card title="🎬 Passcode Video Interaction">
+        <p className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+          The video shown full screen during or after entering the passcode.
+        </p>
+        <VideoField
+          label="Intro Video"
+          hint="Full-screen video played after entering the correct passcode."
+          value={p.videoUrl || ''}
+          onChange={v => up('videoUrl', v)}
+        />
+        {p.videoUrl && (
+          <button
+            onClick={() => up('videoUrl', '')}
+            className="text-xs text-red-400 hover:text-red-500 underline cursor-pointer mt-2 block"
+          >
+            Remove Video
+          </button>
+        )}
+      </Card>
+    </>
+  );
+}
+
 // ── Cinematic Birthday: General & Videos ──────────────────────────
 function CinBdayGeneralTab({ doc, setDoc }) {
   const g  = doc.general  || {};
@@ -2591,6 +2656,25 @@ function CinBdayGalleryTab({ doc, setDoc }) {
         <span className="text-sm text-slate-400 font-medium">{uploading ? 'Uploading…' : 'Upload Photos'}</span>
         <input type="file" accept="image/*" multiple className="hidden" onChange={handleUpload} />
       </label>
+
+      <div className="mt-6 border-t border-slate-700/50 pt-5">
+        <Label>Gallery Footer Message</Label>
+        <p className="text-[10px] text-slate-400 mb-2 leading-relaxed">
+          Type a custom message or quote to be displayed beautifully directly beneath the photo gallery.
+        </p>
+        <TextArea
+          value={cb.galleryMessage || ''}
+          onChange={e => setDoc(d => ({
+            ...d,
+            cinematicBirthday: {
+              ...(d.cinematicBirthday || {}),
+              galleryMessage: e.target.value
+            }
+          }))}
+          placeholder="e.g. Every photo tells a story of our love... ❤️"
+          rows={3}
+        />
+      </div>
     </Card>
   );
 }
@@ -3069,11 +3153,24 @@ export default function AdminEditor() {
   const isProposal         = doc.templateType === 'proposal';
   const isCustom           = doc.templateType === 'custom';
   const isApology          = doc.templateType === 'apology';
-  const isBirthday         = doc.category === 'birthday' && doc.templateType !== 'bday5';
-  const isBirthdayCinematic= doc.templateType === 'bday5';
+  const isBirthday         = doc.category === 'birthday' && doc.templateType !== 'bday5' && doc.templateType !== 'bday6';
+  const isBirthdayCinematic= doc.templateType === 'bday5' || doc.templateType === 'bday6';
   const isCinematic        = doc.templateType === 'cinematic';
   
-  const availableTabs = isBirthdayCinematic ? CINEMATIC_BDAY_TABS
+  const availableTabs = isBirthdayCinematic 
+    ? (doc.templateType === 'bday6' 
+        ? [
+            { id: 'cinbday_general',     label: 'General & Videos',       Icon: Settings },
+            { id: 'passcode',            label: '🔒 Passcode Setup',      Icon: Lock     },
+            { id: 'cinbday_interactive', label: 'Interactive Hero & Letter', Icon: Sparkles },
+            { id: 'cinbday_gift',        label: 'Gift Reveal',             Icon: Gift     },
+            { id: 'cinbday_recap',       label: 'Year Recap',              Icon: CheckCircle2 },
+            { id: 'cinbday_music',       label: 'Music & Lyrics',          Icon: Music    },
+            { id: 'cinbday_gallery',     label: 'Photo Gallery',           Icon: Image    },
+            { id: 'customTitles',        label: 'Typography',              Icon: Type     },
+            { id: 'socialLinks',         label: 'Social Links',            Icon: Share2   },
+          ]
+        : CINEMATIC_BDAY_TABS)
     : isBirthday ? BIRTHDAY_TABS
     : isValentine ? VALENTINE_TABS
     : isProposal ? PROPOSAL_TABS
@@ -3176,6 +3273,7 @@ export default function AdminEditor() {
               ) : isBirthdayCinematic ? (
                 <>
                   {activeTab === 'cinbday_general'     && <CinBdayGeneralTab     doc={doc} setDoc={setDoc} />}
+                  {activeTab === 'passcode'            && <PasscodeTab           doc={doc} setDoc={setDoc} />}
                   {activeTab === 'cinbday_interactive'  && <CinBdayInteractiveTab doc={doc} setDoc={setDoc} />}
                   {activeTab === 'cinbday_gift'         && <CinBdayGiftTab        doc={doc} setDoc={setDoc} />}
                   {activeTab === 'cinbday_recap'        && <CinBdayRecapTab       doc={doc} setDoc={setDoc} />}

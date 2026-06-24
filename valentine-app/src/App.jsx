@@ -9,6 +9,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminEditor    = lazy(() => import("./pages/AdminEditor"));
 const ClientPage     = lazy(() => import("./pages/ClientPage"));
 const Storefront     = lazy(() => import("./pages/Storefront"));
+const WebfrontHome   = lazy(() => import("./pages/WebfrontHome"));
 const DemoPage       = lazy(() => import("./pages/DemoPage"));
 const OrderForm      = lazy(() => import("./pages/OrderForm"));
 const Login          = lazy(() => import("./pages/Login"));
@@ -80,8 +81,11 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-500"><div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div></div>}>
         <Routes>
-          {/* Public storefront — default landing page */}
-          <Route path="/"                  element={<Storefront />} />
+          {/* Landing page */}
+          <Route path="/"                  element={<WebfrontHome />} />
+
+          {/* Full storefront */}
+          <Route path="/storefront"         element={<Storefront />} />
 
           {/* Static hardcoded demo (original) */}
           <Route path="/demo"                  element={<StaticDemo />} />
