@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { optimizeCloudinaryUrl, getBlurPlaceholderUrl } from '../utils/imageHelpers';
 
 /**
@@ -22,6 +22,7 @@ export default function OptimizedImage({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const imgRef = useRef(null);
 
   // Reset loading state if src changes
   useEffect(() => {
@@ -42,6 +43,13 @@ export default function OptimizedImage({
 
   const optimizedSrc = optimizeCloudinaryUrl(src, width);
   const blurSrc = getBlurPlaceholderUrl(src);
+
+  // Check if the image is already cached/complete
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      setIsLoaded(true);
+    }
+  }, [optimizedSrc]);
 
   return (
     <div 
@@ -75,6 +83,7 @@ export default function OptimizedImage({
       {/* 2. Main High-Resolution Image */}
       {!error ? (
         <img
+          ref={imgRef}
           src={optimizedSrc}
           alt={alt}
           loading={loading}
