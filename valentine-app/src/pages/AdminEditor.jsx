@@ -2537,64 +2537,65 @@ function CinBdayGiftTab({ doc, setDoc }) {
   const up = (f, v) => setDoc(d => ({ ...d, cinematicBirthday: { ...(d.cinematicBirthday||{}), [f]: v } }));
 
   return (
-    <Card title="Interactive Gift Box Reveal">
-      <p className="text-[11px] text-slate-500 mb-5">Upload a gift image and write a reveal message. Visitors tap a 3D gift box to open it and reveal your content.</p>
-      <ImageField
-        label="Gift Reveal Image"
-        hint="Shown inside the gift box after tapping."
-        value={cb.giftImageUrl}
-        onChange={v => up('giftImageUrl', v)}
-      />
-      <div className="mt-4">
-        <Label>Gift Reveal Message</Label>
-        <TextArea
-          value={cb.giftRevealText || ''}
-          onChange={e => up('giftRevealText', e.target.value)}
-          placeholder="Happy Birthday! 🎂 This is your special gift…"
-          rows={4}
+    <>
+      <Card title="Interactive Gift Box Reveal">
+        <p className="text-[11px] text-slate-500 mb-5">Upload a gift image and write a reveal message. Visitors tap a 3D gift box to open it and reveal your content.</p>
+        <ImageField
+          label="Gift Reveal Image"
+          hint="Shown inside the gift box after tapping."
+          value={cb.giftImageUrl}
+          onChange={v => up('giftImageUrl', v)}
         />
-      </div>
-    </Card>
-
-    {doc.templateType === 'bday6' && (
-      <Card title="Gift Section Labels">
-        <div className="mb-4">
-          <Label>Gift Section Title</Label>
-          <TextInput
-            value={doc.bday6?.giftSectionTitle || ''}
-            onChange={e => {
-              const val = e.target.value;
-              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionTitle: val } }));
-            }}
-            placeholder="e.g. A Gift For You"
-          />
-        </div>
-        <div className="mb-4">
-          <Label>Gift Section Subtitle</Label>
-          <TextInput
-            value={doc.bday6?.giftSectionSubtitle || ''}
-            onChange={e => {
-              const val = e.target.value;
-              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionSubtitle: val } }));
-            }}
-            placeholder="e.g. Something special, just for you 🎁"
-          />
-        </div>
-        <div>
-          <Label>Gift Unwrap Button Text</Label>
-          <TextInput
-            value={doc.bday6?.giftUnwrapText || ''}
-            onChange={e => {
-              const val = e.target.value;
-              setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftUnwrapText: val } }));
-            }}
-            placeholder="e.g. Tap to Unwrap 🎀 / ඔබන්න"
+        <div className="mt-4">
+          <Label>Gift Reveal Message</Label>
+          <TextArea
+            value={cb.giftRevealText || ''}
+            onChange={e => up('giftRevealText', e.target.value)}
+            placeholder="Happy Birthday! 🎂 This is your special gift…"
+            rows={4}
           />
         </div>
       </Card>
-    )}
-  </>
-);
+
+      {doc.templateType === 'bday6' && (
+        <Card title="Gift Section Labels">
+          <div className="mb-4">
+            <Label>Gift Section Title</Label>
+            <TextInput
+              value={doc.bday6?.giftSectionTitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionTitle: val } }));
+              }}
+              placeholder="e.g. A Gift For You"
+            />
+          </div>
+          <div className="mb-4">
+            <Label>Gift Section Subtitle</Label>
+            <TextInput
+              value={doc.bday6?.giftSectionSubtitle || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftSectionSubtitle: val } }));
+              }}
+              placeholder="e.g. Something special, just for you 🎁"
+            />
+          </div>
+          <div>
+            <Label>Gift Unwrap Button Text</Label>
+            <TextInput
+              value={doc.bday6?.giftUnwrapText || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setDoc(d => ({ ...d, bday6: { ...(d.bday6 || {}), giftUnwrapText: val } }));
+              }}
+              placeholder="e.g. Tap to Unwrap 🎀 / ඔබන්න"
+            />
+          </div>
+        </Card>
+      )}
+    </>
+  );
 }
 
 // ── Cinematic Birthday: Year Recap & Bucket List ──────────────────
