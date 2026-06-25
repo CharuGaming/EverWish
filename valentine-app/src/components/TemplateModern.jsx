@@ -225,7 +225,7 @@ function ModernScratchCard({ img, onClick, primaryColor }) {
       className="relative aspect-square bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-1.5 cursor-pointer hover:shadow-md transition-all duration-200"
     >
       <div className="relative w-full h-full rounded-xl overflow-hidden" onClick={() => scratched && onClick(img)}>
-        <img src={optimizeCloudinaryUrl(img.url, 600)} alt={img.caption || "Gallery"} className="w-full h-full object-cover" />
+        <img loading="lazy" src={optimizeCloudinaryUrl(img.url, 600)} alt={img.caption || "Gallery"} className="w-full h-full object-cover" />
         
         <canvas ref={canvasRef} width={300} height={300}
           className={`absolute inset-0 w-full h-full touch-none ${scratched ? 'pointer-events-none' : 'cursor-crosshair'}`}
@@ -353,7 +353,7 @@ export default function TemplateModern({ siteData }) {
               transition={{ duration: 1, ease: 'easeOut' }}
               className={`w-full max-w-lg mx-auto aspect-[4/5] rounded-3xl overflow-hidden shadow-sm p-2.5 mb-8 ${bgVideoUrl ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white border border-slate-200'}`}
             >
-              <img 
+              <img loading="lazy" 
                 src={optimizeCloudinaryUrl(siteData.heroImageUrl, 800)} 
                 alt="Our memory" 
                 className="w-full h-full object-cover rounded-2xl"
@@ -588,7 +588,7 @@ export default function TemplateModern({ siteData }) {
                       transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.8 }}
                       className="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-slate-50 border border-slate-100 flex items-center justify-center p-2"
                     >
-                      <img 
+                      <img loading="lazy" 
                         src={optimizeCloudinaryUrl(siteData.gift.bouquetUrl, 600)} 
                         alt="Gift bouquet" 
                         className="max-w-full max-h-full object-contain rounded-xl"

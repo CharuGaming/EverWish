@@ -77,7 +77,7 @@ function GalleryScratchCard({ photo, i, inView, setSelectedImg }) {
       whileHover={{ scale: 1.05 }}
     >
       <div className="w-full aspect-[4/3] overflow-hidden bg-slate-100 relative" onClick={() => scratched && setSelectedImg(photo)}>
-        <img 
+        <img loading="lazy" 
           src={optimizeCloudinaryUrl(photo.url, 600)} 
           alt={photo.caption} 
           loading="lazy"

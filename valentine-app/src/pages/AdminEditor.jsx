@@ -220,7 +220,7 @@ function ImageField({ label, hint, value, onChange }) {
 
       {value && !error && (
         <div className="mt-3 relative inline-block group">
-          <img src={value} alt="preview" className="h-20 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />
+          <img loading="lazy" src={value} alt="preview" className="h-20 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />
           <button
             onClick={handleDelete}
             disabled={uploading}
@@ -404,7 +404,7 @@ function VideoField({ label, hint, value, onChange }) {
       {value && !error && (
         <div className="mt-3 relative inline-block group">
           <div className="p-3 bg-slate-900 border border-slate-700 rounded-lg max-w-xs">
-            <video src={value} controls className="w-full rounded-md max-h-40 object-cover" />
+            <video preload="none" src={value} controls className="w-full rounded-md max-h-40 object-cover" />
           </div>
           <button
             onClick={handleDelete}
@@ -1194,7 +1194,7 @@ function ValentineMatchTab({ doc, setDoc }) {
               <input ref={refs[i]} type="file" accept="image/*" onChange={e=>upImg(i,e.target.files?.[0])} className="hidden" />
             </div>
             {errors[i] && <p className="mt-1 text-xs text-red-400 flex items-center gap-1"><AlertTriangle size={11}/>{errors[i]}</p>}
-            {url && !errors[i] && <img src={url} alt={`match-${i}`} className="mt-2 h-16 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />}
+            {url && !errors[i] && <img loading="lazy" src={url} alt={`match-${i}`} className="mt-2 h-16 w-auto object-contain rounded-lg border border-slate-700 bg-slate-900" />}
           </div>
         ))}
         </div>
@@ -1920,7 +1920,7 @@ function BirthdayGeneralTab({ doc, setDoc }) {
           <div className="grid grid-cols-2 gap-3 mb-4">
             {bdayGallery.map((ph, i) => (
               <div key={i} className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-900">
-                <img src={ph.url} alt={ph.caption || `Photo ${i + 1}`} className="w-full h-24 object-cover" />
+                <img loading="lazy" src={ph.url} alt={ph.caption || `Photo ${i + 1}`} className="w-full h-24 object-cover" />
                 <button
                   onClick={() => removeBdayPhoto(i)}
                   className="absolute top-1.5 right-1.5 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
@@ -2794,7 +2794,7 @@ function CinBdayGalleryTab({ doc, setDoc }) {
       <div className="grid grid-cols-2 gap-3 mb-4">
         {images.map((url, i) => (
           <div key={i} className="relative group rounded-xl overflow-hidden border border-white/10">
-            <img src={url} alt={`gallery ${i}`} className="w-full h-28 object-cover" />
+            <img loading="lazy" src={url} alt={`gallery ${i}`} className="w-full h-28 object-cover" />
             <button
               type="button"
               onClick={() => remove(i)}
@@ -2927,7 +2927,7 @@ function CinBdayInteractiveTab({ doc, setDoc }) {
             <div className="grid grid-cols-3 gap-3 mb-3">
               {heroPhotos.map((url, i) => (
                 <div key={i} className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 shadow">
-                  <img src={url} alt={`Hero photo ${i+1}`} className="w-full h-24 object-cover" />
+                  <img loading="lazy" src={url} alt={`Hero photo ${i+1}`} className="w-full h-24 object-cover" />
                   <button
                     type="button"
                     onClick={() => removeHeroPhoto(i)}
@@ -3177,7 +3177,7 @@ function ApologyTab({ doc, setDoc }) {
         </div>
         {(d.galleryImages || []).map((url, i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
-            <img src={url} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0" />
+            <img loading="lazy" src={url} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0" />
             <TextInput
               value={url}
               onChange={e => {

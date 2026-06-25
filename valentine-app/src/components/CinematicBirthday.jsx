@@ -269,7 +269,7 @@ export default function CinematicBirthday({ siteData = {} }) {
         {phase === 'playing' && (
           <motion.div key="video" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
             className="fixed inset-0 z-[190] bg-black flex items-center justify-center">
-            <video ref={introVideoRef} src={optimizeCloudinaryUrl(introVideoUrl, 1080)} className="w-full h-full object-cover"
+            <video preload="none" ref={introVideoRef} src={optimizeCloudinaryUrl(introVideoUrl, 1080)} className="w-full h-full object-cover"
               playsInline onEnded={() => setPhase('hero')}/>
             <button onClick={() => setPhase('hero')}
               className="absolute top-6 right-6 text-white/60 hover:text-white text-xs uppercase tracking-widest font-bold bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm transition">

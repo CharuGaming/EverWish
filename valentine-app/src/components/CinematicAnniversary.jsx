@@ -539,8 +539,7 @@ function VideoMontage({ url, isMobile }) {
         </Reveal>
         <Reveal delay={0.2}>
           <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden">
-            <video
-              src={url}
+            <video preload="none" src={url}
               controls
               playsInline
               className="w-full h-full object-cover"
@@ -811,8 +810,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
             transition={{ duration: 0.6 }}
             className="fixed inset-0 z-[190] bg-black flex items-center justify-center"
           >
-            <video
-              ref={introVideoRef}
+            <video preload="none" ref={introVideoRef}
               src={introVideoUrl}
               className="w-full h-full object-cover"
               playsInline
@@ -1030,7 +1028,7 @@ export default function CinematicAnniversary({ siteData = {} }) {
                     {gallery.supporting.map((photo, i) => (
                       <Reveal key={photo.id || i} delay={i * 0.1} className="break-inside-avoid">
                         <div className="relative group overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                          <img 
+                          <img loading="lazy" 
                             src={optimizeCloudinaryUrl(photo.url, 600)} 
                             alt={photo.caption || 'Memory'} 
                             className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"

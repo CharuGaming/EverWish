@@ -128,7 +128,7 @@ function MemoryLockscreen({ matchImages, onUnlock, primary, cardColor, siteData 
                   <div style={{ backfaceVisibility: 'hidden', position: 'absolute', inset: 0, backgroundColor: cardColor || '#ffccd5', borderRadius: 12 }} />
                   <div style={{ backfaceVisibility: 'hidden', position: 'absolute', inset: 0, transform: 'rotateY(180deg)', borderRadius: 12, overflow: 'hidden', border: `2px solid ${isMatched ? '#4ade80' : '#fda4af'}` }}>
                     {card.imageUrl
-                      ? <img src={optimizeCloudinaryUrl(card.imageUrl, 200)} alt="" className="w-full h-full object-cover" />
+                      ? <img loading="lazy" src={optimizeCloudinaryUrl(card.imageUrl, 200)} alt="" className="w-full h-full object-cover" />
                       : <div className="w-full h-full bg-rose-100 flex items-center justify-center text-2xl">{FALLBACK_EMOJIS[card.pairIndex]}</div>}
                   </div>
                 </motion.div>
@@ -210,7 +210,7 @@ function ScratchCard({ imageUrl, caption }) {
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ width: 200, height: 200 }}>
       {imageUrl
-        ? <img src={optimizeCloudinaryUrl(imageUrl, 400)} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ? <img loading="lazy" src={optimizeCloudinaryUrl(imageUrl, 400)} alt="" className="absolute inset-0 w-full h-full object-cover" />
         : <div className="absolute inset-0 bg-rose-100 flex items-center justify-center text-5xl">💕</div>}
       {!scratched && (
         <canvas ref={canvasRef} width={200} height={200} className="absolute inset-0 touch-none cursor-crosshair"
@@ -257,7 +257,7 @@ function MilestonesModule({ milestones, primary }) {
           <motion.div key={i} initial={{ opacity: 0, x: m.alignment === 'right' ? 30 : -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
             className={`flex ${m.alignment === 'right' ? 'justify-end' : 'justify-start'} relative z-10`}>
             <div className="bg-white rounded-2xl shadow-lg p-5 max-w-xs border border-rose-100">
-              {m.imageUrl && <img src={optimizeCloudinaryUrl(m.imageUrl, 400)} alt="" className="w-full h-32 object-cover rounded-xl mb-3" />}
+              {m.imageUrl && <img loading="lazy" src={optimizeCloudinaryUrl(m.imageUrl, 400)} alt="" className="w-full h-32 object-cover rounded-xl mb-3" />}
               <p className="text-xs font-mono text-rose-400 mb-1">{m.date}</p>
               <p className="font-bold text-slate-800">{m.title}</p>
               {m.description && <p className="text-sm text-slate-500 mt-1">{m.description}</p>}

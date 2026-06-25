@@ -83,7 +83,7 @@ function ProposalLockscreen({ proposalText, themeColors, onAccept }) {
       >
         {/* Dynamic lockscreen GIFs */}
         <div className="w-56 h-56 mx-auto mb-6 flex items-center justify-center overflow-hidden rounded-3xl bg-white/50 backdrop-blur-sm p-2 shadow-inner border border-white/20">
-          <img 
+          <img loading="lazy" 
             src={accepted ? "/celebrate.gif" : "/please.gif"} 
             alt="love-gif" 
             className="w-full h-full object-contain rounded-2xl"
@@ -180,7 +180,7 @@ function ProposalScratchCard({ imageUrl, caption, cardColor }) {
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-lg border border-pink-100 bg-white">
       {imageUrl
-        ? <img src={optimizeCloudinaryUrl(imageUrl, 600)} alt={caption||'memory'} className="w-full aspect-square object-cover" />
+        ? <img loading="lazy" src={optimizeCloudinaryUrl(imageUrl, 600)} alt={caption||'memory'} className="w-full aspect-square object-cover" />
         : <div className="w-full aspect-square bg-gradient-to-br from-rose-50 to-pink-50 flex items-center justify-center text-5xl">💕</div>
       }
       <canvas ref={canvasRef} width={300} height={300}
@@ -434,7 +434,7 @@ function VirtualGiftBox({ giftImageUrl, giftMessage, themeColors }) {
                     transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.3 }}
                     className="w-full aspect-square rounded-2xl overflow-hidden mb-5 bg-rose-50"
                   >
-                    <img src={optimizeCloudinaryUrl(giftImageUrl, 600)} alt="gift" className="w-full h-full object-cover" />
+                    <img loading="lazy" src={optimizeCloudinaryUrl(giftImageUrl, 600)} alt="gift" className="w-full h-full object-cover" />
                   </motion.div>
                 )}
                 <p className="text-slate-700 font-serif italic text-lg leading-relaxed">

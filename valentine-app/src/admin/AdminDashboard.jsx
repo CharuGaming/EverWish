@@ -300,7 +300,7 @@ function VirtualGiftTab({ data, set }) {
         </Field>
         {data.bouquetImageUrl && (
           <div className="mt-3 flex justify-center">
-            <img src={data.bouquetImageUrl} alt="Bouquet Preview" className="h-32 object-contain rounded-lg border border-slate-700" />
+            <img loading="lazy" src={data.bouquetImageUrl} alt="Bouquet Preview" className="h-32 object-contain rounded-lg border border-slate-700" />
           </div>
         )}
       </SectionCard>
@@ -476,7 +476,7 @@ function GalleryTab({ data, set }) {
           {data.gallery.supporting.map((s, i) => (
             <div key={s.id} className="bg-slate-900 border border-slate-700 rounded-xl p-4 flex gap-4 items-start">
               {s.url && (
-                <img src={s.url} alt="thumb" className="w-14 h-14 object-cover rounded-lg flex-shrink-0 border border-slate-700" />
+                <img loading="lazy" src={s.url} alt="thumb" className="w-14 h-14 object-cover rounded-lg flex-shrink-0 border border-slate-700" />
               )}
               <div className="flex-1 min-w-0 space-y-2">
                 <Input

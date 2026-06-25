@@ -195,9 +195,9 @@ export default function TimeCapsule({ unlockDate, message, mediaUrl }) {
                 {mediaUrl && (
                   <div className="rounded-2xl overflow-hidden mb-6 shadow-md bg-slate-100">
                     {isVideo ? (
-                      <video src={mediaUrl} controls className="w-full max-h-72 object-cover" />
+                      <video preload="none" src={mediaUrl} controls className="w-full max-h-72 object-cover" />
                     ) : (
-                      <img src={mediaUrl} alt="Time capsule memory" className="w-full max-h-72 object-cover" />
+                      <img loading="lazy" src={mediaUrl} alt="Time capsule memory" className="w-full max-h-72 object-cover" />
                     )}
                   </div>
                 )}

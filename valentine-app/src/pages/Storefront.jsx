@@ -194,7 +194,7 @@ function TemplateCard({ tpl, index, onPreview }) {
       {/* Thumbnail */}
       <div className={`relative h-44 bg-gradient-to-br ${tpl.gradient} flex items-center justify-center overflow-hidden shrink-0`}>
         {tpl.imageUrl ? (
-          <img 
+          <img loading="lazy" 
             src={tpl.imageUrl} 
             alt={tpl.name} 
             className="absolute inset-0 w-full h-full object-cover animate-live-pan"

@@ -166,8 +166,7 @@ function ApologyIntroScreen({ introVideoUrl, onComplete, introButtonText }) {
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
         >
           {introVideoUrl && (
-            <video
-              ref={videoRef}
+            <video preload="none" ref={videoRef}
               src={optimizeCloudinaryUrl(introVideoUrl, 854)}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline

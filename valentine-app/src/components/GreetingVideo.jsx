@@ -79,8 +79,7 @@ export default function GreetingVideo({ videoUrl, primary = '#f59e0b' }) {
           </div>
 
           {/* Video element */}
-          <video
-            ref={videoRef}
+          <video preload="none" ref={videoRef}
             src={optimizeCloudinaryUrl(videoUrl, 854)}
             playsInline
             controls
