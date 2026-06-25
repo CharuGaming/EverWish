@@ -50,55 +50,16 @@ export function optimizeCloudinaryVideoUrl(url, isMobile = false) {
  * Automatically detects images vs videos to apply custom performance options.
  */
 export function optimizeCloudinaryUrl(url, width = 800) {
-  if (!url || typeof url !== 'string' || !url.includes('res.cloudinary.com')) {
-    return url;
-  }
-
-  // Detect if it is a video URL
-  const isVideo = url.includes('/video/') || /\.(mp4|webm|mov|m4v|ogv|3gp)($|\?)/i.test(url.split('?')[0]);
-  if (isVideo) {
-    // Fallback UA sniff only — prefer passing isMobile from a React hook in components.
-    const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone/i.test(navigator.userAgent);
-    return getOptimizedVideoUrl(url, isMobile);
-  }
-
-  const parts = url.split('/upload/');
-  if (parts.length < 2) return url;
-
-  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
-  if (parts[1].split('.').length > 2) {
-    return url;
-  }
-
-  // Guard: avoid double-transforming if already optimized
-  if (parts[1].includes('f_auto') || parts[1].includes('q_auto')) {
-    return url;
-  }
-
-  return `${parts[0]}/upload/f_auto,q_auto,c_scale,w_${width}/${parts[1]}`;
+  // Bypass all Cloudinary dynamic transformations to avoid 400 errors on Free Tier
+  return url;
 }
 
 /**
  * Generates a tiny, highly compressed blurred placeholder URL for Cloudinary images.
  */
 export function getBlurPlaceholderUrl(url) {
-  if (!url || typeof url !== 'string' || !url.includes('res.cloudinary.com')) {
-    return null;
-  }
-  
-  // Guard: if it's a video, no image placeholder
-  const isVideo = url.includes('/video/') || /\.(mp4|webm|mov|m4v|ogv|3gp)($|\?)/i.test(url.split('?')[0]);
-  if (isVideo) return null;
-
-  const parts = url.split('/upload/');
-  if (parts.length < 2) return null;
-
-  // Guard: Cloudinary dynamic transformations fail if the public ID contains dots (.)
-  if (parts[1].split('.').length > 2) {
-    return null;
-  }
-
-  return `${parts[0]}/upload/f_auto,q_10,w_40,e_blur:1000/${parts[1]}`;
+  // Bypass blur placeholder generation to avoid 400 errors on Free Tier
+  return null;
 }
 
 /**

@@ -166,7 +166,9 @@ export async function toggleTemplateStatus(templateId) {
 export async function uploadImage(file) {
   try {
     // 1. Fetch upload signature from backend
-    const sigRes = await fetch(`${BASE}/api/upload/signature`);
+    const sigRes = await fetch(`${BASE}/api/upload/signature`, {
+      headers: getAuthHeaders(),
+    });
     if (!sigRes.ok) throw new Error('Failed to fetch upload signature');
     const { timestamp, signature, cloudName, apiKey } = await sigRes.json();
 

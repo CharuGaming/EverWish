@@ -152,19 +152,7 @@ export default function ClientPage() {
     });
   }, [siteId]);
 
-  // Load unlocked state from localStorage on page load
-  useEffect(() => {
-    if (siteData && !siteData.isPreview && siteId) {
-      try {
-        const stored = localStorage.getItem(`everwish_unlocked_${siteId}`);
-        if (stored === 'true') {
-          setIsUnlocked(true);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }, [siteData, siteId]);
+
 
   useEffect(() => {
     const handleMessage = (e) => {
@@ -192,14 +180,7 @@ export default function ClientPage() {
   const handleUnlock = useCallback(() => {
     setIsUnlocked(true);
     triggerBurst();
-    if (siteId && siteData && !siteData.isPreview) {
-      try {
-        localStorage.setItem(`everwish_unlocked_${siteId}`, 'true');
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }, [triggerBurst, siteId, siteData]);
+  }, [triggerBurst]);
   
   const handleUnlockImmediate = useCallback(() => setPlayTrigger(true), []);
 
